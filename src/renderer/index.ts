@@ -8,8 +8,11 @@ import type { WeeklyReportData, Theme } from "../types.js";
 import { buildCSS } from "./themes.js";
 import { registerHelpers } from "./helpers.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const TEMPLATES_DIR = join(__dirname, "..", "..", "src", "renderer", "templates");
+// Templates live at src/renderer/templates/ (both dev and npm package)
+const TEMPLATES_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "..", "..", "src", "renderer", "templates",
+);
 
 const readTemplate = (path: string): string =>
   readFileSync(join(TEMPLATES_DIR, path), "utf-8");

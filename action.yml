@@ -1,0 +1,71 @@
+name: 'GitHub Weekly Reporter'
+description: 'Generate a beautiful weekly GitHub activity report and deploy to GitHub Pages'
+author: 'deariary'
+
+branding:
+  icon: 'bar-chart-2'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access and deployment'
+    required: true
+  username:
+    description: 'GitHub username to generate the report for'
+    required: false
+    default: ${{ github.actor }}
+  theme:
+    description: 'Report theme (default, dark)'
+    required: false
+    default: 'default'
+  openai-api-key:
+    description: 'OpenAI API key for AI narrative'
+    required: false
+    default: ''
+  anthropic-api-key:
+    description: 'Anthropic API key for AI narrative'
+    required: false
+    default: ''
+  gemini-api-key:
+    description: 'Gemini API key for AI narrative'
+    required: false
+    default: ''
+  llm-provider:
+    description: 'LLM provider (openai, anthropic, gemini)'
+    required: false
+    default: ''
+  llm-model:
+    description: 'LLM model name'
+    required: false
+    default: ''
+  version:
+    description: 'CLI version to use (e.g. "1.2.0", "latest")'
+    required: false
+    default: 'latest'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+
+    - name: Generate report
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_USERNAME: ${{ inputs.username }}
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
+        LLM_PROVIDER: ${{ inputs.llm-provider }}
+        LLM_MODEL: ${{ inputs.llm-model }}
+      run: npx github-weekly-reporter@${{ inputs.version }} generate --theme ${{ inputs.theme }}
+
+    - name: Deploy to GitHub Pages
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+      run: npx github-weekly-reporter@${{ inputs.version }} deploy
