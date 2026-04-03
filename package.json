@@ -35,6 +35,7 @@
     "@anthropic-ai/sdk": "^0.82.0",
     "@google/generative-ai": "^0.24.1",
     "@octokit/graphql": "^8.2.1",
+    "commander": "^14.0.3",
     "handlebars": "^4.7.9",
     "openai": "^6.33.0"
   },
