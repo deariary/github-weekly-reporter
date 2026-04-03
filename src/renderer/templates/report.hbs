@@ -5,6 +5,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="{{aiContent.subtitle}}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <meta property="og:title" content="{{aiContent.title}}" />
   <meta property="og:description" content="{{aiContent.subtitle}}" />
   <meta property="og:image" content="{{{ogImageUrl}}}" />
@@ -55,33 +57,37 @@
 </head>
 <body>
 
-<nav>
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav aria-label="Site navigation">
   <a href="../../" class="nav-left">
-    <img src="{{avatarUrl}}" alt="{{username}}" />
+    <img src="{{avatarUrl}}" alt="{{username}}" width="28" height="28" />
     <span>{{username}}</span>
   </a>
   <a href="../../" class="nav-back">&larr; {{i18n.allWeeks}}</a>
 </nav>
 
-<div class="page">
+<main id="main-content">
+<article class="page">
   {{> header}}
   {{> overview}}
   {{> summaries}}
   {{> highlights}}
-</div>
+</article>
+</main>
 
 {{#if prevWeek}}{{#if nextWeek}}
-<nav class="week-nav">
+<nav class="week-nav" aria-label="Week navigation">
   <a href="{{prevWeek}}" class="week-nav-link">&larr; {{i18n.prevWeek}}</a>
   <a href="{{nextWeek}}" class="week-nav-link">{{i18n.nextWeek}} &rarr;</a>
 </nav>
 {{else}}
-<nav class="week-nav">
+<nav class="week-nav" aria-label="Week navigation">
   <a href="{{prevWeek}}" class="week-nav-link">&larr; {{i18n.prevWeek}}</a>
   <span></span>
 </nav>
 {{/if}}{{else}}{{#if nextWeek}}
-<nav class="week-nav">
+<nav class="week-nav" aria-label="Week navigation">
   <span></span>
   <a href="{{nextWeek}}" class="week-nav-link">{{i18n.nextWeek}} &rarr;</a>
 </nav>

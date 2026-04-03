@@ -90,6 +90,26 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
     @import url('${f.importUrl}');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ACCESSIBILITY */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      padding: 0.5rem 1rem;
+      background: ${c.accent};
+      color: ${c.bg};
+      border-radius: 0 0 6px 6px;
+      z-index: 200;
+      font-size: 0.875rem;
+      text-decoration: none;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible {
+      outline: 2px solid ${c.accent};
+      outline-offset: 2px;
+    }
+
     body {
       font-family: ${f.bodyFamily};
       background: ${c.bg};

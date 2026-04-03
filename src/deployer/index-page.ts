@@ -139,7 +139,7 @@ const TEMPLATE = `<!DOCTYPE html>
 
   {{#if username}}
   <a href="https://github.com/{{username}}" class="profile" target="_blank" rel="noopener nofollow">
-    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" />{{/if}}
+    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="56" height="56" loading="lazy" />{{/if}}
     <div>
       <div class="profile-name">{{username}}</div>
       <div class="profile-handle">@{{username}}</div>
