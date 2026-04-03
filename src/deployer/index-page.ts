@@ -5,13 +5,14 @@ import type { Theme } from "../types.js";
 import { buildCSS } from "../renderer/themes.js";
 
 export type IndexPageData = {
-  username: string;
-  avatarUrl: string;
+  username?: string;
+  avatarUrl?: string;
 };
 
-type ReportEntry = {
+export type ReportEntry = {
   path: string;
   week: string;
+  title?: string;
   dateLabel: string;
 };
 
@@ -23,29 +24,108 @@ const TEMPLATE = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Archive of weekly GitHub activity reports" />
   <style>{{{css}}}</style>
+  <style>
+    .index-page { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 4rem;
+    }
+    .profile img {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      border: 2px solid {{borderColor}};
+    }
+    .profile-name { font-size: 1.25rem; font-weight: 600; }
+    .profile-handle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8125rem;
+      color: {{tertiaryColor}};
+    }
+
+    .index-title {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 3rem;
+    }
+
+    .week-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .week-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-radius: 10px;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid {{borderColor}};
+      background: {{cardBg}};
+      transition: all 0.2s;
+    }
+    .week-item:hover {
+      border-color: {{borderHoverColor}};
+      background: {{cardHoverBg}};
+    }
+    .week-item-left {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      min-width: 0;
+    }
+    .week-item-week {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: {{accentColor}};
+      flex-shrink: 0;
+    }
+    .week-item-content { min-width: 0; }
+    .week-item-title {
+      font-size: 1rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .week-item-date {
+      font-size: 0.8125rem;
+      color: {{tertiaryColor}};
+      display: block;
+      margin-top: 0.125rem;
+    }
+  </style>
 </head>
 <body>
 
-<div class="page" style="padding-top: 4rem;">
+<div class="index-page">
 
   {{#if username}}
-  <div style="display:flex;align-items:center;gap:1.25rem;margin-bottom:4rem;">
-    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="" style="width:56px;height:56px;border-radius:50%;" />{{/if}}
+  <div class="profile">
+    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" />{{/if}}
     <div>
-      <div style="font-size:1.25rem;font-weight:600;">{{username}}</div>
+      <div class="profile-name">{{username}}</div>
+      <div class="profile-handle">@{{username}}</div>
     </div>
   </div>
   {{/if}}
 
-  <h1 style="font-size:2rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:3rem;">Weekly Reports</h1>
+  <h1 class="index-title">Weekly Reports</h1>
 
-  <div style="display:flex;flex-direction:column;gap:0.5rem;">
+  <div class="week-list">
     {{#each reports}}
-    <a href="{{this.path}}/" style="display:flex;justify-content:space-between;align-items:center;padding:1.25rem 1.5rem;border-radius:10px;text-decoration:none;color:inherit;border:1px solid;transition:all 0.2s;" class="week-item">
-      <div style="display:flex;align-items:baseline;gap:1rem;">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.875rem;font-weight:600;" class="week-accent">{{this.week}}</span>
-        <div>
-          <div style="font-size:1rem;font-weight:500;">{{this.dateLabel}}</div>
+    <a href="{{this.path}}/" class="week-item">
+      <div class="week-item-left">
+        <span class="week-item-week">{{this.week}}</span>
+        <div class="week-item-content">
+          <div class="week-item-title">{{#if this.title}}{{this.title}}{{else}}{{this.dateLabel}}{{/if}}</div>
+          <span class="week-item-date">{{this.dateLabel}}</span>
         </div>
       </div>
     </a>
@@ -64,30 +144,35 @@ const TEMPLATE = `<!DOCTYPE html>
 </html>`;
 
 const weekToDateLabel = (path: string): string => {
-  // path is like "2026/W14"
   const [year, week] = path.split("/");
   return `${year} ${week}`;
 };
 
 export const renderIndexPage = (
-  reportPaths: string[],
+  reports: ReportEntry[],
   theme: Theme = "default",
   pageData?: IndexPageData,
 ): string => {
-  const reports: ReportEntry[] = reportPaths
-    .sort()
-    .reverse()
-    .map((p) => ({
-      path: p,
-      week: p.split("/")[1] ?? p,
-      dateLabel: weekToDateLabel(p),
-    }));
-
+  // Inline theme-specific colors for index page styles
+  const isDark = theme === "dark";
   const template = Handlebars.compile(TEMPLATE);
   return template({
-    reports,
+    reports: [...reports].sort((a, b) => b.path.localeCompare(a.path)),
     css: buildCSS(theme),
     username: pageData?.username,
     avatarUrl: pageData?.avatarUrl,
+    borderColor: isDark ? "rgba(255,255,255,0.06)" : "#d0d7de",
+    borderHoverColor: isDark ? "rgba(255,255,255,0.12)" : "#8b949e",
+    cardBg: isDark ? "rgba(255,255,255,0.02)" : "#f6f8fa",
+    cardHoverBg: isDark ? "rgba(255,255,255,0.05)" : "#eef1f5",
+    tertiaryColor: isDark ? "rgba(255,255,255,0.3)" : "#8b949e",
+    accentColor: isDark ? "#39d353" : "#0969da",
   });
 };
+
+export const buildReportEntry = (path: string, title?: string): ReportEntry => ({
+  path,
+  week: path.split("/")[1] ?? path,
+  title,
+  dateLabel: weekToDateLabel(path),
+});

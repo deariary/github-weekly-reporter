@@ -5,7 +5,7 @@ import { readFile, writeFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { renderReport } from "../../renderer/index.js";
-import { renderIndexPage } from "../../deployer/index-page.js";
+import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deployer/index-page.js";
 import { getWeekId } from "../../deployer/week.js";
 import { loadConfig } from "../config.js";
 import type { WeeklyReportData, AIContent, Theme } from "../../types.js";
@@ -41,6 +41,17 @@ const tryReadYaml = async <T>(path: string): Promise<T | null> => {
   }
 };
 
+const buildReportEntries = async (
+  outputDir: string,
+  reportPaths: string[],
+): Promise<ReportEntry[]> =>
+  Promise.all(
+    reportPaths.map(async (path) => {
+      const llmData = await tryReadYaml<AIContent>(join(outputDir, path, "llm-data.yaml"));
+      return buildReportEntry(path, llmData?.title);
+    }),
+  );
+
 const run = async (options: RenderOptions): Promise<void> => {
   const weekId = getWeekId();
   const reportDir = join(options.output, weekId.path);
@@ -70,10 +81,14 @@ const run = async (options: RenderOptions): Promise<void> => {
   await writeFile(reportPath, html, "utf-8");
   console.log(`Report written to ${reportPath}`);
 
-  // Write index page
-  const allReports = await listReportDirs(options.output);
-  if (!allReports.includes(weekId.path)) allReports.push(weekId.path);
-  const indexHtml = renderIndexPage(allReports, options.theme);
+  // Write index page with titles from each week's LLM data
+  const allPaths = await listReportDirs(options.output);
+  if (!allPaths.includes(weekId.path)) allPaths.push(weekId.path);
+  const entries = await buildReportEntries(options.output, allPaths);
+  const indexHtml = renderIndexPage(entries, options.theme, {
+    username: githubData.username,
+    avatarUrl: githubData.avatarUrl,
+  });
   const indexPath = join(options.output, "index.html");
   await writeFile(indexPath, indexHtml, "utf-8");
   console.log(`Index written to ${indexPath}`);
