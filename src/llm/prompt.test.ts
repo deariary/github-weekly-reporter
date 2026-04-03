@@ -41,6 +41,7 @@ const MOCK_INPUT: NarrativeInput = {
   ],
   issues: [],
   events: [],
+  externalContributions: [],
 };
 
 describe("buildPrompt", () => {

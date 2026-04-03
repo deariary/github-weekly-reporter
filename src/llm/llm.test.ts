@@ -14,6 +14,7 @@ const MOCK_INPUT: NarrativeInput = {
   pullRequests: [],
   issues: [],
   events: [],
+  externalContributions: [],
 };
 
 describe("generateContent", () => {

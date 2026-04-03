@@ -22,6 +22,7 @@ const MOCK_DATA: WeeklyReportData = {
   pullRequests: [],
   issues: [],
   events: [],
+  externalContributions: [],
   aiContent: null,
 };
 

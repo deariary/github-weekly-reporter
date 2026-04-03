@@ -6,9 +6,12 @@ import { fetchContributions } from "./fetch-contributions.js";
 import { fetchPullRequests } from "./fetch-pull-requests.js";
 import { fetchIssues } from "./fetch-issues.js";
 import { fetchEvents } from "./fetch-events.js";
+import { fetchExternalPRs } from "./fetch-external-prs.js";
+import { fetchUserOrgs } from "./fetch-user-orgs.js";
 import { fetchLanguages } from "./fetch-languages.js";
+import { detectExternalRepos } from "./detect-external.js";
 import { aggregateRepositories } from "./aggregate.js";
-import type { WeeklyReportData } from "../types.js";
+import type { WeeklyReportData, ExternalContribution } from "../types.js";
 
 export const collectWeeklyData = async (
   token: string,
@@ -20,12 +23,35 @@ export const collectWeeklyData = async (
 
   const range = buildWeeklyRange();
 
-  const [contributions, pullRequests, issues, events] = await Promise.all([
+  const [contributions, pullRequests, issues, events, userOrgs] = await Promise.all([
     fetchContributions(gql, username, range),
     fetchPullRequests(gql, username, range),
     fetchIssues(gql, username, range),
     fetchEvents(token, username, range),
+    fetchUserOrgs(token),
   ]);
+
+  // Detect external repos from events and fetch their PRs
+  const externalRepoNames = detectExternalRepos(events, username, userOrgs);
+  const externalPRs = await fetchExternalPRs(token, externalRepoNames, username, range);
+
+  const externalContributions: ExternalContribution[] = externalRepoNames
+    .map((repo) => ({
+      repo,
+      events: events.filter((e) => e.repo === repo),
+      pullRequests: externalPRs.filter((pr) => pr.repository === repo),
+    }))
+    .filter((c) => c.events.length > 0 || c.pullRequests.length > 0);
+
+  // Filter events to only own repos (external events go into externalContributions)
+  const ownOwners = new Set([
+    username.toLowerCase(),
+    ...userOrgs.map((o) => o.toLowerCase()),
+  ]);
+  const ownEvents = events.filter((e) => {
+    const owner = e.repo.split("/")[0]?.toLowerCase() ?? "";
+    return ownOwners.has(owner);
+  });
 
   const activeRepoNames = [
     ...pullRequests.map((pr) => pr.repository),
@@ -62,7 +88,8 @@ export const collectWeeklyData = async (
     languages,
     pullRequests,
     issues,
-    events,
+    events: ownEvents,
+    externalContributions,
     aiContent: null,
   };
 };

@@ -17,5 +17,6 @@ export type {
   PullRequest,
   Issue,
   GitHubEvent,
+  ExternalContribution,
   Theme,
 } from "./types.js";

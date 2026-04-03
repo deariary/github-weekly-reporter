@@ -93,6 +93,12 @@ export type WeeklyStats = {
   issuesClosed: number;
 };
 
+export type ExternalContribution = {
+  repo: string;
+  events: GitHubEvent[];
+  pullRequests: PullRequest[];
+};
+
 export type WeeklyReportData = {
   username: string;
   avatarUrl: string;
@@ -104,6 +110,7 @@ export type WeeklyReportData = {
   pullRequests: PullRequest[];
   issues: Issue[];
   events: GitHubEvent[];
+  externalContributions: ExternalContribution[];
   aiContent: AIContent | null;
 };
 

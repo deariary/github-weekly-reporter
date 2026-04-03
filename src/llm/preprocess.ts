@@ -99,5 +99,15 @@ export const buildLLMContext = (input: NarrativeInput): string => {
       .map((r) => `${r.name}: ${r.prsOpened} PRs, ${r.issuesOpened} issues`);
   }
 
+  if (input.externalContributions.length > 0) {
+    context.external_contributions = input.externalContributions
+      .slice(0, 5)
+      .map((c) => ({
+        repo: c.repo,
+        events: c.events.length,
+        prs: c.pullRequests.map((pr) => pr.title),
+      }));
+  }
+
   return toYaml(context, { lineWidth: 120 });
 };

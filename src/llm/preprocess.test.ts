@@ -51,6 +51,7 @@ const MOCK_INPUT: NarrativeInput = {
       payload: { kind: "push", ref: "refs/heads/main", commits: ["fix typo", "update deps"] },
     },
   ],
+  externalContributions: [],
 };
 
 describe("buildLLMContext", () => {
@@ -85,6 +86,7 @@ describe("buildLLMContext", () => {
       pullRequests: [],
       issues: [],
       events: [],
+      externalContributions: [],
       languages: [],
       repositories: [],
     };
