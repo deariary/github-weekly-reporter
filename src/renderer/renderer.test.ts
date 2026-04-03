@@ -140,4 +140,35 @@ describe("renderReport", () => {
     expect(html).toContain('lang="en"');
     expect(html).toContain("All weeks");
   });
+
+  it("uses Noto Sans JP font for Japanese", () => {
+    const html = renderReport(MOCK_DATA, { language: "ja" });
+    expect(html).toContain("Noto+Sans+JP");
+    expect(html).toContain("Noto Sans JP");
+  });
+
+  it("uses Space Grotesk font for English", () => {
+    const html = renderReport(MOCK_DATA, { language: "en" });
+    expect(html).toContain("Space+Grotesk");
+    expect(html).toContain("Space Grotesk");
+  });
+
+  it("uses Noto Sans KR font for Korean", () => {
+    const html = renderReport(MOCK_DATA, { language: "ko" });
+    expect(html).toContain("Noto+Sans+KR");
+    expect(html).toContain("Noto Sans KR");
+  });
+
+  it("uses Inter font for Russian", () => {
+    const html = renderReport(MOCK_DATA, { language: "ru" });
+    expect(html).toContain("family=Inter");
+    expect(html).toContain("'Inter'");
+  });
+
+  it("renders Simplified Chinese locale", () => {
+    const html = renderReport(MOCK_WITH_AI, { language: "zh-CN" });
+    expect(html).toContain('lang="zh-CN"');
+    expect(html).toContain("摘要");
+    expect(html).toContain("Noto Sans SC");
+  });
 });

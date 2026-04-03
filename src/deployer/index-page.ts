@@ -2,7 +2,7 @@
 
 import Handlebars from "handlebars";
 import type { Theme, Language } from "../types.js";
-import { getLocale } from "../i18n/index.js";
+import { getLocale, getFontConfig } from "../i18n/index.js";
 import { buildCSS } from "../renderer/themes.js";
 
 export type IndexPageData = {
@@ -48,7 +48,7 @@ const TEMPLATE = `<!DOCTYPE html>
     }
     .profile-name { font-size: 1.25rem; font-weight: 600; }
     .profile-handle {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: {{monoFamily}};
       font-size: 0.8125rem;
       color: {{tertiaryColor}};
     }
@@ -62,7 +62,7 @@ const TEMPLATE = `<!DOCTYPE html>
 
     .year-group { margin-bottom: 2.5rem; }
     .year-label {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: {{monoFamily}};
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
@@ -112,7 +112,7 @@ const TEMPLATE = `<!DOCTYPE html>
       z-index: 1;
     }
     .week-item-week {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: {{monoFamily}};
       font-size: 0.875rem;
       font-weight: 600;
       color: {{accentColor}};
@@ -203,15 +203,17 @@ export const renderIndexPage = (
 ): string => {
   const isDark = theme === "dark";
   const locale = getLocale(language);
+  const fontConfig = getFontConfig(language);
   const template = Handlebars.compile(TEMPLATE);
   return template({
     yearGroups: groupByYear(reports),
-    css: buildCSS(theme),
+    css: buildCSS(theme, language),
     username: pageData?.username,
     avatarUrl: pageData?.avatarUrl,
     lang: language,
     weeklyReports: locale.weeklyReports,
     poweredBy: locale.poweredBy,
+    monoFamily: fontConfig.monoFamily,
     borderColor: isDark ? "rgba(255,255,255,0.06)" : "#d0d7de",
     borderHoverColor: isDark ? "rgba(255,255,255,0.12)" : "#8b949e",
     cardBg: isDark ? "rgba(255,255,255,0.02)" : "#f6f8fa",

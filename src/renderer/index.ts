@@ -75,7 +75,7 @@ export const renderReport = (
   return template({
     ...data,
     dailyCommits: computeHeatmapLevels(data.dailyCommits),
-    css: buildCSS(theme),
+    css: buildCSS(theme, language),
     lang: language,
     i18n: locale,
   });

@@ -172,7 +172,17 @@ export type LLMProvider = "openai" | "anthropic" | "gemini";
 
 export type Theme = "default" | "dark";
 
-export type Language = "en" | "ja";
+export type Language =
+  | "en"
+  | "ja"
+  | "zh-CN"
+  | "zh-TW"
+  | "ko"
+  | "es"
+  | "fr"
+  | "de"
+  | "pt"
+  | "ru";
 
 export type ReportConfig = {
   githubToken: string;
