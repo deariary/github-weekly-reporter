@@ -29,9 +29,10 @@ const TEMPLATE = `<!DOCTYPE html>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Archive of weekly GitHub activity reports" />
+  <meta name="view-transition" content="same-origin" />
   <style>{{{css}}}</style>
   <style>
-    .index-page { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+    .index-page { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; view-transition-name: page-content; }
 
     .profile {
       display: flex;
