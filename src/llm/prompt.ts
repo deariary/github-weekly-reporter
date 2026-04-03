@@ -24,8 +24,9 @@ Writing style:
 Section requirements:
 - title: a punchy one-line title capturing the week's theme
 - subtitle: one sentence expanding on the title
-- overview: 2 short paragraphs MAX. Keep it tight. This is a brief intro, not an essay.
-  Just set the scene and mention the key themes. Details go in summaries below.
+- overview: 2-3 paragraphs. Set the scene, describe the main narrative arc of the week,
+  and mention what made it interesting. Each paragraph should be 2-4 sentences.
+  This is the reader's first impression, so make it engaging and substantive.
 - summaries: ORDER BY what's most interesting this week. Lead with the most compelling story.
   Skip types that would just repeat obvious stats with nothing insightful to say.
   Include 3-6 sections total. You can mix predefined types with custom free-form sections.
@@ -65,9 +66,11 @@ Schema:
 title: "one-line title"
 subtitle: "one sentence"
 overview: |
-  Brief paragraph setting the scene.
+  First paragraph setting the scene and describing what drove the week.
 
-  Second paragraph with key themes.
+  Second paragraph diving into the main narrative arc. What shifted, what was interesting.
+
+  Third paragraph (optional) wrapping up the themes or looking ahead.
 summaries:
   - type: "repo-summary"
     heading: "heading"
