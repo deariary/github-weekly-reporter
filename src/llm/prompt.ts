@@ -1,37 +1,23 @@
 // Build the prompt for AI narrative generation
 
 import type { NarrativeInput } from "./types.js";
-
-const formatRepoSummary = (input: NarrativeInput): string =>
-  input.repositories
-    .slice(0, 5)
-    .map((r) => `- ${r.name}: ${r.prsOpened} PRs opened, ${r.prsMerged} merged, ${r.issuesOpened} issues`)
-    .join("\n");
-
-const formatLanguageSummary = (input: NarrativeInput): string =>
-  input.languages
-    .slice(0, 5)
-    .map((l) => `- ${l.language}: ${l.percentage.toFixed(1)}%`)
-    .join("\n");
+import { buildLLMContext } from "./preprocess.js";
 
 export const buildPrompt = (input: NarrativeInput): string => `
-You are writing a weekly activity summary for a software developer.
-Write 2-3 short paragraphs summarizing the following GitHub activity.
-Tone: professional but friendly, like a weekly standup summary written for the developer themselves.
-Do not use markdown formatting. Write plain text only.
+You are writing a weekly development log for a software developer.
+Your job is to read their GitHub activity and write something genuinely useful and interesting.
 
-Developer: ${input.username}
-Period: ${input.dateRange.from} to ${input.dateRange.to}
+Rules:
+- Read the PR titles, bodies, commit messages, and events carefully.
+- Identify what they actually worked on, not just count numbers.
+- Notice patterns: did they focus on one project? Switch between many? Do lots of reviews?
+- Mention specific things: "finished the OAuth refactor", not "worked on backend".
+- If there were releases, highlight them.
+- If the commit pattern shows a burst day, mention it naturally.
+- Write in second person ("you"), like a thoughtful colleague summarizing your week.
+- Be specific and concise. No filler. No generic praise.
+- 2-4 paragraphs. Plain text, no markdown.
 
-Stats:
-- ${input.stats.totalCommits} commits
-- ${input.stats.prsOpened} PRs opened, ${input.stats.prsMerged} merged
-- ${input.stats.prsReviewed} PRs reviewed
-- ${input.stats.issuesOpened} issues opened, ${input.stats.issuesClosed} closed
-
-Top repositories:
-${formatRepoSummary(input)}
-
-Languages:
-${formatLanguageSummary(input)}
+Activity data:
+${buildLLMContext(input)}
 `.trim();

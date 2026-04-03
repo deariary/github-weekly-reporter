@@ -23,34 +23,42 @@ const MOCK_INPUT: NarrativeInput = {
   languages: [
     { language: "TypeScript", bytes: 8000, percentage: 80, color: "#3178c6" },
   ],
-  pullRequests: [],
+  pullRequests: [
+    {
+      title: "feat: add OAuth flow",
+      body: "Added OAuth2 PKCE",
+      url: "",
+      repository: "org/repo-a",
+      state: "merged",
+      labels: [],
+      additions: 320,
+      deletions: 45,
+      changedFiles: 12,
+      author: "testuser",
+      createdAt: "2026-04-01T00:00:00Z",
+      mergedAt: "2026-04-02T00:00:00Z",
+    },
+  ],
   issues: [],
   events: [],
 };
 
 describe("buildPrompt", () => {
-  it("includes username and date range", () => {
+  it("includes system instructions", () => {
     const prompt = buildPrompt(MOCK_INPUT);
-    expect(prompt).toContain("testuser");
-    expect(prompt).toContain("2026-03-28");
-    expect(prompt).toContain("2026-04-03");
+    expect(prompt).toContain("weekly development log");
+    expect(prompt).toContain("second person");
   });
 
-  it("includes stats", () => {
+  it("includes activity data as YAML", () => {
     const prompt = buildPrompt(MOCK_INPUT);
-    expect(prompt).toContain("42 commits");
-    expect(prompt).toContain("5 PRs opened");
-    expect(prompt).toContain("3 merged");
+    expect(prompt).toContain("developer: testuser");
+    expect(prompt).toContain("feat: add OAuth flow");
   });
 
-  it("includes repository summary", () => {
+  it("includes PR details in context", () => {
     const prompt = buildPrompt(MOCK_INPUT);
+    expect(prompt).toContain("+320 -45");
     expect(prompt).toContain("org/repo-a");
-  });
-
-  it("includes language breakdown", () => {
-    const prompt = buildPrompt(MOCK_INPUT);
-    expect(prompt).toContain("TypeScript");
-    expect(prompt).toContain("80.0%");
   });
 });
