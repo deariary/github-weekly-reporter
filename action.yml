@@ -63,6 +63,14 @@ runs:
       with:
         node-version: '24'
 
+    - name: Configure git
+      shell: bash
+      run: |
+        git config user.name "github-weekly-reporter[bot]"
+        git config user.email "github-weekly-reporter[bot]@users.noreply.github.com"
+
+    # --- Daily mode: fetch events and persist ---
+
     - name: Daily fetch (accumulate events)
       if: inputs.mode == 'daily'
       shell: bash
@@ -72,6 +80,22 @@ runs:
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
       run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch
+
+    - name: Commit data (daily)
+      if: inputs.mode == 'daily'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        git add data/
+        if git diff --cached --quiet; then
+          echo "No new data to commit"
+        else
+          git commit -m "data: daily events $(date -u +%Y-%m-%d)"
+          git push
+        fi
+
+    # --- Weekly mode: full pipeline ---
 
     - name: Weekly fetch (build full data from accumulated events)
       if: inputs.mode == 'weekly'
@@ -100,6 +124,20 @@ runs:
           npx github-weekly-reporter@${{ inputs.version }} generate
         else
           echo "No LLM provider configured, skipping AI content generation"
+        fi
+
+    - name: Commit data (weekly)
+      if: inputs.mode == 'weekly'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        git add data/
+        if git diff --cached --quiet; then
+          echo "No new data to commit"
+        else
+          git commit -m "data: weekly report $(date -u +%Y-%m-%d)"
+          git push
         fi
 
     - name: Render HTML report
