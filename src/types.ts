@@ -108,13 +108,8 @@ export type WeeklyReportData = {
 
 // LLM structured output
 
-export type SummaryType =
-  | "commit-summary"
-  | "review-summary"
-  | "repo-summary"
-  | "contribution-summary"
-  | "collaboration-summary"
-  | "activity-pattern";
+// Predefined types get special visuals, custom types render with chips only
+export type SummaryType = string;
 
 export type HighlightType = "pr" | "release" | "issue" | "discussion";
 

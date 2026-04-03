@@ -21,20 +21,27 @@ Section requirements:
 - subtitle: one sentence expanding on the title
 - overview: 2 short paragraphs MAX. Keep it tight. This is a brief intro, not an essay.
   Just set the scene and mention the key themes. Details go in summaries below.
-- summaries: include ALL types that have data to talk about. Every type listed below
-  should get a section unless there is genuinely zero relevant data for it.
+- summaries: ORDER BY what's most interesting this week. Lead with the most compelling story.
+  Skip types that would just repeat obvious stats with nothing insightful to say.
+  Include 3-6 sections total. You can mix predefined types with custom free-form sections.
   Each summary has a heading (short, punchy) and body (2-4 sentences).
   Add 2-4 chips per summary with key stats. Every chip MUST have a non-empty label and value.
-- highlights: MUST include at least 2 items, ideally 3-5. Pick the most notable PRs, releases, or issues.
-  Use exact PR titles from the data. Each highlight has 1-2 sentences explaining why it mattered.
+- highlights: pick 2-5 notable items. Use exact PR titles from the data.
+  Each highlight has 1-2 sentences explaining why it mattered.
 
-Summary types (include ALL that apply):
+Predefined summary types (use when relevant):
 - repo-summary: which repos were active and what the focus was
 - commit-summary: commit patterns, volume, notable streaks
 - review-summary: review activity, what kind of feedback was given/received
-- contribution-summary: contributions to repos outside own org (if any external data exists)
+- contribution-summary: contributions to repos outside own org
 - collaboration-summary: who was worked with, review dynamics
 - activity-pattern: daily rhythm, peak days, rest days
+
+Custom summary types:
+You can also create free-form summary sections with any type name that fits the data.
+Examples: "deep-dive", "tech-debt", "learning", "debugging-story", "architecture",
+"testing", "devops", "content-creation", or anything else that captures a theme of the week.
+Use custom types when the predefined ones don't capture something interesting about the week.
 
 Available highlight types:
 - pr: a notable pull request. meta format: "merged Apr 2 · +320 -45 · 12 files"
@@ -64,19 +71,12 @@ summaries:
       - label: "deariary/backend"
         value: "19 PRs"
         color: "default"
-  - type: "commit-summary"
-    heading: "heading"
-    body: "2-4 sentences"
+  - type: "deep-dive"
+    heading: "heading about a specific technical topic"
+    body: "2-4 sentences about something technically interesting"
     chips:
-      - label: "total"
-        value: "354 commits"
-        color: "default"
-  - type: "review-summary"
-    heading: "heading"
-    body: "2-4 sentences"
-    chips:
-      - label: "reviews"
-        value: "48"
+      - label: "topic"
+        value: "OAuth2 PKCE"
         color: "default"
   - type: "activity-pattern"
     heading: "heading"
@@ -85,23 +85,11 @@ summaries:
       - label: "peak"
         value: "Tue 161"
         color: "green"
-  - type: "collaboration-summary"
-    heading: "heading"
-    body: "2-4 sentences"
-    chips:
-      - label: "reviewed"
-        value: "5 repos"
-        color: "default"
 highlights:
   - type: "pr"
     title: "exact PR title from data"
     repo: "owner/repo"
     meta: "merged Apr 2 · +320 -45 · 12 files"
-    body: "1-2 sentences"
-  - type: "pr"
-    title: "another PR title"
-    repo: "owner/repo"
-    meta: "merged Apr 1 · +12 -3 · 2 files"
     body: "1-2 sentences"
   - type: "release"
     title: "v1.2.0"

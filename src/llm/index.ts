@@ -1,7 +1,7 @@
 // LLM module: generate structured content with explicit provider/model config
 
 import { parse as parseYaml } from "yaml";
-import type { AIContent, SummaryType, HighlightType, PullRequest, Issue } from "../types.js";
+import type { AIContent, HighlightType, PullRequest, Issue } from "../types.js";
 import type { NarrativeInput, LLMConfig } from "./types.js";
 import { buildPrompt } from "./prompt.js";
 import { createOpenAIProvider } from "./providers/openai.js";
@@ -59,7 +59,7 @@ const parseAIContent = (raw: string): AIContent => {
     overview: String(parsed.overview ?? ""),
     summaries: Array.isArray(parsed.summaries)
       ? parsed.summaries.map((s: Record<string, unknown>) => ({
-          type: String(s.type) as SummaryType,
+          type: String(s.type),
           heading: String(s.heading),
           body: String(s.body),
           chips: Array.isArray(s.chips)
