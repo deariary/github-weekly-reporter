@@ -73,11 +73,11 @@ const run = async (options: RenderOptions): Promise<void> => {
 
   const llmDataPath = join(dataWeekDir, "llm-data.yaml");
   const aiContent = await tryReadYaml<AIContent>(llmDataPath);
-  if (aiContent) {
-    console.log("Loaded LLM data.");
-  } else {
-    console.log("No LLM data found. Rendering without AI content.");
+  if (!aiContent) {
+    console.error(`LLM data not found at ${llmDataPath}. Run 'generate' first.`);
+    process.exit(1);
   }
+  console.log("Loaded LLM data.");
 
   const data: WeeklyReportData = { ...githubData, aiContent };
 

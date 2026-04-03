@@ -11,7 +11,7 @@ import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
 import { aggregateRepositories } from "../../collector/aggregate.js";
 import { getWeekId } from "../../deployer/week.js";
-import type { GitHubEvent, WeeklyReportData } from "../../types.js";
+import type { GitHubEvent } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
 
@@ -108,7 +108,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   const totalAdditions = pullRequests.reduce((sum, pr) => sum + pr.additions, 0);
   const totalDeletions = pullRequests.reduce((sum, pr) => sum + pr.deletions, 0);
 
-  const data: WeeklyReportData = {
+  const githubData = {
     username: contributions.username,
     avatarUrl: contributions.avatarUrl,
     dateRange: {
@@ -131,11 +131,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     issues: [],
     events,
     externalContributions: [],
-    aiContent: null,
   };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { aiContent: _, ...githubData } = data;
   const dataPath = join(reportDir, "github-data.yaml");
   await writeFile(dataPath, toYaml(githubData, { lineWidth: 120 }), "utf-8");
   console.log(`GitHub data written to ${dataPath}`);

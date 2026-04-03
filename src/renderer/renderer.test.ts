@@ -22,11 +22,6 @@ const MOCK_DATA: WeeklyReportData = {
   issues: [],
   events: [],
   externalContributions: [],
-  aiContent: null,
-};
-
-const MOCK_WITH_AI: WeeklyReportData = {
-  ...MOCK_DATA,
   aiContent: {
     title: "Auth refactor completed",
     subtitle: "A focused backend week",
@@ -71,8 +66,8 @@ describe("renderReport", () => {
     expect(html).toContain("2026-04-03");
   });
 
-  it("renders AI content when provided", () => {
-    const html = renderReport(MOCK_WITH_AI);
+  it("renders AI content", () => {
+    const html = renderReport(MOCK_DATA);
     expect(html).toContain("Auth refactor completed");
     expect(html).toContain("A focused backend week");
     expect(html).toContain("First paragraph about the week.");
@@ -80,7 +75,7 @@ describe("renderReport", () => {
   });
 
   it("renders summary sections", () => {
-    const html = renderReport(MOCK_WITH_AI);
+    const html = renderReport(MOCK_DATA);
     expect(html).toContain("Summary");
     expect(html).toContain("commit-summary");
     expect(html).toContain("47 commits");
@@ -88,7 +83,7 @@ describe("renderReport", () => {
   });
 
   it("renders highlight cards", () => {
-    const html = renderReport(MOCK_WITH_AI);
+    const html = renderReport(MOCK_DATA);
     expect(html).toContain("Highlights");
     expect(html).toContain("feat: add OAuth flow");
     expect(html).toContain("org/backend");
@@ -102,17 +97,9 @@ describe("renderReport", () => {
   });
 
   it("includes OG meta tags", () => {
-    const html = renderReport(MOCK_WITH_AI);
+    const html = renderReport(MOCK_DATA);
     expect(html).toContain("og:title");
     expect(html).toContain("Auth refactor completed");
-  });
-
-  it("omits AI sections when aiContent is null", () => {
-    const html = renderReport(MOCK_DATA);
-    const body = html.split("<body>")[1] ?? "";
-    expect(body).not.toContain("Summary");
-    expect(body).not.toContain("Highlights");
-    expect(body).not.toContain('class="overview"');
   });
 
   it("renders dark theme (string argument for backward compatibility)", () => {
@@ -128,7 +115,7 @@ describe("renderReport", () => {
   });
 
   it("renders Japanese locale", () => {
-    const html = renderReport(MOCK_WITH_AI, { language: "ja" });
+    const html = renderReport(MOCK_DATA, { language: "ja" });
     expect(html).toContain('lang="ja"');
     expect(html).toContain("サマリー");
     expect(html).toContain("ハイライト");
@@ -170,7 +157,7 @@ describe("renderReport", () => {
   });
 
   it("renders Simplified Chinese locale", () => {
-    const html = renderReport(MOCK_WITH_AI, { language: "zh-CN" });
+    const html = renderReport(MOCK_DATA, { language: "zh-CN" });
     expect(html).toContain('lang="zh-CN"');
     expect(html).toContain("摘要");
     expect(html).toContain("Noto Sans SC");
