@@ -9,7 +9,11 @@
   {{#each aiContent.highlights}}
   <div class="highlight-card">
     <span class="highlight-badge highlight-{{this.type}}">{{this.type}}</span>
+    {{#if this.url}}
+    <div class="highlight-title"><a href="{{this.url}}">{{this.title}}</a></div>
+    {{else}}
     <div class="highlight-title">{{this.title}}</div>
+    {{/if}}
     <div class="highlight-meta">{{this.repo}} · {{this.meta}}</div>
     <div class="highlight-body">{{this.body}}</div>
   </div>

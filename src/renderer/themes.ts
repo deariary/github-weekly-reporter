@@ -19,6 +19,12 @@ type ThemeColors = {
   badgeRelease: string;
   badgeIssue: string;
   badgeDiscussion: string;
+  heatmap0: string;
+  heatmap1: string;
+  heatmap2: string;
+  heatmap3: string;
+  heatmap4: string;
+  heatmap4Text: string;
 };
 
 const THEMES: Record<Theme, ThemeColors> = {
@@ -39,6 +45,12 @@ const THEMES: Record<Theme, ThemeColors> = {
     badgeRelease: "#1a7f37",
     badgeIssue: "#bf8700",
     badgeDiscussion: "#0969da",
+    heatmap0: "#ebedf0",
+    heatmap1: "#9be9a8",
+    heatmap2: "#40c463",
+    heatmap3: "#30a14e",
+    heatmap4: "#216e39",
+    heatmap4Text: "#fff",
   },
   dark: {
     bg: "#050505",
@@ -57,6 +69,12 @@ const THEMES: Record<Theme, ThemeColors> = {
     badgeRelease: "#238636",
     badgeIssue: "#d29922",
     badgeDiscussion: "#58a6ff",
+    heatmap0: "rgba(255,255,255,0.03)",
+    heatmap1: "#0e4429",
+    heatmap2: "#006d32",
+    heatmap3: "#26a641",
+    heatmap4: "#39d353",
+    heatmap4Text: "#000",
   },
 };
 
@@ -252,11 +270,36 @@ export const buildCSS = (theme: Theme): string => {
       color: ${c.textTertiary};
       margin-bottom: 0.75rem;
     }
+    .highlight-title a { color: ${c.text}; text-decoration: none; }
+    .highlight-title a:hover { color: ${c.accent}; text-decoration: underline; }
     .highlight-body {
       font-size: 0.9375rem;
       color: ${c.textSecondary};
       line-height: 1.75;
     }
+
+    /* LANGUAGE BAR */
+    .lang-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 1rem; margin-bottom: 0.625rem; }
+    .lang-bar div { height: 100%; }
+    .lang-tags { display: flex; flex-wrap: wrap; gap: 0.625rem; font-size: 0.8125rem; color: ${c.textSecondary}; }
+    .lang-tags span { display: inline-flex; align-items: center; gap: 0.25rem; }
+    .lang-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+    /* MINI HEATMAP */
+    .mini-heatmap { display: flex; gap: 4px; margin-top: 1rem; }
+    .mh-day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .mh-block {
+      width: 44px; height: 44px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8125rem; font-weight: 600;
+    }
+    .mh-label { font-size: 0.5625rem; text-transform: uppercase; letter-spacing: 0.1em; color: ${c.textTertiary}; }
+    .mh-level-0 { background: ${c.heatmap0}; color: ${c.textTertiary}; }
+    .mh-level-1 { background: ${c.heatmap1}; }
+    .mh-level-2 { background: ${c.heatmap2}; }
+    .mh-level-3 { background: ${c.heatmap3}; }
+    .mh-level-4 { background: ${c.heatmap4}; color: ${c.heatmap4Text}; }
 
     /* FOOTER */
     .footer {

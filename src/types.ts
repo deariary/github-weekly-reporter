@@ -146,6 +146,7 @@ export type HighlightSection = {
   repo: string;
   meta: string;
   body: string;
+  url?: string; // resolved from PR/Issue data, not from LLM
 };
 
 export type AIContent = {

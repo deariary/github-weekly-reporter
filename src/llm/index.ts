@@ -1,7 +1,7 @@
 // LLM module: generate structured content with explicit provider/model config
 
 import { parse as parseYaml } from "yaml";
-import type { AIContent, SummaryType, HighlightType } from "../types.js";
+import type { AIContent, SummaryType, HighlightType, PullRequest, Issue } from "../types.js";
 import type { NarrativeInput, LLMConfig } from "./types.js";
 import { buildPrompt } from "./prompt.js";
 import { createOpenAIProvider } from "./providers/openai.js";
@@ -20,8 +20,34 @@ const stripCodeFences = (text: string): string =>
   text.replace(/^```(?:ya?ml)?\s*\n?/m, "").replace(/\n?```\s*$/m, "").trim();
 
 const fixUnquotedValues = (yaml: string): string =>
-  // Fix unquoted values that start with + or contain special chars
   yaml.replace(/: (\+[^\n"']*)/g, ': "$1"');
+
+const resolveHighlightUrls = (
+  content: AIContent,
+  pullRequests: PullRequest[],
+  issues: Issue[],
+): AIContent => ({
+  ...content,
+  highlights: content.highlights.map((h) => {
+    if (h.url) return h;
+
+    if (h.type === "pr") {
+      const match = pullRequests.find(
+        (pr) => pr.title === h.title || pr.title.includes(h.title),
+      );
+      return match ? { ...h, url: match.url } : h;
+    }
+
+    if (h.type === "issue") {
+      const match = issues.find(
+        (i) => i.title === h.title || i.title.includes(h.title),
+      );
+      return match ? { ...h, url: match.url } : h;
+    }
+
+    return h;
+  }),
+});
 
 const parseAIContent = (raw: string): AIContent => {
   const cleaned = fixUnquotedValues(stripCodeFences(raw));
@@ -67,7 +93,8 @@ export const generateContent = async (
     const prompt = buildPrompt(input);
     const raw = await provider.generate(prompt);
     if (!raw) return null;
-    return parseAIContent(raw);
+    const content = parseAIContent(raw);
+    return resolveHighlightUrls(content, input.pullRequests, input.issues);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.warn(`LLM content generation failed (${config.provider}): ${message}`);
