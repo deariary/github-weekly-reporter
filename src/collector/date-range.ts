@@ -107,6 +107,17 @@ const midnightInTz = (
   return candidate;
 };
 
+// Parse a "YYYY-MM-DD" string as a date in the given timezone.
+// Returns the UTC instant corresponding to noon of that local date,
+// so that getWeekId / buildWeeklyRange resolve the correct day.
+export const parseLocalDate = (dateStr: string, timezone: string): Date => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  if (!match) throw new Error(`Invalid date format: "${dateStr}". Expected YYYY-MM-DD.`);
+  const [, y, m, d] = match.map(Number);
+  const midnight = midnightInTz(y, m - 1, d, timezone);
+  return new Date(midnight.getTime() + 12 * 3_600_000);
+};
+
 export const buildWeeklyRange = (
   now: Date = new Date(),
   timezone: string = "UTC",

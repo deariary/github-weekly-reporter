@@ -8,7 +8,7 @@ branding:
 
 inputs:
   github-token:
-    description: 'GitHub token for API access and deployment'
+    description: 'GitHub token for API access and deployment (requires contents: write permission)'
     required: true
   username:
     description: 'GitHub username to generate the report for'
@@ -50,6 +50,10 @@ inputs:
     description: 'LLM model name'
     required: false
     default: ''
+  date:
+    description: 'Target date within the week (YYYY-MM-DD). Defaults to today. Use to generate reports for past weeks.'
+    required: false
+    default: ''
   version:
     description: 'CLI version to use (e.g. "1.2.0", "latest")'
     required: false
@@ -63,6 +67,14 @@ runs:
       with:
         node-version: '24'
 
+    - name: Configure git
+      shell: bash
+      run: |
+        git config user.name "github-weekly-reporter[bot]"
+        git config user.email "github-weekly-reporter[bot]@users.noreply.github.com"
+
+    # --- Daily mode: fetch events and persist ---
+
     - name: Daily fetch (accumulate events)
       if: inputs.mode == 'daily'
       shell: bash
@@ -71,7 +83,22 @@ runs:
         GITHUB_USERNAME: ${{ inputs.username }}
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
-      run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch
+      run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+
+    - name: Commit and push data (daily)
+      if: inputs.mode == 'daily'
+      shell: bash
+      run: |
+        git add data/
+        if git diff --cached --quiet; then
+          echo "No new data to commit"
+        else
+          git pull --rebase
+          git commit -m "data: daily events $(date -u +%Y-%m-%d)"
+          git push
+        fi
+
+    # --- Weekly mode: full pipeline ---
 
     - name: Weekly fetch (build full data from accumulated events)
       if: inputs.mode == 'weekly'
@@ -81,7 +108,7 @@ runs:
         GITHUB_USERNAME: ${{ inputs.username }}
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
-      run: npx github-weekly-reporter@${{ inputs.version }} weekly-fetch
+      run: npx github-weekly-reporter@${{ inputs.version }} weekly-fetch ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
 
     - name: Generate AI content
       if: inputs.mode == 'weekly'
@@ -97,9 +124,22 @@ runs:
         DATA_DIR: ./data
       run: |
         if [ -n "$LLM_PROVIDER" ] && [ -n "$LLM_MODEL" ]; then
-          npx github-weekly-reporter@${{ inputs.version }} generate
+          npx github-weekly-reporter@${{ inputs.version }} generate ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
         else
           echo "No LLM provider configured, skipping AI content generation"
+        fi
+
+    - name: Commit and push data (weekly)
+      if: inputs.mode == 'weekly'
+      shell: bash
+      run: |
+        git add data/
+        if git diff --cached --quiet; then
+          echo "No new data to commit"
+        else
+          git pull --rebase
+          git commit -m "data: weekly report $(date -u +%Y-%m-%d)"
+          git push
         fi
 
     - name: Render HTML report
@@ -110,7 +150,7 @@ runs:
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
         OUTPUT_DIR: ./output
-      run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }}
+      run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }} ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
 
     - name: Deploy to GitHub Pages
       if: inputs.mode == 'weekly'
@@ -119,4 +159,4 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         OUTPUT_DIR: ./output
-      run: npx github-weekly-reporter@${{ inputs.version }} deploy
+      run: npx github-weekly-reporter@${{ inputs.version }} deploy ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
