@@ -44,13 +44,15 @@
     {{#eq this.type "repo-summary"}}
     {{#if @root.repositories.length}}
     <div class="repo-bars">
-      {{#each @root.repositories}}
+      {{#each (sortReposDesc @root.repositories)}}
       <div class="repo-bar-item">
-        <div class="repo-bar-label">{{this.name}}</div>
+        <div class="repo-bar-header">
+          <span class="repo-bar-label">{{this.name}}</span>
+          <span class="repo-bar-value">{{this.prsOpened}} PRs</span>
+        </div>
         <div class="repo-bar-track">
           <div class="repo-bar-fill" style="width:{{repoBarWidth this.prsOpened @root.repositories}}%"></div>
         </div>
-        <div class="repo-bar-value">{{this.prsOpened}} PRs</div>
       </div>
       {{/each}}
     </div>

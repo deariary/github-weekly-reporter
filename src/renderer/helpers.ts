@@ -35,6 +35,12 @@ export const registerHelpers = (hbs: typeof Handlebars): void => {
     },
   );
 
+  hbs.registerHelper(
+    "sortReposDesc",
+    (repos: RepositoryActivity[]): RepositoryActivity[] =>
+      [...repos].sort((a, b) => b.prsOpened - a.prsOpened),
+  );
+
   hbs.registerHelper("eq", function (this: unknown, a: unknown, b: unknown, options: Handlebars.HelperOptions) {
     return a === b ? options.fn(this) : options.inverse(this);
   });

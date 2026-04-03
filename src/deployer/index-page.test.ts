@@ -20,6 +20,14 @@ describe("renderIndexPage", () => {
     expect(w13Pos).toBeLessThan(w12Pos);
   });
 
+  it("groups by year", () => {
+    const html = renderIndexPage(entries(["2025/W52", "2026/W01", "2026/W02"]));
+    const year2026Pos = html.indexOf("2026");
+    const year2025Pos = html.indexOf("2025");
+    // 2026 should come before 2025 (reverse chrono)
+    expect(year2026Pos).toBeLessThan(year2025Pos);
+  });
+
   it("includes dofollow footer link", () => {
     const html = renderIndexPage(entries(["2026/W14"]));
     expect(html).toContain("deariary.com?utm_source=github-weekly-reporter");
@@ -36,6 +44,12 @@ describe("renderIndexPage", () => {
     const report = [buildReportEntry("2026/W14", "Shipped the auth refactor")];
     const html = renderIndexPage(report);
     expect(html).toContain("Shipped the auth refactor");
+  });
+
+  it("falls back to week number when no title", () => {
+    const report = [buildReportEntry("2026/W14")];
+    const html = renderIndexPage(report);
+    expect(html).toContain("Week W14");
   });
 
   it("shows profile when provided", () => {

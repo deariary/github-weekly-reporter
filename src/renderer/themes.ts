@@ -190,7 +190,17 @@ export const buildCSS = (theme: Theme): string => {
     }
 
     /* SUMMARY SECTION */
-    .section-summary { margin-bottom: 3rem; }
+    .section-summary {
+      margin-bottom: 3rem;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .section-summary:hover {
+      border-color: ${c.chipBorder};
+      background: ${c.cardBg};
+    }
     .section-summary .section-type {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.6875rem;
@@ -229,6 +239,11 @@ export const buildCSS = (theme: Theme): string => {
       display: inline-flex;
       align-items: center;
       gap: 0.375rem;
+      transition: all 0.2s ease;
+    }
+    .chip:hover {
+      border-color: ${c.accent};
+      box-shadow: 0 0 8px ${c.accent}33;
     }
     .chip-green { color: ${c.green}; font-weight: 500; }
     .chip-red { color: ${c.red}; font-weight: 500; }
@@ -241,9 +256,13 @@ export const buildCSS = (theme: Theme): string => {
       border-radius: 12px;
       padding: 1.5rem 1.75rem;
       margin-bottom: 1rem;
-      transition: border-color 0.2s;
+      transition: all 0.3s ease;
     }
-    .highlight-card:hover { border-color: ${c.border}; }
+    .highlight-card:hover {
+      border-color: ${c.accent};
+      box-shadow: 0 0 20px ${c.accent}22, inset 0 0 20px ${c.accent}08;
+      transform: translateY(-2px);
+    }
     .highlight-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.5625rem;
@@ -286,6 +305,11 @@ export const buildCSS = (theme: Theme): string => {
       display: flex; align-items: center; justify-content: center;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.8125rem; font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .mh-block:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 12px ${c.accent}44;
     }
     .mh-label { font-size: 0.5625rem; text-transform: uppercase; letter-spacing: 0.1em; color: ${c.textTertiary}; }
     .mh-level-0 { background: ${c.heatmap0}; color: ${c.textTertiary}; }
@@ -319,25 +343,21 @@ export const buildCSS = (theme: Theme): string => {
       margin-top: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-    }
-    .repo-bar-item {
-      display: flex;
-      align-items: center;
       gap: 0.75rem;
-      font-size: 0.75rem;
+    }
+    .repo-bar-item { font-size: 0.75rem; }
+    .repo-bar-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
     }
     .repo-bar-label {
       font-family: 'JetBrains Mono', monospace;
       color: ${c.textSecondary};
-      min-width: 160px;
-      text-align: right;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.75rem;
     }
     .repo-bar-track {
-      flex: 1;
+      width: 100%;
       height: 6px;
       border-radius: 3px;
       background: ${c.chipBg};
@@ -347,12 +367,12 @@ export const buildCSS = (theme: Theme): string => {
       height: 100%;
       border-radius: 3px;
       background: ${c.accent};
-      transition: width 0.3s;
+      transition: width 0.5s ease;
     }
     .repo-bar-value {
       font-family: 'JetBrains Mono', monospace;
       color: ${c.textTertiary};
-      min-width: 50px;
+      font-size: 0.75rem;
     }
 
     /* FOOTER */
