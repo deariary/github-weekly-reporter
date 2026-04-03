@@ -143,10 +143,11 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
     .nav-inner {
       max-width: 720px;
       margin: 0 auto;
-      padding: 1rem 2rem;
+      padding: 0.75rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      min-height: 56px;
     }
     nav a { color: ${c.text}; text-decoration: none; }
     .nav-site-title { font-size: 0.875rem; font-weight: 600; }

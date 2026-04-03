@@ -53,9 +53,10 @@ const TEMPLATE = `<!DOCTYPE html>
     .index-nav-inner {
       max-width: 720px;
       margin: 0 auto;
-      padding: 1rem 2rem;
+      padding: 0.75rem 2rem;
       display: flex;
       align-items: center;
+      min-height: 56px;
     }
     .index-nav .nav-site-title {
       font-size: 0.875rem;
@@ -64,34 +65,28 @@ const TEMPLATE = `<!DOCTYPE html>
 
     .index-page { max-width: 720px; margin: 0 auto; padding: 6rem 2rem 4rem; }
 
-    /* AUTHOR CARD */
-    .author-card {
+    /* AUTHOR */
+    .author {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
-      padding: 2rem;
-      margin-bottom: 3rem;
-      border-radius: 12px;
-      border: 1px solid {{borderColor}};
-      background: {{cardBg}};
+      gap: 1rem;
+      margin-bottom: 2.5rem;
       text-decoration: none;
       color: inherit;
-      transition: all 0.3s ease;
     }
-    .author-card:hover {
-      border-color: {{accentColor}};
-      box-shadow: 0 0 20px {{accentColor}}15;
-    }
-    .author-card img {
-      width: 64px; height: 64px;
+    .author:hover .author-name { color: {{accentColor}}; }
+    .author img {
+      width: 48px; height: 48px;
       border-radius: 50%;
-      border: 2px solid {{borderColor}};
       flex-shrink: 0;
     }
     .author-info { min-width: 0; }
-    .author-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.125rem; }
+    .author-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
     .author-handle {
-      font-family: {{monoFamily}};
       font-size: 0.8125rem;
       color: {{tertiaryColor}};
     }
@@ -201,8 +196,7 @@ const TEMPLATE = `<!DOCTYPE html>
     @media (max-width: 600px) {
       .index-nav-inner { padding: 1rem 1.25rem; }
       .index-page { padding: 5rem 1.25rem 3rem; }
-      .author-card { padding: 1.25rem; gap: 1rem; }
-      .author-card img { width: 48px; height: 48px; }
+      .author img { width: 40px; height: 40px; }
       .week-item { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
       .week-item-stats { gap: 0.75rem; }
     }
@@ -219,8 +213,8 @@ const TEMPLATE = `<!DOCTYPE html>
 <div class="index-page">
 
   {{#if username}}
-  <a href="https://github.com/{{username}}" class="author-card" target="_blank" rel="noopener nofollow">
-    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="64" height="64" loading="lazy" />{{/if}}
+  <a href="https://github.com/{{username}}" class="author" target="_blank" rel="noopener nofollow">
+    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="48" height="48" loading="lazy" />{{/if}}
     <div class="author-info">
       <div class="author-name">{{username}}</div>
       <div class="author-handle">github.com/{{username}}</div>
