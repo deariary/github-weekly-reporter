@@ -34,7 +34,7 @@
     <div class="mini-heatmap">
       {{#each @root.dailyCommits}}
       <div class="mh-day">
-        <div class="mh-block mh-level-{{heatmapLevel this.count}}">{{this.count}}</div>
+        <div class="mh-block mh-level-{{this.level}}">{{this.count}}</div>
         <div class="mh-label">{{weekday this.date}}</div>
       </div>
       {{/each}}

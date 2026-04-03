@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
-import type { WeeklyReportData, Theme } from "../types.js";
+import type { WeeklyReportData, Theme, DailyCommitCount } from "../types.js";
 import { buildCSS } from "./themes.js";
 import { registerHelpers } from "./helpers.js";
 
@@ -24,6 +24,20 @@ const PARTIAL_NAMES = [
   "highlights",
   "footer",
 ] as const;
+
+type DailyCommitWithLevel = DailyCommitCount & { level: number };
+
+const computeHeatmapLevels = (dailyCommits: DailyCommitCount[]): DailyCommitWithLevel[] => {
+  const max = Math.max(...dailyCommits.map((d) => d.count), 1);
+  return dailyCommits.map((d) => {
+    if (d.count === 0) return { ...d, level: 0 };
+    const ratio = d.count / max;
+    if (ratio <= 0.25) return { ...d, level: 1 };
+    if (ratio <= 0.5) return { ...d, level: 2 };
+    if (ratio <= 0.75) return { ...d, level: 3 };
+    return { ...d, level: 4 };
+  });
+};
 
 const createInstance = (): typeof Handlebars => {
   const hbs = Handlebars.create();
@@ -45,6 +59,7 @@ export const renderReport = (
 
   return template({
     ...data,
+    dailyCommits: computeHeatmapLevels(data.dailyCommits),
     css: buildCSS(theme),
   });
 };

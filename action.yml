@@ -51,17 +51,31 @@ runs:
       with:
         node-version: '24'
 
-    - name: Generate report
+    - name: Fetch GitHub data
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_USERNAME: ${{ inputs.username }}
+      run: npx github-weekly-reporter@${{ inputs.version }} fetch
+
+    - name: Generate AI content
+      shell: bash
+      env:
         OPENAI_API_KEY: ${{ inputs.openai-api-key }}
         ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
         GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
         LLM_PROVIDER: ${{ inputs.llm-provider }}
         LLM_MODEL: ${{ inputs.llm-model }}
-      run: npx github-weekly-reporter@${{ inputs.version }} generate --theme ${{ inputs.theme }}
+      run: |
+        if [ -n "$LLM_PROVIDER" ] && [ -n "$LLM_MODEL" ]; then
+          npx github-weekly-reporter@${{ inputs.version }} generate
+        else
+          echo "No LLM provider configured, skipping AI content generation"
+        fi
+
+    - name: Render HTML report
+      shell: bash
+      run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }}
 
     - name: Deploy to GitHub Pages
       shell: bash
