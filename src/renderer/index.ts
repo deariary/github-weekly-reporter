@@ -1,67 +1,59 @@
-// Main report renderer: assembles a self-contained HTML file
+// Main report renderer: compiles Handlebars templates into a self-contained HTML file
 
+import { readFileSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import Handlebars from "handlebars";
 import type { WeeklyReportData, Theme } from "../types.js";
 import { buildCSS } from "./themes.js";
-import {
-  renderHeader,
-  renderStats,
-  renderHeatmap,
-  renderLanguages,
-  renderRepositories,
-  renderNarrative,
-  renderFooter,
-} from "./html-parts.js";
+import { registerHelpers } from "./helpers.js";
 
-const escape = (str: string): string =>
-  str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const TEMPLATES_DIR = join(__dirname, "..", "..", "src", "renderer", "templates");
 
-const buildMetaTags = (data: WeeklyReportData): string => {
-  const title = `${data.username}'s Weekly Report (${data.dateRange.from} - ${data.dateRange.to})`;
-  const description = `GitHub activity report: ${data.stats.totalCommits} commits, ${data.stats.prsOpened} PRs, ${data.stats.issuesOpened} issues`;
+const readTemplate = (path: string): string =>
+  readFileSync(join(TEMPLATES_DIR, path), "utf-8");
 
-  return `
-    <title>${escape(title)}</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="${escape(description)}" />
-    <meta property="og:title" content="${escape(title)}" />
-    <meta property="og:description" content="${escape(description)}" />
-    <meta property="og:image" content="${escape(data.avatarUrl)}" />
-    <meta property="og:type" content="website" />
-  `;
+const PARTIAL_NAMES = [
+  "header",
+  "stats",
+  "heatmap",
+  "languages",
+  "repositories",
+  "narrative",
+  "footer",
+] as const;
+
+const buildStatCards = (data: WeeklyReportData) => [
+  { value: data.stats.totalCommits, label: "Commits" },
+  { value: data.stats.prsOpened, label: "PRs Opened" },
+  { value: data.stats.prsMerged, label: "PRs Merged" },
+  { value: data.stats.prsReviewed, label: "Reviews" },
+  { value: data.stats.issuesOpened, label: "Issues Opened" },
+  { value: data.stats.issuesClosed, label: "Issues Closed" },
+];
+
+const createInstance = (): typeof Handlebars => {
+  const hbs = Handlebars.create();
+  registerHelpers(hbs);
+
+  PARTIAL_NAMES.forEach((name) => {
+    hbs.registerPartial(name, readTemplate(`partials/${name}.hbs`));
+  });
+
+  return hbs;
 };
 
 export const renderReport = (
   data: WeeklyReportData,
   theme: Theme = "default",
 ): string => {
-  const css = buildCSS(theme);
-  const meta = buildMetaTags(data);
+  const hbs = createInstance();
+  const template = hbs.compile(readTemplate("report.hbs"));
 
-  const body = [
-    renderHeader(data),
-    renderStats(data),
-    renderHeatmap(data.dailyCommits),
-    renderLanguages(data.languages),
-    renderRepositories(data.repositories),
-    renderNarrative(data.aiNarrative),
-    renderFooter(),
-  ].join("\n");
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-${meta}
-<style>${css}</style>
-</head>
-<body>
-<div class="container">
-${body}
-</div>
-</body>
-</html>`;
+  return template({
+    ...data,
+    css: buildCSS(theme),
+    statCards: buildStatCards(data),
+  });
 };
