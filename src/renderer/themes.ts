@@ -95,6 +95,10 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
       background: ${c.bg};
       color: ${c.text};
       line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     }
 
     /* INLINE CODE */
