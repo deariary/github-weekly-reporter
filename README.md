@@ -133,15 +133,9 @@ jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: deariary/github-weekly-reporter@v1
         with:
-          node-version: '20'
-
-      - run: npx github-weekly-reporter generate -t ${{ secrets.GITHUB_TOKEN }} -u ${{ github.actor }}
-
-      - run: npx github-weekly-reporter deploy -d ./report -r https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## URL Structure
