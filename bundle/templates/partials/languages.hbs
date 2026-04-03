@@ -1,0 +1,19 @@
+{{#if languages.length}}
+<div class="section">
+  <h2>Languages</h2>
+  <div class="lang-bar">
+    {{#each languages}}
+    <div class="lang-bar-segment" style="width:{{this.percentage}}%;background:{{this.color}}"></div>
+    {{/each}}
+  </div>
+  <ul class="lang-list">
+    {{#each languages}}
+    <li>
+      <span class="lang-dot" style="background:{{this.color}}"></span>
+      <span>{{this.language}}</span>
+      <span class="lang-pct">{{fixed this.percentage 1}}%</span>
+    </li>
+    {{/each}}
+  </ul>
+</div>
+{{/if}}

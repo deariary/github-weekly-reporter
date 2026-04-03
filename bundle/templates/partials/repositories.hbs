@@ -1,0 +1,25 @@
+{{#if repositories.length}}
+<div class="section">
+  <h2>Active Repositories</h2>
+  <table class="repo-table">
+    <thead>
+      <tr>
+        <th>Repository</th>
+        <th>PRs Opened</th>
+        <th>PRs Merged</th>
+        <th>Issues</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each repositories}}
+      <tr>
+        <td><a href="{{this.url}}">{{this.name}}</a></td>
+        <td>{{this.prsOpened}}</td>
+        <td>{{this.prsMerged}}</td>
+        <td>{{this.issuesOpened}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+{{/if}}

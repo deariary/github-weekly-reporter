@@ -1,0 +1,10 @@
+{{#if aiNarrative}}
+<div class="section">
+  <h2>AI Summary</h2>
+  <div class="narrative">
+    {{#each (paragraphs aiNarrative)}}
+    <p>{{this}}</p>
+    {{/each}}
+  </div>
+</div>
+{{/if}}
