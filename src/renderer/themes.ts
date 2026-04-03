@@ -149,10 +149,15 @@ export const buildCSS = (theme: Theme): string => {
     }
 
     /* OVERVIEW */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .overview {
       padding: 2.5rem 0 3rem;
       border-top: 1px solid ${c.border};
       margin-bottom: 4rem;
+      animation: fade-up 0.5s ease both;
     }
     .overview p {
       font-size: 1.0625rem;
@@ -189,6 +194,20 @@ export const buildCSS = (theme: Theme): string => {
     }
 
     /* SUMMARY SECTION */
+    @keyframes card-enter {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .section-summary:nth-child(2) { animation-delay: 0.05s; }
+    .section-summary:nth-child(3) { animation-delay: 0.1s; }
+    .section-summary:nth-child(4) { animation-delay: 0.15s; }
+    .section-summary:nth-child(5) { animation-delay: 0.2s; }
+    .section-summary:nth-child(6) { animation-delay: 0.25s; }
+    .section-summary:nth-child(7) { animation-delay: 0.3s; }
+    .highlight-card:nth-child(2) { animation-delay: 0.05s; }
+    .highlight-card:nth-child(3) { animation-delay: 0.1s; }
+    .highlight-card:nth-child(4) { animation-delay: 0.15s; }
+    .highlight-card:nth-child(5) { animation-delay: 0.2s; }
     .section-summary {
       margin-bottom: 1rem;
       padding: 1.5rem 1.75rem;
@@ -196,6 +215,7 @@ export const buildCSS = (theme: Theme): string => {
       border: 1px solid ${c.chipBorder};
       background: ${c.cardBg};
       transition: all 0.3s ease;
+      animation: card-enter 0.4s ease both;
     }
     .section-summary:hover {
       border-color: ${c.accent};
@@ -256,6 +276,7 @@ export const buildCSS = (theme: Theme): string => {
       border: 1px solid ${c.chipBorder};
       border-radius: 12px;
       padding: 1.5rem 1.75rem;
+      animation: card-enter 0.4s ease both;
       margin-bottom: 1rem;
       transition: all 0.3s ease;
     }
