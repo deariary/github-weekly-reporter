@@ -22,8 +22,11 @@ Writing style:
 - Notice patterns: focus shifts between projects, burst days, collaboration dynamics.
 
 Section requirements:
-- title: a punchy one-line title capturing the week's theme
-- subtitle: one sentence expanding on the title
+- title: a specific one-line title that could ONLY describe THIS week.
+  MUST reference a concrete detail: a repo name, feature name, PR topic, or technical concept.
+  BAD (too generic): "A Productive Week", "Lots of Progress", "Bug Fixes and Features"
+  GOOD (specific): "OAuth2 PKCE lands in the auth service", "ecma262 editorial sprint", "Migrating the payment flow to Stripe v3"
+- subtitle: one sentence expanding on the title with additional concrete details
 - overview: 2-3 paragraphs. Set the scene, describe the main narrative arc of the week,
   and mention what made it interesting. Each paragraph should be 2-4 sentences.
   This is the reader's first impression, so make it engaging and substantive.
