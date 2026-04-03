@@ -90,10 +90,10 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "26px",
+                    fontSize: "30px",
                     color: "rgba(255,255,255,0.55)",
-                    marginTop: "8px",
-                    maxWidth: "900px",
+                    marginTop: "12px",
+                    maxWidth: "960px",
                   },
                   children: data.subtitle,
                 },
