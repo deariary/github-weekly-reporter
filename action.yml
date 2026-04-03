@@ -13,7 +13,7 @@ inputs:
   username:
     description: 'GitHub username to generate the report for'
     required: false
-    default: ''
+    default: ${{ github.actor }}
   theme:
     description: 'Report theme (default, dark)'
     required: false
@@ -39,10 +39,26 @@ inputs:
     required: false
     default: ''
 
-outputs:
-  report-url:
-    description: 'URL path of the generated report (e.g. 2026/W14)'
-
 runs:
-  using: 'node20'
-  main: 'bundle/action/index.js'
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Generate report
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_USERNAME: ${{ inputs.username }}
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
+        LLM_PROVIDER: ${{ inputs.llm-provider }}
+        LLM_MODEL: ${{ inputs.llm-model }}
+      run: npx github-weekly-reporter generate --theme ${{ inputs.theme }}
+
+    - name: Deploy to GitHub Pages
+      shell: bash
+      run: npx github-weekly-reporter deploy -r https://x-access-token:${{ inputs.github-token }}@github.com/${{ github.repository }}.git
