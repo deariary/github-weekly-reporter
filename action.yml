@@ -67,17 +67,11 @@ runs:
       with:
         node-version: '24'
 
-    - name: Configure git credentials
+    - name: Configure git
       shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-        REPO: ${{ github.repository }}
       run: |
         git config user.name "github-weekly-reporter[bot]"
         git config user.email "github-weekly-reporter[bot]@users.noreply.github.com"
-        echo "https://x-access-token:${GITHUB_TOKEN}@github.com" \
-          > "$HOME/.git-credentials"
-        git config credential.helper "store --file=$HOME/.git-credentials"
 
     # --- Daily mode: fetch events and persist ---
 
