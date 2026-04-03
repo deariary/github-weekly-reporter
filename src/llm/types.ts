@@ -1,10 +1,11 @@
 // LLM provider abstraction types
 
-import type { WeeklyReportData } from "../types.js";
+import type { WeeklyReportData, LLMProvider as LLMProviderName } from "../types.js";
 
-export type LLMProviderConfig = {
+export type LLMConfig = {
+  provider: LLMProviderName;
   apiKey: string;
-  model?: string;
+  model: string;
 };
 
 export type LLMProvider = {

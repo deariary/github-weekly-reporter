@@ -1,13 +1,11 @@
 // Google Gemini provider implementation
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { LLMProvider, LLMProviderConfig } from "../types.js";
+import type { LLMProvider, LLMConfig } from "../types.js";
 
-const DEFAULT_MODEL = "gemini-2.0-flash";
-
-export const createGeminiProvider = (config: LLMProviderConfig): LLMProvider => {
+export const createGeminiProvider = (config: LLMConfig): LLMProvider => {
   const genAI = new GoogleGenerativeAI(config.apiKey);
-  const model = genAI.getGenerativeModel({ model: config.model ?? DEFAULT_MODEL });
+  const model = genAI.getGenerativeModel({ model: config.model });
 
   return {
     generate: async (prompt: string): Promise<string> => {
