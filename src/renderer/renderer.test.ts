@@ -141,28 +141,32 @@ describe("renderReport", () => {
     expect(html).toContain("All weeks");
   });
 
-  it("uses Noto Sans JP font for Japanese", () => {
+  it("uses Zen Kaku Gothic New for Japanese", () => {
     const html = renderReport(MOCK_DATA, { language: "ja" });
-    expect(html).toContain("Noto+Sans+JP");
-    expect(html).toContain("Noto Sans JP");
+    expect(html).toContain("Zen+Kaku+Gothic+New");
+    expect(html).toContain("Zen Kaku Gothic New");
   });
 
-  it("uses Space Grotesk font for English", () => {
+  it("uses Schibsted Grotesk for English", () => {
     const html = renderReport(MOCK_DATA, { language: "en" });
-    expect(html).toContain("Space+Grotesk");
-    expect(html).toContain("Space Grotesk");
+    expect(html).toContain("Schibsted+Grotesk");
+    expect(html).toContain("Schibsted Grotesk");
   });
 
-  it("uses Noto Sans KR font for Korean", () => {
+  it("uses Space Mono for monospace", () => {
+    const html = renderReport(MOCK_DATA, { language: "en" });
+    expect(html).toContain("Space Mono");
+  });
+
+  it("uses IBM Plex Sans KR for Korean", () => {
     const html = renderReport(MOCK_DATA, { language: "ko" });
-    expect(html).toContain("Noto+Sans+KR");
-    expect(html).toContain("Noto Sans KR");
+    expect(html).toContain("IBM+Plex+Sans+KR");
+    expect(html).toContain("IBM Plex Sans KR");
   });
 
-  it("uses Inter font for Russian", () => {
+  it("uses Urbanist for Russian", () => {
     const html = renderReport(MOCK_DATA, { language: "ru" });
-    expect(html).toContain("family=Inter");
-    expect(html).toContain("'Inter'");
+    expect(html).toContain("Urbanist");
   });
 
   it("renders Simplified Chinese locale", () => {

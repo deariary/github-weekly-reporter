@@ -11,69 +11,51 @@ export type FontConfig = {
   monoFamily: string;
 };
 
-// JetBrains Mono is used for monospace across all languages
-const MONO = "'JetBrains Mono', monospace";
+const MONO = "'Space Mono', monospace";
+
+// Latin: Schibsted Grotesk (sharp, Nordic grotesk with character)
+const LATIN_URL = "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap";
+const LATIN_BODY = "'Schibsted Grotesk', sans-serif";
 
 const fonts: Record<Language, FontConfig> = {
-  // Latin script: Space Grotesk works well
-  en: {
-    importUrl: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
-    bodyFamily: "'Space Grotesk', sans-serif",
-    monoFamily: MONO,
-  },
-  es: {
-    importUrl: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
-    bodyFamily: "'Space Grotesk', sans-serif",
-    monoFamily: MONO,
-  },
-  fr: {
-    importUrl: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
-    bodyFamily: "'Space Grotesk', sans-serif",
-    monoFamily: MONO,
-  },
-  de: {
-    importUrl: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
-    bodyFamily: "'Space Grotesk', sans-serif",
-    monoFamily: MONO,
-  },
-  pt: {
-    importUrl: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
-    bodyFamily: "'Space Grotesk', sans-serif",
-    monoFamily: MONO,
-  },
+  en: { importUrl: LATIN_URL, bodyFamily: LATIN_BODY, monoFamily: MONO },
+  es: { importUrl: LATIN_URL, bodyFamily: LATIN_BODY, monoFamily: MONO },
+  fr: { importUrl: LATIN_URL, bodyFamily: LATIN_BODY, monoFamily: MONO },
+  de: { importUrl: LATIN_URL, bodyFamily: LATIN_BODY, monoFamily: MONO },
+  pt: { importUrl: LATIN_URL, bodyFamily: LATIN_BODY, monoFamily: MONO },
 
-  // Japanese: Noto Sans JP provides clean, modern CJK glyphs
+  // Japanese: Zen Kaku Gothic New (editorial, refined gothic)
   ja: {
-    importUrl: "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
-    bodyFamily: "'Noto Sans JP', sans-serif",
+    importUrl: "https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap",
+    bodyFamily: "'Zen Kaku Gothic New', sans-serif",
     monoFamily: MONO,
   },
 
-  // Simplified Chinese
+  // Simplified Chinese: Noto Sans SC (best available on Google Fonts for SC)
   "zh-CN": {
-    importUrl: "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
+    importUrl: "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap",
     bodyFamily: "'Noto Sans SC', sans-serif",
     monoFamily: MONO,
   },
 
-  // Traditional Chinese
+  // Traditional Chinese: Noto Sans TC (best available on Google Fonts for TC)
   "zh-TW": {
-    importUrl: "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
+    importUrl: "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap",
     bodyFamily: "'Noto Sans TC', sans-serif",
     monoFamily: MONO,
   },
 
-  // Korean
+  // Korean: IBM Plex Sans KR (technical, developer-oriented)
   ko: {
-    importUrl: "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
-    bodyFamily: "'Noto Sans KR', sans-serif",
+    importUrl: "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap",
+    bodyFamily: "'IBM Plex Sans KR', sans-serif",
     monoFamily: MONO,
   },
 
-  // Russian (Cyrillic): Inter has excellent Cyrillic support
+  // Russian: Urbanist (geometric with Cyrillic support)
   ru: {
-    importUrl: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap",
-    bodyFamily: "'Inter', sans-serif",
+    importUrl: "https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap",
+    bodyFamily: "'Urbanist', sans-serif",
     monoFamily: MONO,
   },
 };

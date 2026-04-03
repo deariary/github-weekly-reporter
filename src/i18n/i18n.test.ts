@@ -108,16 +108,16 @@ describe("llmLanguageInstruction", () => {
 });
 
 describe("getFontConfig", () => {
-  it("returns Space Grotesk for English", () => {
+  it("returns Schibsted Grotesk for English", () => {
     const config = getFontConfig("en");
-    expect(config.bodyFamily).toContain("Space Grotesk");
-    expect(config.monoFamily).toContain("JetBrains Mono");
+    expect(config.bodyFamily).toContain("Schibsted Grotesk");
+    expect(config.monoFamily).toContain("Space Mono");
     expect(config.importUrl).toContain("fonts.googleapis.com");
   });
 
-  it("returns Noto Sans JP for Japanese", () => {
+  it("returns Zen Kaku Gothic New for Japanese", () => {
     const config = getFontConfig("ja");
-    expect(config.bodyFamily).toContain("Noto Sans JP");
+    expect(config.bodyFamily).toContain("Zen Kaku Gothic New");
   });
 
   it("returns Noto Sans SC for Simplified Chinese", () => {
@@ -130,20 +130,20 @@ describe("getFontConfig", () => {
     expect(config.bodyFamily).toContain("Noto Sans TC");
   });
 
-  it("returns Noto Sans KR for Korean", () => {
+  it("returns IBM Plex Sans KR for Korean", () => {
     const config = getFontConfig("ko");
-    expect(config.bodyFamily).toContain("Noto Sans KR");
+    expect(config.bodyFamily).toContain("IBM Plex Sans KR");
   });
 
-  it("returns Inter for Russian", () => {
+  it("returns Urbanist for Russian", () => {
     const config = getFontConfig("ru");
-    expect(config.bodyFamily).toContain("Inter");
+    expect(config.bodyFamily).toContain("Urbanist");
   });
 
   it.each(ALL_LANGUAGES)("font config for %s has all required fields", (lang) => {
     const config = getFontConfig(lang);
     expect(config.importUrl).toContain("fonts.googleapis.com");
     expect(config.bodyFamily).toBeTruthy();
-    expect(config.monoFamily).toContain("JetBrains Mono");
+    expect(config.monoFamily).toContain("Space Mono");
   });
 });
