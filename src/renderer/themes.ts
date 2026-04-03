@@ -165,29 +165,33 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
 
     /* HEADER */
     .header { margin-bottom: 3rem; }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.8125rem;
+      color: ${c.textTertiary};
+    }
+    .header-sep { color: ${c.textTertiary}; }
+    .header-date {
+      font-family: ${f.monoFamily};
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
     .header-author {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
       text-decoration: none;
       color: ${c.textSecondary};
-      font-size: 0.875rem;
       font-weight: 500;
-      margin-bottom: 1rem;
       transition: color 0.2s;
     }
     .header-author:hover { color: ${c.accent}; }
     .header-author img {
       width: 24px; height: 24px;
       border-radius: 50%;
-    }
-    .header-week {
-      font-family: ${f.monoFamily};
-      font-size: 0.75rem;
-      color: ${c.textTertiary};
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 1.25rem;
     }
     .header-title {
       font-size: clamp(1.75rem, 4vw, 2.25rem);

@@ -56,8 +56,16 @@ const buildReportEntries = async (
 ): Promise<ReportEntry[]> =>
   Promise.all(
     reportPaths.map(async (path) => {
-      const llmData = await tryReadYaml<AIContent>(join(dataDir, path, "llm-data.yaml"));
-      return buildReportEntry(path, llmData?.title);
+      const [llmData, ghData] = await Promise.all([
+        tryReadYaml<AIContent>(join(dataDir, path, "llm-data.yaml")),
+        tryReadYaml<WeeklyReportData>(join(dataDir, path, "github-data.yaml")),
+      ]);
+      const stats = ghData ? {
+        commits: ghData.stats.totalCommits,
+        prs: ghData.stats.prsOpened,
+        reviews: ghData.stats.prsReviewed,
+      } : undefined;
+      return buildReportEntry(path, llmData?.title, llmData?.subtitle, stats);
     }),
   );
 

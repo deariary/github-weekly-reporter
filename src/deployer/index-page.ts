@@ -10,12 +10,20 @@ export type IndexPageData = {
   avatarUrl?: string;
 };
 
+export type ReportEntryStats = {
+  commits: number;
+  prs: number;
+  reviews: number;
+};
+
 export type ReportEntry = {
   path: string;
   week: string;
   year: string;
   title?: string;
+  subtitle?: string;
   dateLabel: string;
+  stats?: ReportEntryStats;
 };
 
 type YearGroup = {
@@ -26,46 +34,63 @@ type YearGroup = {
 const TEMPLATE = `<!DOCTYPE html>
 <html lang="{{lang}}">
 <head>
-  <title>{{weeklyReports}}{{#if username}} - {{username}}{{/if}}</title>
+  <title>{{siteTitle}}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Archive of weekly GitHub activity reports" />
+  <meta name="description" content="{{siteTitle}}" />
   <meta name="view-transition" content="same-origin" />
   <style>{{{css}}}</style>
   <style>
+    /* INDEX NAV (matches report nav) */
     .index-nav {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: inherit;
+      background: {{bgColor}}dd;
       backdrop-filter: blur(12px);
       border-bottom: 1px solid {{borderColor}};
     }
-    .nav-site-title {
-      display: block;
+    .index-nav-inner {
       max-width: 720px;
       margin: 0 auto;
       padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+    }
+    .index-nav .nav-site-title {
       font-size: 0.875rem;
       font-weight: 600;
     }
-    .index-page { max-width: 720px; margin: 0 auto; padding: 6rem 2rem 6rem; }
 
-    .profile {
+    .index-page { max-width: 720px; margin: 0 auto; padding: 6rem 2rem 4rem; }
+
+    /* AUTHOR CARD */
+    .author-card {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
-      margin-bottom: 4rem;
+      gap: 1.5rem;
+      padding: 2rem;
+      margin-bottom: 3rem;
+      border-radius: 12px;
+      border: 1px solid {{borderColor}};
+      background: {{cardBg}};
       text-decoration: none;
       color: inherit;
+      transition: all 0.3s ease;
     }
-    .profile img {
-      width: 56px; height: 56px;
+    .author-card:hover {
+      border-color: {{accentColor}};
+      box-shadow: 0 0 20px {{accentColor}}15;
+    }
+    .author-card img {
+      width: 64px; height: 64px;
       border-radius: 50%;
       border: 2px solid {{borderColor}};
+      flex-shrink: 0;
     }
-    .profile-name { font-size: 1.25rem; font-weight: 600; }
-    .profile-handle {
+    .author-info { min-width: 0; }
+    .author-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.125rem; }
+    .author-handle {
       font-family: {{monoFamily}};
       font-size: 0.8125rem;
       color: {{tertiaryColor}};
@@ -96,6 +121,7 @@ const TEMPLATE = `<!DOCTYPE html>
     .week-item {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       padding: 1.25rem 1.5rem;
       border-radius: 10px;
       text-decoration: none;
@@ -126,6 +152,7 @@ const TEMPLATE = `<!DOCTYPE html>
       align-items: baseline;
       gap: 1rem;
       min-width: 0;
+      flex: 1;
       position: relative;
       z-index: 1;
     }
@@ -136,33 +163,67 @@ const TEMPLATE = `<!DOCTYPE html>
       color: {{accentColor}};
       flex-shrink: 0;
     }
-    .week-item-content { min-width: 0; }
+    .week-item-content { min-width: 0; flex: 1; }
     .week-item-title {
       font-size: 1rem;
       font-weight: 500;
+    }
+    .week-item-subtitle {
+      font-size: 0.8125rem;
+      color: {{secondaryColor}};
+      margin-top: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .week-item-date {
       font-size: 0.8125rem;
       color: {{tertiaryColor}};
       display: block;
-      margin-top: 0.125rem;
+      margin-top: 0.25rem;
+    }
+    .week-item-stats {
+      display: flex;
+      gap: 1rem;
+      font-family: {{monoFamily}};
+      font-size: 0.6875rem;
+      color: {{tertiaryColor}};
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .week-item-stat { white-space: nowrap; }
+    .week-item-stat-value { font-weight: 600; }
+    .stat-commits .week-item-stat-value { color: {{greenColor}}; }
+    .stat-prs .week-item-stat-value { color: {{prColor}}; }
+    .stat-reviews .week-item-stat-value { color: {{reviewColor}}; }
+
+    @media (max-width: 600px) {
+      .index-nav-inner { padding: 1rem 1.25rem; }
+      .index-page { padding: 5rem 1.25rem 3rem; }
+      .author-card { padding: 1.25rem; gap: 1rem; }
+      .author-card img { width: 48px; height: 48px; }
+      .week-item { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .week-item-stats { gap: 0.75rem; }
     }
   </style>
 </head>
 <body>
 
 <nav class="index-nav">
-  <span class="nav-site-title">{{siteTitle}}</span>
+  <div class="index-nav-inner">
+    <span class="nav-site-title">{{siteTitle}}</span>
+  </div>
 </nav>
 
 <div class="index-page">
 
   {{#if username}}
-  <a href="https://github.com/{{username}}" class="profile" target="_blank" rel="noopener nofollow">
-    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="56" height="56" loading="lazy" />{{/if}}
-    <div>
-      <div class="profile-name">{{username}}</div>
-      <div class="profile-handle">@{{username}}</div>
+  <a href="https://github.com/{{username}}" class="author-card" target="_blank" rel="noopener nofollow">
+    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="64" height="64" loading="lazy" />{{/if}}
+    <div class="author-info">
+      <div class="author-name">{{username}}</div>
+      <div class="author-handle">github.com/{{username}}</div>
     </div>
   </a>
   {{/if}}
@@ -179,9 +240,17 @@ const TEMPLATE = `<!DOCTYPE html>
           <span class="week-item-week">{{this.week}}</span>
           <div class="week-item-content">
             <div class="week-item-title">{{#if this.title}}{{this.title}}{{else}}Week {{this.week}}{{/if}}</div>
+            {{#if this.subtitle}}<div class="week-item-subtitle">{{this.subtitle}}</div>{{/if}}
             <span class="week-item-date">{{this.dateLabel}}</span>
           </div>
         </div>
+        {{#if this.stats}}
+        <div class="week-item-stats">
+          <span class="week-item-stat stat-commits"><span class="week-item-stat-value">{{this.stats.commits}}</span> commits</span>
+          <span class="week-item-stat stat-prs"><span class="week-item-stat-value">{{this.stats.prs}}</span> PRs</span>
+          <span class="week-item-stat stat-reviews"><span class="week-item-stat-value">{{this.stats.reviews}}</span> reviews</span>
+        </div>
+        {{/if}}
       </a>
       {{/each}}
     </div>
@@ -240,18 +309,29 @@ export const renderIndexPage = (
     poweredBy: locale.poweredBy,
     generatedWith: locale.generatedWith,
     monoFamily: fontConfig.monoFamily,
-    borderColor: isDark ? "rgba(255,255,255,0.06)" : "#d0d7de",
-    borderHoverColor: isDark ? "rgba(255,255,255,0.12)" : "#8b949e",
+    bgColor: isDark ? "#050505" : "#ffffff",
+    borderColor: isDark ? "rgba(255,255,255,0.08)" : "#d0d7de",
     cardBg: isDark ? "rgba(255,255,255,0.02)" : "#f6f8fa",
     tertiaryColor: isDark ? "rgba(255,255,255,0.3)" : "#8b949e",
+    secondaryColor: isDark ? "rgba(255,255,255,0.65)" : "#656d76",
     accentColor: isDark ? "#39d353" : "#0969da",
+    greenColor: isDark ? "#3fb950" : "#1a7f37",
+    prColor: isDark ? "#8957e5" : "#8250df",
+    reviewColor: isDark ? "#58a6ff" : "#0969da",
   });
 };
 
-export const buildReportEntry = (path: string, title?: string): ReportEntry => ({
+export const buildReportEntry = (
+  path: string,
+  title?: string,
+  subtitle?: string,
+  stats?: ReportEntryStats,
+): ReportEntry => ({
   path,
   week: path.split("/")[1] ?? path,
   year: path.split("/")[0] ?? "",
   title,
+  subtitle,
   dateLabel: weekToDateLabel(path),
+  stats,
 });
