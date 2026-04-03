@@ -1,7 +1,14 @@
 // LLM module: generate structured content with explicit provider/model config
 
 import { parse as parseYaml } from "yaml";
-import type { AIContent, HighlightType, PullRequest, Issue } from "../types.js";
+import type {
+  AIContent,
+  HighlightType,
+  PullRequest,
+  Issue,
+  GitHubEvent,
+  ReleaseEventPayload,
+} from "../types.js";
 import type { NarrativeInput, LLMConfig } from "./types.js";
 import { buildPrompt } from "./prompt.js";
 import { createOpenAIProvider } from "./providers/openai.js";
@@ -22,10 +29,14 @@ const stripCodeFences = (text: string): string =>
 const fixUnquotedValues = (yaml: string): string =>
   yaml.replace(/: (\+[^\n"']*)/g, ': "$1"');
 
+const buildReleaseUrl = (repo: string, tag: string): string =>
+  `https://github.com/${repo}/releases/tag/${tag}`;
+
 const resolveHighlightUrls = (
   content: AIContent,
   pullRequests: PullRequest[],
   issues: Issue[],
+  events: GitHubEvent[],
 ): AIContent => ({
   ...content,
   highlights: content.highlights.map((h) => {
@@ -43,6 +54,21 @@ const resolveHighlightUrls = (
         (i) => i.title === h.title || i.title.includes(h.title),
       );
       return match ? { ...h, url: match.url } : h;
+    }
+
+    if (h.type === "release") {
+      const match = events.find(
+        (e) =>
+          e.payload.kind === "release" &&
+          e.repo === h.repo &&
+          ((e.payload as ReleaseEventPayload).tag === h.title ||
+            (e.payload as ReleaseEventPayload).name === h.title),
+      );
+      if (match) {
+        const tag = (match.payload as ReleaseEventPayload).tag;
+        return { ...h, url: buildReleaseUrl(match.repo, tag) };
+      }
+      return h;
     }
 
     return h;
@@ -94,7 +120,7 @@ export const generateContent = async (
     const raw = await provider.generate(prompt);
     if (!raw) return null;
     const content = parseAIContent(raw);
-    return resolveHighlightUrls(content, input.pullRequests, input.issues);
+    return resolveHighlightUrls(content, input.pullRequests, input.issues, input.events);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.warn(`LLM content generation failed (${config.provider}): ${message}`);
