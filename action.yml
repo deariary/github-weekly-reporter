@@ -1,0 +1,48 @@
+name: 'GitHub Weekly Reporter'
+description: 'Generate a beautiful weekly GitHub activity report and deploy to GitHub Pages'
+author: 'deariary'
+
+branding:
+  icon: 'bar-chart-2'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access and deployment'
+    required: true
+  username:
+    description: 'GitHub username to generate the report for'
+    required: false
+    default: ''
+  theme:
+    description: 'Report theme (default, dark)'
+    required: false
+    default: 'default'
+  openai-api-key:
+    description: 'OpenAI API key for AI narrative'
+    required: false
+    default: ''
+  anthropic-api-key:
+    description: 'Anthropic API key for AI narrative'
+    required: false
+    default: ''
+  gemini-api-key:
+    description: 'Gemini API key for AI narrative'
+    required: false
+    default: ''
+  llm-provider:
+    description: 'LLM provider (openai, anthropic, gemini)'
+    required: false
+    default: ''
+  llm-model:
+    description: 'LLM model name'
+    required: false
+    default: ''
+
+outputs:
+  report-url:
+    description: 'URL path of the generated report (e.g. 2026/W14)'
+
+runs:
+  using: 'node20'
+  main: 'dist/action/index.js'
