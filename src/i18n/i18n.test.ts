@@ -92,9 +92,11 @@ describe("llmLanguageInstruction", () => {
     expect(llmLanguageInstruction("en")).toBeNull();
   });
 
-  it("returns Japanese instruction", () => {
+  it("returns Japanese instruction with casual tone guidance", () => {
     const instruction = llmLanguageInstruction("ja");
     expect(instruction).toContain("Japanese");
+    expect(instruction).toContain("da/dearu");
+    expect(instruction).toContain("NEVER use desu/masu");
   });
 
   it.each<Language>(["zh-CN", "zh-TW", "ko", "es", "fr", "de", "pt", "ru"])(

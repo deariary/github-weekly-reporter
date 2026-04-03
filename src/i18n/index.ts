@@ -221,15 +221,49 @@ export const formatNumber = (n: number, language: Language): string =>
 
 const LLM_INSTRUCTIONS: Record<Language, string | null> = {
   en: null,
-  ja: "IMPORTANT: Write ALL text content in Japanese. Title, subtitle, overview, summaries, and highlights must all be written in natural Japanese.",
-  "zh-CN": "IMPORTANT: Write ALL text content in Simplified Chinese. Title, subtitle, overview, summaries, and highlights must all be written in natural Simplified Chinese.",
-  "zh-TW": "IMPORTANT: Write ALL text content in Traditional Chinese. Title, subtitle, overview, summaries, and highlights must all be written in natural Traditional Chinese.",
-  ko: "IMPORTANT: Write ALL text content in Korean. Title, subtitle, overview, summaries, and highlights must all be written in natural Korean.",
-  es: "IMPORTANT: Write ALL text content in Spanish. Title, subtitle, overview, summaries, and highlights must all be written in natural Spanish.",
-  fr: "IMPORTANT: Write ALL text content in French. Title, subtitle, overview, summaries, and highlights must all be written in natural French.",
-  de: "IMPORTANT: Write ALL text content in German. Title, subtitle, overview, summaries, and highlights must all be written in natural German.",
-  pt: "IMPORTANT: Write ALL text content in Brazilian Portuguese. Title, subtitle, overview, summaries, and highlights must all be written in natural Brazilian Portuguese.",
-  ru: "IMPORTANT: Write ALL text content in Russian. Title, subtitle, overview, summaries, and highlights must all be written in natural Russian.",
+  ja: [
+    "IMPORTANT: Write ALL text content in Japanese.",
+    "Use casual, plain form (da/dearu style). NEVER use desu/masu form.",
+    "Write like a developer jotting down notes in their personal log.",
+    "Technical terms (OAuth, JWT, PR, etc.) can stay in English.",
+    "Example tone: 'OAuth2 PKCE移行を進めた。認証フロー全体をリファクタし、JWTに切り替えた。'",
+  ].join(" "),
+  "zh-CN": [
+    "IMPORTANT: Write ALL text content in Simplified Chinese.",
+    "Use a casual, direct tone like a developer's personal notes.",
+    "Technical terms can stay in English.",
+  ].join(" "),
+  "zh-TW": [
+    "IMPORTANT: Write ALL text content in Traditional Chinese.",
+    "Use a casual, direct tone like a developer's personal notes.",
+    "Technical terms can stay in English.",
+  ].join(" "),
+  ko: [
+    "IMPORTANT: Write ALL text content in Korean.",
+    "Use a casual, direct tone (haeyo or haera style).",
+    "Technical terms can stay in English.",
+  ].join(" "),
+  es: [
+    "IMPORTANT: Write ALL text content in Spanish.",
+    "Use a casual, direct tone like a developer's personal log.",
+  ].join(" "),
+  fr: [
+    "IMPORTANT: Write ALL text content in French.",
+    "Use a casual, direct tone like a developer's personal log. Use 'tu' form if addressing the reader.",
+  ].join(" "),
+  de: [
+    "IMPORTANT: Write ALL text content in German.",
+    "Use a casual, direct tone like a developer's personal log.",
+  ].join(" "),
+  pt: [
+    "IMPORTANT: Write ALL text content in Brazilian Portuguese.",
+    "Use a casual, direct tone like a developer's personal log.",
+  ].join(" "),
+  ru: [
+    "IMPORTANT: Write ALL text content in Russian.",
+    "Use a casual, direct tone like a developer's personal log.",
+    "Technical terms can stay in English.",
+  ].join(" "),
 };
 
 export const llmLanguageInstruction = (language: Language): string | null =>
