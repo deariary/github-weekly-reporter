@@ -1,27 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>{{username}}'s Weekly Report ({{dateRange.from}} - {{dateRange.to}})</title>
+  <title>{{#if aiContent}}{{aiContent.title}}{{else}}{{username}}'s Week{{/if}} — {{dateRange.from}} - {{dateRange.to}}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="GitHub activity report: {{stats.totalCommits}} commits, {{stats.prsOpened}} PRs, {{stats.issuesOpened}} issues" />
-  <meta property="og:title" content="{{username}}'s Weekly Report ({{dateRange.from}} - {{dateRange.to}})" />
-  <meta property="og:description" content="GitHub activity report: {{stats.totalCommits}} commits, {{stats.prsOpened}} PRs, {{stats.issuesOpened}} issues" />
+  <meta name="description" content="{{#if aiContent}}{{aiContent.subtitle}}{{else}}Weekly report for {{username}}{{/if}}" />
+  <meta property="og:title" content="{{#if aiContent}}{{aiContent.title}}{{else}}{{username}}'s Week{{/if}}" />
+  <meta property="og:description" content="{{#if aiContent}}{{aiContent.subtitle}}{{else}}Weekly report{{/if}}" />
   <meta property="og:image" content="{{avatarUrl}}" />
   <meta property="og:type" content="website" />
   <style>{{{css}}}</style>
 </head>
 <body>
-<div class="container">
 
+<nav>
+  <a href="../index.html" class="nav-left">
+    <img src="{{avatarUrl}}" alt="{{username}}" />
+    <span>{{username}}</span>
+  </a>
+  <a href="../index.html" class="nav-back">&larr; All weeks</a>
+</nav>
+
+<div class="page">
   {{> header}}
-  {{> stats}}
-  {{> heatmap}}
-  {{> languages}}
-  {{> repositories}}
-  {{> narrative}}
-  {{> footer}}
-
+  {{#if aiContent}}
+  {{> overview}}
+  {{> summaries}}
+  {{> highlights}}
+  {{/if}}
 </div>
+
+{{> footer}}
+
 </body>
 </html>

@@ -117,7 +117,49 @@ export type WeeklyReportData = {
   pullRequests: PullRequest[];
   issues: Issue[];
   events: GitHubEvent[];
-  aiNarrative: string | null;
+  aiContent: AIContent | null;
+};
+
+// LLM structured output
+
+export type SummaryType =
+  | "commit-summary"
+  | "review-summary"
+  | "language-summary"
+  | "repo-summary"
+  | "contribution-summary"
+  | "collaboration-summary"
+  | "activity-pattern";
+
+export type HighlightType = "pr" | "release" | "issue" | "discussion";
+
+export type DataChip = {
+  label: string;
+  value: string;
+  color?: "green" | "red" | "default";
+};
+
+export type SummarySection = {
+  type: SummaryType;
+  heading: string;
+  body: string;
+  chips?: DataChip[];
+};
+
+export type HighlightSection = {
+  type: HighlightType;
+  title: string;
+  repo: string;
+  meta: string;
+  body: string;
+};
+
+export type AIContent = {
+  title: string;
+  subtitle: string;
+  overview: string; // multi-paragraph long-form text
+  summaries: SummarySection[];
+  highlights: HighlightSection[];
 };
 
 // Configuration types

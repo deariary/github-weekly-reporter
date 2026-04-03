@@ -19,22 +19,11 @@ const readTemplate = (path: string): string =>
 
 const PARTIAL_NAMES = [
   "header",
-  "stats",
-  "heatmap",
-  "languages",
-  "repositories",
-  "narrative",
+  "overview",
+  "summaries",
+  "highlights",
   "footer",
 ] as const;
-
-const buildStatCards = (data: WeeklyReportData) => [
-  { value: data.stats.totalCommits, label: "Commits" },
-  { value: data.stats.prsOpened, label: "PRs Opened" },
-  { value: data.stats.prsMerged, label: "PRs Merged" },
-  { value: data.stats.prsReviewed, label: "Reviews" },
-  { value: data.stats.issuesOpened, label: "Issues Opened" },
-  { value: data.stats.issuesClosed, label: "Issues Closed" },
-];
 
 const createInstance = (): typeof Handlebars => {
   const hbs = Handlebars.create();
@@ -57,6 +46,5 @@ export const renderReport = (
   return template({
     ...data,
     css: buildCSS(theme),
-    statCards: buildStatCards(data),
   });
 };

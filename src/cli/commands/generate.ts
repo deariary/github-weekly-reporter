@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { stringify as toYaml } from "yaml";
 import { collectWeeklyData } from "../../collector/index.js";
 import { renderReport } from "../../renderer/index.js";
-import { generateNarrative } from "../../llm/index.js";
+import { generateContent } from "../../llm/index.js";
 import { renderIndexPage } from "../../deployer/index-page.js";
 import { getWeekId } from "../../deployer/week.js";
 import { loadConfig } from "../config.js";
@@ -83,8 +83,8 @@ const run = async (options: GenerateOptions): Promise<void> => {
   const data = await collectWeeklyData(options.token, options.username);
 
   if (options.llmProvider && options.llmApiKey && options.llmModel) {
-    console.log(`Generating AI narrative (${options.llmProvider}/${options.llmModel})...`);
-    data.aiNarrative = await generateNarrative(data, {
+    console.log(`Generating AI content (${options.llmProvider}/${options.llmModel})...`);
+    data.aiContent = await generateContent(data, {
       provider: options.llmProvider,
       apiKey: options.llmApiKey,
       model: options.llmModel,

@@ -46,7 +46,7 @@ const MOCK_INPUT: NarrativeInput = {
 describe("buildPrompt", () => {
   it("includes system instructions", () => {
     const prompt = buildPrompt(MOCK_INPUT);
-    expect(prompt).toContain("weekly development log");
+    expect(prompt).toContain("structured content");
     expect(prompt).toContain("second person");
   });
 

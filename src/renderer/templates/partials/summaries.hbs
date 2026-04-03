@@ -1,0 +1,24 @@
+{{#if aiContent.summaries.length}}
+<div class="section-group">
+  <div class="section-group-header">
+    <h2 class="section-group-title">Summary</h2>
+    <div class="section-group-line"></div>
+    <span class="section-group-count">{{aiContent.summaries.length}} sections</span>
+  </div>
+
+  {{#each aiContent.summaries}}
+  <div class="section-summary">
+    <div class="section-type">{{this.type}}</div>
+    <div class="section-heading">{{this.heading}}</div>
+    <div class="section-body">{{this.body}}</div>
+    {{#if this.chips}}
+    <div class="data-chips">
+      {{#each this.chips}}
+      <span class="chip"><span class="chip-label">{{this.label}}</span> <span class="chip-value chip-{{this.color}}">{{this.value}}</span></span>
+      {{/each}}
+    </div>
+    {{/if}}
+  </div>
+  {{/each}}
+</div>
+{{/if}}

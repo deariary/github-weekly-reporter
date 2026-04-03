@@ -63,6 +63,6 @@ export const collectWeeklyData = async (
     pullRequests,
     issues,
     events,
-    aiNarrative: null,
+    aiContent: null,
   };
 };
