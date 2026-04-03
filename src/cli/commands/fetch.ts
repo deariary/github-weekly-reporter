@@ -104,7 +104,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   // Fetch contributions (GraphQL)
   console.log("Fetching contribution stats...");
   const gql = graphql.defaults({ headers: { authorization: `token ${options.token}` } });
-  const contributions = await fetchContributions(gql, options.username, range);
+  const contributions = await fetchContributions(gql, options.username, range, options.timezone);
 
   const repositories = aggregateRepositories(pullRequests, []);
   const totalAdditions = pullRequests.reduce((sum, pr) => sum + pr.additions, 0);

@@ -86,7 +86,7 @@ const fetchPage = async (
   return (await response.json()) as RawEvent[];
 };
 
-const isInRange = (eventDate: string, range: DateRange): boolean => {
+export const isInRange = (eventDate: string, range: DateRange): boolean => {
   const t = new Date(eventDate).getTime();
   return t >= range.from.getTime() && t <= range.to.getTime();
 };
