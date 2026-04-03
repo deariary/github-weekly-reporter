@@ -132,17 +132,21 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
     }
 
     /* NAV */
-    nav {
+    nav[aria-label="Site navigation"] {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2.5rem;
       background: ${c.bg}dd;
       backdrop-filter: blur(12px);
       border-bottom: 1px solid ${c.border};
+    }
+    .nav-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     nav a { color: ${c.text}; text-decoration: none; }
     .nav-left { display: flex; align-items: center; gap: 1rem; }
@@ -206,9 +210,9 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
       to { opacity: 1; transform: translateY(0); }
     }
     .overview {
-      padding: 2.5rem 0 3rem;
+      padding: 2.5rem 0 2rem;
       border-top: 1px solid ${c.border};
-      margin-bottom: 4rem;
+      margin-bottom: 3rem;
       animation: fade-up 0.5s ease both;
     }
     .overview p {

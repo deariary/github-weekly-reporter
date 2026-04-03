@@ -15,6 +15,7 @@ export type LocaleStrings = {
   prevWeek: string;
   nextWeek: string;
   poweredBy: string;
+  generatedWith: string;
   weeklyReports: string;
   weeklyReport: string;
 };
@@ -54,6 +55,7 @@ const en: Locale = {
   prevWeek: "Previous week",
   nextWeek: "Next week",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "Weekly Reports",
   weeklyReport: "Weekly Report",
   sectionsCount: (n) => `${n} sections`,
@@ -69,6 +71,7 @@ const ja: Locale = {
   prevWeek: "前の週",
   nextWeek: "次の週",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "ウィークリーレポート",
   weeklyReport: "ウィークリーレポート",
   sectionsCount: (n) => `${n} セクション`,
@@ -84,6 +87,7 @@ const zhCN: Locale = {
   prevWeek: "上一周",
   nextWeek: "下一周",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "每周报告",
   weeklyReport: "每周报告",
   sectionsCount: (n) => `${n} 个部分`,
@@ -99,6 +103,7 @@ const zhTW: Locale = {
   prevWeek: "上一週",
   nextWeek: "下一週",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "每週報告",
   weeklyReport: "每週報告",
   sectionsCount: (n) => `${n} 個部分`,
@@ -114,6 +119,7 @@ const ko: Locale = {
   prevWeek: "이전 주",
   nextWeek: "다음 주",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "주간 보고서",
   weeklyReport: "주간 보고서",
   sectionsCount: (n) => `${n}개 섹션`,
@@ -129,6 +135,7 @@ const es: Locale = {
   prevWeek: "Semana anterior",
   nextWeek: "Semana siguiente",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "Informes semanales",
   weeklyReport: "Informe semanal",
   sectionsCount: (n) => `${n} secciones`,
@@ -144,6 +151,7 @@ const fr: Locale = {
   prevWeek: "Semaine precedente",
   nextWeek: "Semaine suivante",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "Rapports hebdomadaires",
   weeklyReport: "Rapport hebdomadaire",
   sectionsCount: (n) => `${n} sections`,
@@ -159,6 +167,7 @@ const de: Locale = {
   prevWeek: "Vorherige Woche",
   nextWeek: "Naechste Woche",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "Wochenberichte",
   weeklyReport: "Wochenbericht",
   sectionsCount: (n) => `${n} Abschnitte`,
@@ -174,6 +183,7 @@ const pt: Locale = {
   prevWeek: "Semana anterior",
   nextWeek: "Proxima semana",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "Relatorios semanais",
   weeklyReport: "Relatorio semanal",
   sectionsCount: (n) => `${n} secoes`,
@@ -189,6 +199,7 @@ const ru: Locale = {
   prevWeek: "Предыдущая неделя",
   nextWeek: "Следующая неделя",
   poweredBy: "Powered by",
+  generatedWith: "Generated with",
   weeklyReports: "Еженедельные отчеты",
   weeklyReport: "Еженедельный отчет",
   sectionsCount: (n) => `${n} разделов`,

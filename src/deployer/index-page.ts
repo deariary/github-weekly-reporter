@@ -33,7 +33,27 @@ const TEMPLATE = `<!DOCTYPE html>
   <meta name="view-transition" content="same-origin" />
   <style>{{{css}}}</style>
   <style>
-    .index-page { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; }
+    .index-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: inherit;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid {{borderColor}};
+    }
+    .index-nav .nav-left {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      color: inherit;
+    }
+    .index-nav img { width: 28px; height: 28px; border-radius: 50%; }
+    .index-nav span { font-size: 0.875rem; font-weight: 500; }
+    .index-page { max-width: 720px; margin: 0 auto; padding: 6rem 2rem 6rem; }
 
     .profile {
       display: flex;
@@ -135,6 +155,15 @@ const TEMPLATE = `<!DOCTYPE html>
 </head>
 <body>
 
+{{#if username}}
+<nav class="index-nav">
+  <a href="https://github.com/{{username}}" class="nav-left" target="_blank" rel="noopener nofollow">
+    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="28" height="28" loading="lazy" />{{/if}}
+    <span>{{username}}</span>
+  </a>
+</nav>
+{{/if}}
+
 <div class="index-page">
 
   {{#if username}}
@@ -173,7 +202,7 @@ const TEMPLATE = `<!DOCTYPE html>
 <footer class="footer">
   {{poweredBy}} <a href="https://deariary.com?utm_source=github-weekly-reporter&utm_medium=footer" target="_blank" rel="noopener">deariary</a>
   &nbsp;&middot;&nbsp;
-  <a href="https://github.com/deariary/github-weekly-reporter" target="_blank" rel="noopener">github-weekly-reporter</a>
+  {{generatedWith}} <a href="https://github.com/deariary/github-weekly-reporter" target="_blank" rel="noopener">github-weekly-reporter</a>
 </footer>
 
 </body>
@@ -215,6 +244,7 @@ export const renderIndexPage = (
     lang: language,
     weeklyReports: locale.weeklyReports,
     poweredBy: locale.poweredBy,
+    generatedWith: locale.generatedWith,
     monoFamily: fontConfig.monoFamily,
     borderColor: isDark ? "rgba(255,255,255,0.06)" : "#d0d7de",
     borderHoverColor: isDark ? "rgba(255,255,255,0.12)" : "#8b949e",
