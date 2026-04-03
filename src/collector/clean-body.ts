@@ -15,7 +15,7 @@ const collapseWhitespace = (text: string): string =>
   text.replace(/\n{3,}/g, "\n\n").replace(/[ \t]+/g, " ").trim();
 
 const extractSummarySection = (text: string): string => {
-  const summaryMatch = text.match(/## Summary\s*\n([\s\S]*?)(?=\n## |\n---|\z)/i);
+  const summaryMatch = text.match(/## Summary\s*\n([\s\S]*?)(?=\n## |\n---|$)/i);
   return summaryMatch ? summaryMatch[1].trim() : text;
 };
 

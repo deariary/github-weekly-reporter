@@ -131,6 +131,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     aiContent: null,
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { aiContent: _, ...githubData } = data;
   const dataPath = join(reportDir, "github-data.yaml");
   await writeFile(dataPath, toYaml(githubData, { lineWidth: 120 }), "utf-8");
