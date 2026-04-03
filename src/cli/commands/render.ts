@@ -156,6 +156,14 @@ ${sitemapEntries}
   const robotsPath = join(options.outputDir, "robots.txt");
   await writeFile(robotsPath, robots, "utf-8");
   console.log(`robots.txt written to ${robotsPath}`);
+
+  // Generate CNAME for custom domains (not *.github.io)
+  const hostname = new URL(base).hostname;
+  if (!hostname.endsWith(".github.io")) {
+    const cnamePath = join(options.outputDir, "CNAME");
+    await writeFile(cnamePath, hostname + "\n", "utf-8");
+    console.log(`CNAME written to ${cnamePath}`);
+  }
 };
 
 export const registerRender = (program: Command): void => {
