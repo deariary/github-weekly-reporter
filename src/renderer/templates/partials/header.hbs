@@ -1,4 +1,8 @@
 <div class="header">
+  <a href="https://github.com/{{username}}" class="header-author" target="_blank" rel="noopener nofollow">
+    <img src="{{avatarUrl}}" alt="{{username}}" />
+    <span>{{username}}</span>
+  </a>
   <div class="header-week">{{weekLabel dateRange.from dateRange.to}}</div>
   <h1 class="header-title">{{#if aiContent}}{{aiContent.title}}{{else}}{{userWeek username}}{{/if}}</h1>
   {{#if aiContent}}<p class="header-sub">{{aiContent.subtitle}}</p>{{/if}}
