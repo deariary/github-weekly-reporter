@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="{{lang}}">
 <head>
-  <title>{{#if aiContent}}{{aiContent.title}}{{else}}{{userWeek username}}{{/if}} - {{dateRange.from}} - {{dateRange.to}}</title>
+  <title>{{aiContent.title}} - {{dateRange.from}} - {{dateRange.to}}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="{{#if aiContent}}{{aiContent.subtitle}}{{else}}{{i18n.weeklyReport}} for {{username}}{{/if}}" />
-  <meta property="og:title" content="{{#if aiContent}}{{aiContent.title}}{{else}}{{userWeek username}}{{/if}}" />
-  <meta property="og:description" content="{{#if aiContent}}{{aiContent.subtitle}}{{else}}{{i18n.weeklyReport}}{{/if}}" />
+  <meta name="description" content="{{aiContent.subtitle}}" />
+  <meta property="og:title" content="{{aiContent.title}}" />
+  <meta property="og:description" content="{{aiContent.subtitle}}" />
   <meta property="og:image" content="{{avatarUrl}}" />
   <meta property="og:type" content="website" />
   <meta name="view-transition" content="same-origin" />
@@ -24,11 +24,9 @@
 
 <div class="page">
   {{> header}}
-  {{#if aiContent}}
   {{> overview}}
   {{> summaries}}
   {{> highlights}}
-  {{/if}}
 </div>
 
 {{> footer}}

@@ -126,7 +126,7 @@ export type WeeklyReportData = {
   issues: Issue[];
   events: GitHubEvent[];
   externalContributions: ExternalContribution[];
-  aiContent: AIContent | null;
+  aiContent: AIContent;
 };
 
 // LLM structured output

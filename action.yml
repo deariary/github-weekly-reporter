@@ -43,11 +43,11 @@ inputs:
     required: false
     default: ''
   llm-provider:
-    description: 'LLM provider (openai, anthropic, gemini)'
+    description: 'LLM provider (openai, anthropic, gemini). Required for weekly mode.'
     required: false
     default: ''
   llm-model:
-    description: 'LLM model name'
+    description: 'LLM model name. Required for weekly mode.'
     required: false
     default: ''
   date:
@@ -122,12 +122,7 @@ runs:
         LANGUAGE: ${{ inputs.language }}
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
-      run: |
-        if [ -n "$LLM_PROVIDER" ] && [ -n "$LLM_MODEL" ]; then
-          npx github-weekly-reporter@${{ inputs.version }} generate ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
-        else
-          echo "No LLM provider configured, skipping AI content generation"
-        fi
+      run: npx github-weekly-reporter@${{ inputs.version }} generate ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
 
     - name: Commit and push data (weekly)
       if: inputs.mode == 'weekly'

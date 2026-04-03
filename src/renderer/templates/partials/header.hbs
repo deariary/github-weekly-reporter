@@ -4,6 +4,6 @@
     <span>{{username}}</span>
   </a>
   <div class="header-week">{{weekLabel dateRange.from dateRange.to}}</div>
-  <h1 class="header-title">{{#if aiContent}}{{aiContent.title}}{{else}}{{userWeek username}}{{/if}}</h1>
-  {{#if aiContent}}<p class="header-sub">{{aiContent.subtitle}}</p>{{/if}}
+  <h1 class="header-title">{{aiContent.title}}</h1>
+  <p class="header-sub">{{aiContent.subtitle}}</p>
 </div>
