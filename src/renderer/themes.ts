@@ -191,15 +191,17 @@ export const buildCSS = (theme: Theme): string => {
 
     /* SUMMARY SECTION */
     .section-summary {
-      margin-bottom: 3rem;
-      padding: 1.5rem;
+      margin-bottom: 1rem;
+      padding: 1.5rem 1.75rem;
       border-radius: 12px;
-      border: 1px solid transparent;
+      border: 1px solid ${c.chipBorder};
+      background: ${c.cardBg};
       transition: all 0.3s ease;
     }
     .section-summary:hover {
-      border-color: ${c.chipBorder};
-      background: ${c.cardBg};
+      border-color: ${c.accent};
+      box-shadow: 0 0 20px ${c.accent}22, inset 0 0 20px ${c.accent}08;
+      transform: translateY(-2px);
     }
     .section-summary .section-type {
       font-family: 'JetBrains Mono', monospace;
