@@ -9,14 +9,37 @@ on:
         type: string
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
   publish:
+    needs: [lint, test]
     runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -24,9 +47,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - run: npm ci
-      - run: npm run lint
       - run: npm run build
-      - run: npm test
 
       - name: Set version
         run: npm version ${{ inputs.version }} --no-git-tag-version
