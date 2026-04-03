@@ -32,7 +32,7 @@ const TEMPLATE = `<!DOCTYPE html>
   <meta name="view-transition" content="same-origin" />
   <style>{{{css}}}</style>
   <style>
-    .index-page { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; view-transition-name: page-content; }
+    .index-page { max-width: 720px; margin: 0 auto; padding: 4rem 2rem 6rem; }
 
     .profile {
       display: flex;

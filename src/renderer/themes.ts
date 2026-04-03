@@ -393,23 +393,6 @@ export const buildCSS = (theme: Theme): string => {
     @view-transition {
       navigation: auto;
     }
-    ::view-transition-old(root) {
-      animation: fade-out 0.2s ease-out;
-    }
-    ::view-transition-new(root) {
-      animation: fade-in 0.3s ease-in;
-    }
-    .page { view-transition-name: page-content; }
-    ::view-transition-old(page-content) {
-      animation: slide-out 0.25s ease-out;
-    }
-    ::view-transition-new(page-content) {
-      animation: slide-in 0.3s ease-in;
-    }
-    @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
-    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slide-out { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-20px); opacity: 0; } }
-    @keyframes slide-in { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     @media (max-width: 600px) {
       nav { padding: 1rem 1.25rem; }
