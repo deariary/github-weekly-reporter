@@ -3,7 +3,6 @@
 import { Command } from "commander";
 import { deploy } from "../../deployer/index.js";
 import { getWeekId } from "../../deployer/week.js";
-import { loadConfig } from "../config.js";
 
 type DeployCommandOptions = {
   directory: string;
@@ -52,16 +51,15 @@ export const registerDeploy = (program: Command): void => {
   program
     .command("deploy")
     .description("Deploy generated report to GitHub Pages (gh-pages branch)")
-    .option("-d, --directory <dir>", "Directory containing generated report files", "./report")
+    .option("-d, --directory <dir>", "Directory containing generated report files (env: OUTPUT_DIR, default: ./report)")
     .option("-r, --repo <slug>", "Repository (owner/repo or full URL, env: GITHUB_REPOSITORY)")
-    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, config: timezone, default: UTC)")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .action(async (opts) => {
       try {
-        const config = await loadConfig();
-        const timezone = opts.timezone ?? env("TIMEZONE") ?? config.timezone ?? "UTC";
+        const timezone = opts.timezone ?? env("TIMEZONE") ?? "UTC";
         const repoUrl = buildRepoUrl(opts.repo);
         await run({
-          directory: opts.directory ?? config.output ?? "./report",
+          directory: opts.directory ?? env("OUTPUT_DIR") ?? "./report",
           repoUrl,
           timezone,
         });

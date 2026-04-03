@@ -7,8 +7,9 @@ import { parse as parseYaml } from "yaml";
 import { renderReport } from "../../renderer/index.js";
 import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deployer/index-page.js";
 import { getWeekId } from "../../deployer/week.js";
-import { loadConfig } from "../config.js";
 import type { WeeklyReportData, AIContent, Theme, Language } from "../../types.js";
+
+const env = (key: string): string | undefined => process.env[key];
 
 type RenderOptions = {
   output: string;
@@ -107,19 +108,18 @@ export const registerRender = (program: Command): void => {
   program
     .command("render")
     .description("Render HTML report from fetched data and LLM content")
-    .option("-o, --output <dir>", "Output directory (config: output)")
-    .option("--theme <theme>", "Report theme (config: theme)")
-    .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, config: language, default: en)")
-    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, config: timezone, default: UTC)")
+    .option("-o, --output <dir>", "Output directory (env: OUTPUT_DIR, default: ./report)")
+    .option("--theme <theme>", "Report theme (env: THEME, default: default)")
+    .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, default: en)")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
-        const config = await loadConfig();
         const options: RenderOptions = {
-          output: opts.output ?? config.output ?? "./report",
-          theme: (opts.theme ?? config.theme ?? "default") as Theme,
-          language: (opts.language ?? process.env.LANGUAGE ?? config.language ?? "en") as Language,
-          timezone: opts.timezone ?? process.env.TIMEZONE ?? config.timezone ?? "UTC",
+          output: opts.output ?? env("OUTPUT_DIR") ?? "./report",
+          theme: (opts.theme ?? env("THEME") ?? "default") as Theme,
+          language: (opts.language ?? env("LANGUAGE") ?? "en") as Language,
+          timezone: opts.timezone ?? env("TIMEZONE") ?? "UTC",
           date: opts.date ? new Date(opts.date + "T12:00:00Z") : undefined,
         };
         await run(options);

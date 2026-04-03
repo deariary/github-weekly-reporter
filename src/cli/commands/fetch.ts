@@ -11,7 +11,6 @@ import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
 import { aggregateRepositories } from "../../collector/aggregate.js";
 import { getWeekId } from "../../deployer/week.js";
-import { loadConfig } from "../config.js";
 import type { GitHubEvent, WeeklyReportData } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
@@ -24,17 +23,16 @@ type BaseOptions = {
   date?: Date;
 };
 
-const resolveBaseOptions = async (
+const resolveBaseOptions = (
   cli: Record<string, string | undefined>,
-): Promise<BaseOptions> => {
-  const config = await loadConfig();
+): BaseOptions => {
   const token = cli.token ?? env("GITHUB_TOKEN");
   if (!token) throw new Error("GitHub token required. Pass --token or set GITHUB_TOKEN.");
-  const username = cli.username ?? env("GITHUB_USERNAME") ?? config.username;
-  if (!username) throw new Error("GitHub username required. Pass --username, set GITHUB_USERNAME, or add to config file.");
+  const username = cli.username ?? env("GITHUB_USERNAME");
+  if (!username) throw new Error("GitHub username required. Pass --username or set GITHUB_USERNAME.");
   const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
-  const timezone = cli.timezone ?? env("TIMEZONE") ?? config.timezone ?? "UTC";
-  return { token, username, output: cli.output ?? config.output ?? "./report", date, timezone };
+  const timezone = cli.timezone ?? env("TIMEZONE") ?? "UTC";
+  return { token, username, output: cli.output ?? env("OUTPUT_DIR") ?? "./report", date, timezone };
 };
 
 const tryReadYaml = async <T>(path: string): Promise<T | null> => {
@@ -147,9 +145,9 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
 const baseOptions = (cmd: Command): Command =>
   cmd
     .option("-t, --token <token>", "GitHub token (env: GITHUB_TOKEN)")
-    .option("-u, --username <username>", "GitHub username (env: GITHUB_USERNAME, config: username)")
-    .option("-o, --output <dir>", "Output directory (config: output)")
-    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, config: timezone, default: UTC)")
+    .option("-u, --username <username>", "GitHub username (env: GITHUB_USERNAME)")
+    .option("-o, --output <dir>", "Output directory (env: OUTPUT_DIR, default: ./report)")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)");
 
 export const registerFetch = (program: Command): void => {
@@ -159,7 +157,7 @@ export const registerFetch = (program: Command): void => {
       .description("Fetch today's GitHub events and accumulate (run daily via cron)"),
   ).action(async (opts) => {
     try {
-      const options = await resolveBaseOptions(opts);
+      const options = resolveBaseOptions(opts);
       await runDailyFetch(options);
     } catch (error) {
       console.error("Error:", error instanceof Error ? error.message : error);
@@ -173,7 +171,7 @@ export const registerFetch = (program: Command): void => {
       .description("Build full weekly data from accumulated events + individual PR fetches"),
   ).action(async (opts) => {
     try {
-      const options = await resolveBaseOptions(opts);
+      const options = resolveBaseOptions(opts);
       await runWeeklyFetch(options);
     } catch (error) {
       console.error("Error:", error instanceof Error ? error.message : error);
