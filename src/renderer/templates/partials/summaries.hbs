@@ -12,22 +12,6 @@
     <div class="section-heading">{{this.heading}}</div>
     <div class="section-body">{{this.body}}</div>
 
-    {{! Language summary: show inline bar + colored tags }}
-    {{#eq this.type "language-summary"}}
-    {{#if @root.languages.length}}
-    <div class="lang-bar">
-      {{#each @root.languages}}
-      <div style="flex:{{this.percentage}};background:{{this.color}}"></div>
-      {{/each}}
-    </div>
-    <div class="lang-tags">
-      {{#each @root.languages}}
-      <span><span class="lang-dot" style="background:{{this.color}}"></span> {{this.language}} {{fixed this.percentage 0}}%</span>
-      {{/each}}
-    </div>
-    {{/if}}
-    {{/eq}}
-
     {{! Activity pattern: show mini heatmap }}
     {{#eq this.type "activity-pattern"}}
     {{#if @root.dailyCommits.length}}
@@ -42,8 +26,7 @@
     {{/if}}
     {{/eq}}
 
-    {{! Chips for all other types (language/activity already have their own visuals) }}
-    {{#neq this.type "language-summary"}}
+    {{! Chips for all types except activity-pattern (has its own visual) }}
     {{#neq this.type "activity-pattern"}}
     {{#if this.chips}}
     <div class="data-chips">
@@ -52,7 +35,6 @@
       {{/each}}
     </div>
     {{/if}}
-    {{/neq}}
     {{/neq}}
   </div>
   {{/each}}

@@ -8,7 +8,6 @@ import { fetchIssues } from "./fetch-issues.js";
 import { fetchEvents } from "./fetch-events.js";
 import { fetchExternalPRs } from "./fetch-external-prs.js";
 import { fetchUserOrgs } from "./fetch-user-orgs.js";
-import { fetchLanguages } from "./fetch-languages.js";
 import { detectExternalRepos } from "./detect-external.js";
 import { aggregateRepositories } from "./aggregate.js";
 import type { WeeklyReportData, ExternalContribution } from "../types.js";
@@ -31,7 +30,6 @@ export const collectWeeklyData = async (
     fetchUserOrgs(token),
   ]);
 
-  // Detect external repos from events and fetch their PRs
   const externalRepoNames = detectExternalRepos(events, username, userOrgs);
   const externalPRs = await fetchExternalPRs(token, externalRepoNames, username, range);
 
@@ -43,7 +41,6 @@ export const collectWeeklyData = async (
     }))
     .filter((c) => c.events.length > 0 || c.pullRequests.length > 0);
 
-  // Filter events to only own repos (external events go into externalContributions)
   const ownOwners = new Set([
     username.toLowerCase(),
     ...userOrgs.map((o) => o.toLowerCase()),
@@ -53,16 +50,7 @@ export const collectWeeklyData = async (
     return ownOwners.has(owner);
   });
 
-  const activeRepoNames = [
-    ...pullRequests.map((pr) => pr.repository),
-    ...issues.map((i) => i.repository),
-  ];
-
-  const [languages, repositories] = await Promise.all([
-    fetchLanguages(gql, activeRepoNames),
-    Promise.resolve(aggregateRepositories(pullRequests, issues)),
-  ]);
-
+  const repositories = aggregateRepositories(pullRequests, issues);
   const totalAdditions = pullRequests.reduce((sum, pr) => sum + pr.additions, 0);
   const totalDeletions = pullRequests.reduce((sum, pr) => sum + pr.deletions, 0);
 
@@ -85,7 +73,6 @@ export const collectWeeklyData = async (
     },
     dailyCommits: contributions.dailyCommits,
     repositories,
-    languages,
     pullRequests,
     issues,
     events: ownEvents,

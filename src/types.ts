@@ -15,13 +15,6 @@ export type RepositoryActivity = {
   url: string;
 };
 
-export type LanguageBreakdown = {
-  language: string;
-  bytes: number;
-  percentage: number;
-  color: string;
-};
-
 export type PullRequest = {
   title: string;
   body: string | null;
@@ -106,7 +99,6 @@ export type WeeklyReportData = {
   stats: WeeklyStats;
   dailyCommits: DailyCommitCount[];
   repositories: RepositoryActivity[];
-  languages: LanguageBreakdown[];
   pullRequests: PullRequest[];
   issues: Issue[];
   events: GitHubEvent[];
@@ -119,7 +111,6 @@ export type WeeklyReportData = {
 export type SummaryType =
   | "commit-summary"
   | "review-summary"
-  | "language-summary"
   | "repo-summary"
   | "contribution-summary"
   | "collaboration-summary"

@@ -20,9 +20,6 @@ const MOCK_INPUT: NarrativeInput = {
   repositories: [
     { name: "org/repo-a", commits: 0, prsOpened: 3, prsMerged: 2, issuesOpened: 1, issuesClosed: 0, url: "" },
   ],
-  languages: [
-    { language: "TypeScript", bytes: 8000, percentage: 80, color: "#3178c6" },
-  ],
   pullRequests: [
     {
       title: "feat: add OAuth flow",

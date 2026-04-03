@@ -32,7 +32,6 @@ Summary types (include ALL that apply):
 - repo-summary: which repos were active and what the focus was
 - commit-summary: commit patterns, volume, notable streaks
 - review-summary: review activity, what kind of feedback was given/received
-- language-summary: language mix and what each language was used for
 - contribution-summary: contributions to repos outside own org (if any external data exists)
 - collaboration-summary: who was worked with, review dynamics
 - activity-pattern: daily rhythm, peak days, rest days
@@ -78,13 +77,6 @@ summaries:
     chips:
       - label: "reviews"
         value: "48"
-        color: "default"
-  - type: "language-summary"
-    heading: "heading"
-    body: "2-4 sentences"
-    chips:
-      - label: "TypeScript"
-        value: "92%"
         color: "default"
   - type: "activity-pattern"
     heading: "heading"

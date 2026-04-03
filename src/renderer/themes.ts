@@ -278,13 +278,6 @@ export const buildCSS = (theme: Theme): string => {
       line-height: 1.75;
     }
 
-    /* LANGUAGE BAR */
-    .lang-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 1rem; margin-bottom: 0.625rem; }
-    .lang-bar div { height: 100%; }
-    .lang-tags { display: flex; flex-wrap: wrap; gap: 0.625rem; font-size: 0.8125rem; color: ${c.textSecondary}; }
-    .lang-tags span { display: inline-flex; align-items: center; gap: 0.25rem; }
-    .lang-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-
     /* MINI HEATMAP */
     .mini-heatmap { display: flex; gap: 4px; margin-top: 1rem; }
     .mh-day { display: flex; flex-direction: column; align-items: center; gap: 4px; }

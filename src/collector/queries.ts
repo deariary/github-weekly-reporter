@@ -75,19 +75,3 @@ export const SEARCH_ISSUES_QUERY = `
     }
   }
 `;
-
-export const REPO_LANGUAGES_QUERY = `
-  query($owner: String!, $name: String!) {
-    repository(owner: $owner, name: $name) {
-      languages(first: 20, orderBy: { field: SIZE, direction: DESC }) {
-        edges {
-          size
-          node {
-            name
-            color
-          }
-        }
-      }
-    }
-  }
-`;

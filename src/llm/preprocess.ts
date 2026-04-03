@@ -86,13 +86,6 @@ export const buildLLMContext = (input: NarrativeInput): string => {
     context.events = formattedEvents;
   }
 
-  if (input.languages.length > 0) {
-    context.languages = input.languages
-      .slice(0, 8)
-      .map((l) => `${l.language} ${l.percentage.toFixed(0)}%`)
-      .join(", ");
-  }
-
   if (input.repositories.length > 0) {
     context.repositories = input.repositories
       .slice(0, 8)

@@ -10,7 +10,6 @@ const MOCK_INPUT: NarrativeInput = {
   stats: { totalCommits: 10, totalAdditions: 100, totalDeletions: 20, prsOpened: 2, prsMerged: 1, prsReviewed: 3, issuesOpened: 1, issuesClosed: 0 },
   dailyCommits: [],
   repositories: [],
-  languages: [],
   pullRequests: [],
   issues: [],
   events: [],

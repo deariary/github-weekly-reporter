@@ -12,7 +12,6 @@ export type {
   ReportConfig,
   WeeklyStats,
   RepositoryActivity,
-  LanguageBreakdown,
   DailyCommitCount,
   PullRequest,
   Issue,

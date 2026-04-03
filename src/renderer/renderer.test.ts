@@ -18,7 +18,6 @@ const MOCK_DATA: WeeklyReportData = {
   },
   dailyCommits: [],
   repositories: [],
-  languages: [],
   pullRequests: [],
   issues: [],
   events: [],
