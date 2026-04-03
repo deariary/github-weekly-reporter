@@ -94,7 +94,7 @@ const run = async (options: GenerateOptions): Promise<void> => {
   console.log(`Rendering report (theme: ${options.theme})...`);
   const html = renderReport(data, options.theme);
 
-  // Write report and raw data to week directory
+  // Write files to week directory
   const reportDir = join(options.output, weekId.path);
   await mkdir(reportDir, { recursive: true });
 
@@ -102,9 +102,18 @@ const run = async (options: GenerateOptions): Promise<void> => {
   await writeFile(reportPath, html, "utf-8");
   console.log(`Report written to ${reportPath}`);
 
-  const dataPath = join(reportDir, "data.yaml");
-  await writeFile(dataPath, toYaml(data, { lineWidth: 120 }), "utf-8");
-  console.log(`Raw data written to ${dataPath}`);
+  // GitHub API data (without aiContent)
+  const { aiContent: _, ...githubData } = data;
+  const githubDataPath = join(reportDir, "github-data.yaml");
+  await writeFile(githubDataPath, toYaml(githubData, { lineWidth: 120 }), "utf-8");
+  console.log(`GitHub data written to ${githubDataPath}`);
+
+  // LLM output (if generated)
+  if (data.aiContent) {
+    const llmDataPath = join(reportDir, "llm-data.yaml");
+    await writeFile(llmDataPath, toYaml(data.aiContent, { lineWidth: 120 }), "utf-8");
+    console.log(`LLM data written to ${llmDataPath}`);
+  }
 
   // Write index page
   const allReports = await listReportDirs(options.output);
