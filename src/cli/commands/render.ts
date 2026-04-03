@@ -17,6 +17,7 @@ type RenderOptions = {
   dataDir: string;
   outputDir: string;
   baseUrl: string;
+  siteTitle?: string;
   theme: Theme;
   language: Language;
   timezone: string;
@@ -100,6 +101,7 @@ const run = async (options: RenderOptions): Promise<void> => {
     timezone: options.timezone,
     baseUrl: base,
     weekPath: weekId.path,
+    siteTitle: options.siteTitle,
     prevWeek: prevWeek ? `../../${prevWeek}/` : undefined,
     nextWeek: nextWeek ? `../../${nextWeek}/` : undefined,
   });
@@ -133,6 +135,7 @@ const run = async (options: RenderOptions): Promise<void> => {
     options.theme,
     { username: githubData.username, avatarUrl: githubData.avatarUrl },
     options.language,
+    options.siteTitle,
   );
   const indexPath = join(options.outputDir, "index.html");
   await mkdir(options.outputDir, { recursive: true });
@@ -174,6 +177,7 @@ export const registerRender = (program: Command): void => {
     .option("--data-dir <dir>", "Data directory (env: DATA_DIR, default: ./data)")
     .option("-o, --output-dir <dir>", "Output directory for HTML (env: OUTPUT_DIR, default: ./output)")
     .option("--base-url <url>", "Base URL for absolute links in OG tags, sitemap, canonical (env: BASE_URL)")
+    .option("--site-title <title>", "Site title for nav header (env: SITE_TITLE, default: {username}'s Weekly Reports)")
     .option("--theme <theme>", "Report theme (env: THEME, default: default)")
     .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, default: en)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
@@ -187,6 +191,7 @@ export const registerRender = (program: Command): void => {
           dataDir: opts.dataDir ?? env("DATA_DIR") ?? "./data",
           outputDir: opts.outputDir ?? env("OUTPUT_DIR") ?? "./output",
           baseUrl,
+          siteTitle: opts.siteTitle ?? env("SITE_TITLE"),
           theme: (opts.theme ?? env("THEME") ?? "default") as Theme,
           language: (opts.language ?? env("LANGUAGE") ?? "en") as Language,
           timezone: opts.timezone ?? env("TIMEZONE") ?? "UTC",

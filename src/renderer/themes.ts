@@ -149,9 +149,7 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
       align-items: center;
     }
     nav a { color: ${c.text}; text-decoration: none; }
-    .nav-left { display: flex; align-items: center; gap: 1rem; }
-    .nav-left img { width: 28px; height: 28px; border-radius: 50%; }
-    .nav-left span { font-size: 0.875rem; font-weight: 500; }
+    .nav-site-title { font-size: 0.875rem; font-weight: 600; }
     .nav-back {
       font-family: ${f.monoFamily};
       font-size: 0.75rem;

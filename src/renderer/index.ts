@@ -46,6 +46,7 @@ export type RenderOptions = {
   timezone?: string;
   baseUrl?: string;
   weekPath?: string;
+  siteTitle?: string;
   prevWeek?: string;
   nextWeek?: string;
 };
@@ -81,6 +82,8 @@ export const renderReport = (
   const canonicalUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/` : undefined;
   const ogImageUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/og.png` : "og.png";
 
+  const siteTitle = opts.siteTitle ?? `${data.username}'s ${locale.weeklyReports}`;
+
   return template({
     ...data,
     dailyCommits: computeHeatmapLevels(data.dailyCommits),
@@ -90,6 +93,7 @@ export const renderReport = (
     baseUrl,
     canonicalUrl,
     ogImageUrl,
+    siteTitle,
     prevWeek: opts.prevWeek,
     nextWeek: opts.nextWeek,
   });

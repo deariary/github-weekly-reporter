@@ -41,18 +41,14 @@ const TEMPLATE = `<!DOCTYPE html>
       backdrop-filter: blur(12px);
       border-bottom: 1px solid {{borderColor}};
     }
-    .index-nav .nav-left {
+    .nav-site-title {
+      display: block;
       max-width: 720px;
       margin: 0 auto;
       padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      text-decoration: none;
-      color: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
     }
-    .index-nav img { width: 28px; height: 28px; border-radius: 50%; }
-    .index-nav span { font-size: 0.875rem; font-weight: 500; }
     .index-page { max-width: 720px; margin: 0 auto; padding: 6rem 2rem 6rem; }
 
     .profile {
@@ -155,14 +151,9 @@ const TEMPLATE = `<!DOCTYPE html>
 </head>
 <body>
 
-{{#if username}}
 <nav class="index-nav">
-  <a href="https://github.com/{{username}}" class="nav-left" target="_blank" rel="noopener nofollow">
-    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="28" height="28" loading="lazy" />{{/if}}
-    <span>{{username}}</span>
-  </a>
+  <span class="nav-site-title">{{siteTitle}}</span>
 </nav>
-{{/if}}
 
 <div class="index-page">
 
@@ -231,16 +222,19 @@ export const renderIndexPage = (
   theme: Theme = "default",
   pageData?: IndexPageData,
   language: Language = "en",
+  siteTitle?: string,
 ): string => {
   const isDark = theme === "dark";
   const locale = getLocale(language);
   const fontConfig = getFontConfig(language);
+  const resolvedSiteTitle = siteTitle ?? (pageData?.username ? `${pageData.username}'s ${locale.weeklyReports}` : locale.weeklyReports);
   const template = Handlebars.compile(TEMPLATE);
   return template({
     yearGroups: groupByYear(reports),
     css: buildCSS(theme, language),
     username: pageData?.username,
     avatarUrl: pageData?.avatarUrl,
+    siteTitle: resolvedSiteTitle,
     lang: language,
     weeklyReports: locale.weeklyReports,
     poweredBy: locale.poweredBy,
