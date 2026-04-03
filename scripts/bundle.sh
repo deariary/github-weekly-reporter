@@ -8,7 +8,7 @@ npm run build
 npx esbuild dist/cli/index.js \
   --bundle \
   --platform=node \
-  --target=node22 \
+  --target=node24 \
   --format=esm \
   --banner:js='#!/usr/bin/env node' \
   --outfile=bundle/cli/index.js
