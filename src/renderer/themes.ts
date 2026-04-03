@@ -97,6 +97,16 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
       line-height: 1.7;
     }
 
+    /* INLINE CODE */
+    code {
+      font-family: ${f.monoFamily};
+      font-size: 0.875em;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      background: ${c.chipBg};
+      border: 1px solid ${c.chipBorder};
+    }
+
     /* NAV */
     nav {
       position: fixed;

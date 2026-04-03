@@ -9,8 +9,8 @@
   {{#each aiContent.summaries}}
   <div class="section-summary">
     <div class="section-type">{{this.type}}</div>
-    <div class="section-heading">{{this.heading}}</div>
-    <div class="section-body">{{this.body}}</div>
+    <div class="section-heading">{{{mdInline this.heading}}}</div>
+    <div class="section-body">{{{mdInline this.body}}}</div>
 
     {{! Activity pattern: mini heatmap }}
     {{#eq this.type "activity-pattern"}}

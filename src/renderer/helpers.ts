@@ -1,6 +1,7 @@
 // Handlebars custom helpers
 
 import Handlebars from "handlebars";
+import { parse as mdParse, parseInline as mdInline } from "marked";
 import type { RepositoryActivity, Language } from "../types.js";
 import { getLocale, formatNumber as fmtNumber } from "../i18n/index.js";
 
@@ -61,6 +62,15 @@ export const registerHelpers = (
 
   hbs.registerHelper("userWeek", (username: string): string =>
     locale.userWeek(username),
+  );
+
+  // Markdown rendering
+  hbs.registerHelper("md", (text: string): Handlebars.SafeString =>
+    new Handlebars.SafeString(mdParse(text ?? "") as string),
+  );
+
+  hbs.registerHelper("mdInline", (text: string): Handlebars.SafeString =>
+    new Handlebars.SafeString(mdInline(text ?? "") as string),
   );
 
   hbs.registerHelper("eq", function (this: unknown, a: unknown, b: unknown, opts: Handlebars.HelperOptions) {

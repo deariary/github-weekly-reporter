@@ -43,6 +43,7 @@
     "@octokit/graphql": "^8.2.1",
     "commander": "^14.0.3",
     "handlebars": "^4.7.9",
+    "marked": "^17.0.5",
     "openai": "^6.33.0",
     "smol-toml": "^1.6.1",
     "yaml": "^2.8.3"

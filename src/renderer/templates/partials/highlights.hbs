@@ -15,7 +15,7 @@
     <div class="highlight-title">{{this.title}}</div>
     {{/if}}
     <div class="highlight-meta">{{this.repo}} · {{this.meta}}</div>
-    <div class="highlight-body">{{this.body}}</div>
+    <div class="highlight-body">{{{mdInline this.body}}}</div>
   </div>
   {{/each}}
 </div>
