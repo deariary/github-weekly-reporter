@@ -1,9 +1,18 @@
 // Handlebars custom helpers
 
 import Handlebars from "handlebars";
-import { parse as mdParse, parseInline as mdInline } from "marked";
+import { Marked } from "marked";
 import type { RepositoryActivity, Language } from "../types.js";
 import { getLocale, formatNumber as fmtNumber } from "../i18n/index.js";
+
+const externalLinkRenderer = {
+  link({ href, text }: { href: string; text: string }): string {
+    const escaped = href.replace(/"/g, "&quot;");
+    return `<a href="${escaped}" target="_blank" rel="noopener nofollow">${text}</a>`;
+  },
+};
+
+const marked = new Marked({ renderer: externalLinkRenderer });
 
 export type HelperOptions = {
   language: Language;
@@ -64,13 +73,13 @@ export const registerHelpers = (
     locale.userWeek(username),
   );
 
-  // Markdown rendering
+  // Markdown rendering (all links get target="_blank" rel="noopener nofollow")
   hbs.registerHelper("md", (text: string): Handlebars.SafeString =>
-    new Handlebars.SafeString(mdParse(text ?? "") as string),
+    new Handlebars.SafeString(marked.parse(text ?? "") as string),
   );
 
   hbs.registerHelper("mdInline", (text: string): Handlebars.SafeString =>
-    new Handlebars.SafeString(mdInline(text ?? "") as string),
+    new Handlebars.SafeString(marked.parseInline(text ?? "") as string),
   );
 
   hbs.registerHelper("eq", function (this: unknown, a: unknown, b: unknown, opts: Handlebars.HelperOptions) {

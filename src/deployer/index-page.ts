@@ -169,9 +169,9 @@ const TEMPLATE = `<!DOCTYPE html>
 </div>
 
 <footer class="footer">
-  {{poweredBy}} <a href="https://deariary.com?utm_source=github-weekly-reporter&utm_medium=footer">deariary</a>
+  {{poweredBy}} <a href="https://deariary.com?utm_source=github-weekly-reporter&utm_medium=footer" target="_blank" rel="noopener">deariary</a>
   &nbsp;&middot;&nbsp;
-  <a href="https://github.com/deariary/github-weekly-reporter">github-weekly-reporter</a>
+  <a href="https://github.com/deariary/github-weekly-reporter" target="_blank" rel="noopener">github-weekly-reporter</a>
 </footer>
 
 </body>
