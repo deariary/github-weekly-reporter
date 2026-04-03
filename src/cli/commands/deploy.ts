@@ -3,11 +3,13 @@
 import { Command } from "commander";
 import { deploy } from "../../deployer/index.js";
 import { getWeekId } from "../../deployer/week.js";
+import { parseLocalDate } from "../../collector/date-range.js";
 
 type DeployCommandOptions = {
   directory: string;
   repoUrl: string;
   timezone: string;
+  date?: Date;
 };
 
 const env = (key: string): string | undefined => process.env[key];
@@ -36,7 +38,7 @@ const buildRepoUrl = (repo: string | undefined): string => {
 };
 
 const run = async (options: DeployCommandOptions): Promise<void> => {
-  const weekId = getWeekId(undefined, options.timezone);
+  const weekId = getWeekId(options.date, options.timezone);
 
   console.log(`Deploying ${options.directory} to gh-pages...`);
   await deploy({
@@ -54,6 +56,7 @@ export const registerDeploy = (program: Command): void => {
     .option("-d, --directory <dir>", "Directory containing generated HTML files (env: OUTPUT_DIR, default: ./output)")
     .option("-r, --repo <slug>", "Repository (owner/repo or full URL, env: GITHUB_REPOSITORY)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
+    .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
         const timezone = opts.timezone ?? env("TIMEZONE") ?? "UTC";
@@ -62,6 +65,7 @@ export const registerDeploy = (program: Command): void => {
           directory: opts.directory ?? env("OUTPUT_DIR") ?? "./output",
           repoUrl,
           timezone,
+          date: opts.date ? parseLocalDate(opts.date, timezone) : undefined,
         });
       } catch (error) {
         console.error("Error:", error instanceof Error ? error.message : error);

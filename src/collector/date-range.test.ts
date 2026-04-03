@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildWeeklyRange, toISODate } from "./date-range.js";
+import { buildWeeklyRange, toISODate, parseLocalDate } from "./date-range.js";
 
 // Helper: verify the range covers exactly 7 calendar days.
 // In non-DST zones this is 7 * 86400000 - 1 ms.
@@ -379,5 +379,58 @@ describe("toISODate", () => {
     // 2026-04-03 23:00 UTC = 2026-04-04 04:30 IST
     const date = new Date("2026-04-03T23:00:00Z");
     expect(toISODate(date, "Asia/Kolkata")).toBe("2026-04-04");
+  });
+});
+
+describe("parseLocalDate", () => {
+  it("returns noon in the given timezone (UTC)", () => {
+    const result = parseLocalDate("2026-04-16", "UTC");
+    expect(result.toISOString()).toBe("2026-04-16T12:00:00.000Z");
+  });
+
+  it("returns noon in Asia/Tokyo (UTC+9)", () => {
+    const result = parseLocalDate("2026-04-16", "Asia/Tokyo");
+    // Tokyo noon = UTC 03:00
+    expect(result.toISOString()).toBe("2026-04-16T03:00:00.000Z");
+  });
+
+  it("returns noon in America/New_York (UTC-4 in April / EDT)", () => {
+    const result = parseLocalDate("2026-04-16", "America/New_York");
+    // NYC noon = UTC 16:00
+    expect(result.toISOString()).toBe("2026-04-16T16:00:00.000Z");
+  });
+
+  it("resolves to the correct local date in UTC+14 (Pacific/Kiritimati)", () => {
+    const result = parseLocalDate("2026-04-16", "Pacific/Kiritimati");
+    // Kiritimati noon = UTC 22:00 on Apr 15
+    expect(toISODate(result, "Pacific/Kiritimati")).toBe("2026-04-16");
+  });
+
+  it("resolves to the correct local date in UTC-12 (Etc/GMT+12)", () => {
+    const result = parseLocalDate("2026-04-16", "Etc/GMT+12");
+    // UTC-12 noon = UTC 00:00 on Apr 17
+    expect(toISODate(result, "Etc/GMT+12")).toBe("2026-04-16");
+  });
+
+  it("handles year boundary (2025-12-31 in Asia/Tokyo)", () => {
+    const result = parseLocalDate("2025-12-31", "Asia/Tokyo");
+    expect(toISODate(result, "Asia/Tokyo")).toBe("2025-12-31");
+  });
+
+  it("handles year boundary (2026-01-01 in America/New_York)", () => {
+    const result = parseLocalDate("2026-01-01", "America/New_York");
+    expect(toISODate(result, "America/New_York")).toBe("2026-01-01");
+  });
+
+  it("handles half-hour offset (Asia/Kolkata)", () => {
+    const result = parseLocalDate("2026-04-16", "Asia/Kolkata");
+    // Kolkata noon (UTC+5:30) = UTC 06:30
+    expect(result.toISOString()).toBe("2026-04-16T06:30:00.000Z");
+  });
+
+  it("throws on invalid format", () => {
+    expect(() => parseLocalDate("abc", "UTC")).toThrow("Invalid date format");
+    expect(() => parseLocalDate("2026-13-01", "UTC")).not.toThrow(); // valid format, invalid date handled by midnightInTz
+    expect(() => parseLocalDate("2026/04/16", "UTC")).toThrow("Invalid date format");
   });
 });

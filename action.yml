@@ -8,7 +8,7 @@ branding:
 
 inputs:
   github-token:
-    description: 'GitHub token for API access and deployment'
+    description: 'GitHub token for API access and deployment (requires contents: write permission)'
     required: true
   username:
     description: 'GitHub username to generate the report for'
@@ -69,9 +69,12 @@ runs:
 
     - name: Configure git
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         git config user.name "github-weekly-reporter[bot]"
         git config user.email "github-weekly-reporter[bot]@users.noreply.github.com"
+        git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
 
     # --- Daily mode: fetch events and persist ---
 
@@ -85,16 +88,15 @@ runs:
         DATA_DIR: ./data
       run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
 
-    - name: Commit data (daily)
+    - name: Commit and push data (daily)
       if: inputs.mode == 'daily'
       shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         git add data/
         if git diff --cached --quiet; then
           echo "No new data to commit"
         else
+          git pull --rebase
           git commit -m "data: daily events $(date -u +%Y-%m-%d)"
           git push
         fi
@@ -130,16 +132,15 @@ runs:
           echo "No LLM provider configured, skipping AI content generation"
         fi
 
-    - name: Commit data (weekly)
+    - name: Commit and push data (weekly)
       if: inputs.mode == 'weekly'
       shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         git add data/
         if git diff --cached --quiet; then
           echo "No new data to commit"
         else
+          git pull --rebase
           git commit -m "data: weekly report $(date -u +%Y-%m-%d)"
           git push
         fi
@@ -161,4 +162,4 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         OUTPUT_DIR: ./output
-      run: npx github-weekly-reporter@${{ inputs.version }} deploy
+      run: npx github-weekly-reporter@${{ inputs.version }} deploy ${{ inputs.date && format('--date {0}', inputs.date) || '' }}

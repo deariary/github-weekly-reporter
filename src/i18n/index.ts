@@ -1,6 +1,7 @@
 // Internationalization: locale strings, date/number formatting, LLM instructions
 
 import type { Language } from "../types.js";
+import { parseLocalDate } from "../collector/date-range.js";
 
 export { getFontConfig } from "./fonts.js";
 export type { FontConfig } from "./fonts.js";
@@ -201,7 +202,7 @@ export const formatDate = (
   language: Language,
   timezone: string = "UTC",
 ): string => {
-  const date = new Date(dateStr + "T12:00:00Z");
+  const date = parseLocalDate(dateStr, timezone);
   const tag = getBcp47(language);
   const usesNumericMonth = ["ja", "zh-CN", "zh-TW", "ko"].includes(language);
   return date.toLocaleDateString(tag, {

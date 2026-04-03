@@ -4,6 +4,7 @@ import Handlebars from "handlebars";
 import { Marked } from "marked";
 import type { RepositoryActivity, Language } from "../types.js";
 import { getLocale, formatNumber as fmtNumber } from "../i18n/index.js";
+import { parseLocalDate } from "../collector/date-range.js";
 
 const externalLinkRenderer = {
   link({ href, text }: { href: string; text: string }): string {
@@ -38,8 +39,13 @@ export const registerHelpers = (
   );
 
   hbs.registerHelper("weekday", (dateStr: string): string => {
-    const date = new Date(dateStr + "T00:00:00Z");
-    return locale.weekdaysShort[date.getUTCDay()];
+    const date = parseLocalDate(dateStr, options.timezone);
+    const dayIndex = new Intl.DateTimeFormat("en-US", {
+      timeZone: options.timezone,
+      weekday: "short",
+    }).formatToParts(date).find((p) => p.type === "weekday");
+    const dayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+    return locale.weekdaysShort[dayMap[dayIndex?.value ?? "Sun"] ?? 0];
   });
 
   hbs.registerHelper("formatNumber", (n: number): string =>
