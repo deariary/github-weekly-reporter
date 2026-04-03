@@ -1,7 +1,5 @@
-<header class="header">
-  <img class="avatar" src="{{avatarUrl}}" alt="{{username}}" />
-  <div class="header-text">
-    <h1>{{username}}'s Weekly Report</h1>
-    <p class="date-range">{{dateRange.from}} - {{dateRange.to}}</p>
-  </div>
-</header>
+<div class="header">
+  <div class="header-week">{{weekLabel dateRange.from dateRange.to}}</div>
+  <h1 class="header-title">{{#if aiContent}}{{aiContent.title}}{{else}}{{username}}'s Weekly Report{{/if}}</h1>
+  {{#if aiContent}}<p class="header-sub">{{aiContent.subtitle}}</p>{{/if}}
+</div>

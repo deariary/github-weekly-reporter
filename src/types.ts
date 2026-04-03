@@ -15,38 +15,104 @@ export type RepositoryActivity = {
   url: string;
 };
 
-export type LanguageBreakdown = {
-  language: string;
-  bytes: number;
-  percentage: number;
-  color: string;
-};
-
 export type PullRequest = {
   title: string;
+  body: string | null;
   url: string;
   repository: string;
   state: "open" | "merged" | "closed";
+  labels: string[];
+  additions: number;
+  deletions: number;
+  changedFiles: number;
+  author: string;
   createdAt: string;
   mergedAt: string | null;
 };
 
 export type Issue = {
   title: string;
+  body: string | null;
   url: string;
   repository: string;
   state: "open" | "closed";
+  labels: string[];
+  author: string;
   createdAt: string;
   closedAt: string | null;
 };
 
+export type GitHubEvent = {
+  id: string;
+  type: string;
+  repo: string;
+  createdAt: string;
+  payload: EventPayload;
+};
+
+export type EventPayload =
+  | PushEventPayload
+  | PullRequestReviewEventPayload
+  | ReleaseEventPayload
+  | PullRequestEventPayload
+  | IssuesEventPayload
+  | GenericEventPayload;
+
+export type PushEventPayload = {
+  kind: "push";
+  ref: string;
+  commits: string[];
+};
+
+export type PullRequestReviewEventPayload = {
+  kind: "review";
+  action: string;
+  prNumber: number;
+  prTitle: string;
+  state: string; // approved, changes_requested, commented
+};
+
+export type ReleaseEventPayload = {
+  kind: "release";
+  action: string;
+  tag: string;
+  name: string;
+};
+
+export type PullRequestEventPayload = {
+  kind: "pull_request";
+  action: string;
+  number: number;
+  title: string;
+};
+
+export type IssuesEventPayload = {
+  kind: "issues";
+  action: string;
+  number: number;
+  title: string;
+};
+
+export type GenericEventPayload = {
+  kind: "generic";
+  action: string;
+};
+
 export type WeeklyStats = {
   totalCommits: number;
+  totalAdditions: number;
+  totalDeletions: number;
   prsOpened: number;
   prsMerged: number;
   prsReviewed: number;
   issuesOpened: number;
   issuesClosed: number;
+};
+
+export type ExternalContribution = {
+  repo: string;
+  events: GitHubEvent[];
+  pullRequests: PullRequest[];
 };
 
 export type WeeklyReportData = {
@@ -56,10 +122,48 @@ export type WeeklyReportData = {
   stats: WeeklyStats;
   dailyCommits: DailyCommitCount[];
   repositories: RepositoryActivity[];
-  languages: LanguageBreakdown[];
   pullRequests: PullRequest[];
   issues: Issue[];
-  aiNarrative: string | null;
+  events: GitHubEvent[];
+  externalContributions: ExternalContribution[];
+  aiContent: AIContent | null;
+};
+
+// LLM structured output
+
+// Predefined types get special visuals, custom types render with chips only
+export type SummaryType = string;
+
+export type HighlightType = "pr" | "release" | "issue" | "discussion";
+
+export type DataChip = {
+  label: string;
+  value: string;
+  color?: "green" | "red" | "default";
+};
+
+export type SummarySection = {
+  type: SummaryType;
+  heading: string;
+  body: string;
+  chips?: DataChip[];
+};
+
+export type HighlightSection = {
+  type: HighlightType;
+  title: string;
+  repo: string;
+  meta: string;
+  body: string;
+  url?: string; // resolved from PR/Issue data, not from LLM
+};
+
+export type AIContent = {
+  title: string;
+  subtitle: string;
+  overview: string; // multi-paragraph long-form text
+  summaries: SummarySection[];
+  highlights: HighlightSection[];
 };
 
 // Configuration types

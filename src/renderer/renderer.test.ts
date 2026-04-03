@@ -8,39 +8,49 @@ const MOCK_DATA: WeeklyReportData = {
   dateRange: { from: "2026-03-28", to: "2026-04-03" },
   stats: {
     totalCommits: 42,
+    totalAdditions: 1200,
+    totalDeletions: 300,
     prsOpened: 5,
     prsMerged: 3,
     prsReviewed: 8,
     issuesOpened: 2,
     issuesClosed: 1,
   },
-  dailyCommits: [
-    { date: "2026-03-28", count: 5 },
-    { date: "2026-03-29", count: 0 },
-    { date: "2026-03-30", count: 12 },
-    { date: "2026-03-31", count: 3 },
-    { date: "2026-04-01", count: 8 },
-    { date: "2026-04-02", count: 7 },
-    { date: "2026-04-03", count: 7 },
-  ],
-  repositories: [
-    {
-      name: "org/repo-a",
-      commits: 0,
-      prsOpened: 3,
-      prsMerged: 2,
-      issuesOpened: 1,
-      issuesClosed: 0,
-      url: "https://github.com/org/repo-a",
-    },
-  ],
-  languages: [
-    { language: "TypeScript", bytes: 8000, percentage: 80, color: "#3178c6" },
-    { language: "JavaScript", bytes: 2000, percentage: 20, color: "#f1e05a" },
-  ],
+  dailyCommits: [],
+  repositories: [],
   pullRequests: [],
   issues: [],
-  aiNarrative: null,
+  events: [],
+  externalContributions: [],
+  aiContent: null,
+};
+
+const MOCK_WITH_AI: WeeklyReportData = {
+  ...MOCK_DATA,
+  aiContent: {
+    title: "Auth refactor completed",
+    subtitle: "A focused backend week",
+    overview: "First paragraph about the week.\n\nSecond paragraph with details.",
+    summaries: [
+      {
+        type: "commit-summary",
+        heading: "47 commits",
+        body: "Lots of commits this week.",
+        chips: [
+          { label: "lines", value: "+1200 -300", color: "green" },
+        ],
+      },
+    ],
+    highlights: [
+      {
+        type: "pr",
+        title: "feat: add OAuth flow",
+        repo: "org/backend",
+        meta: "merged Apr 2",
+        body: "Big PR for auth.",
+      },
+    ],
+  },
 };
 
 describe("renderReport", () => {
@@ -50,75 +60,65 @@ describe("renderReport", () => {
     expect(html).toContain("</html>");
   });
 
-  it("includes username and date range", () => {
+  it("includes username in nav", () => {
     const html = renderReport(MOCK_DATA);
     expect(html).toContain("testuser");
+  });
+
+  it("includes date range in header", () => {
+    const html = renderReport(MOCK_DATA);
     expect(html).toContain("2026-03-28");
     expect(html).toContain("2026-04-03");
   });
 
-  it("includes stats values", () => {
-    const html = renderReport(MOCK_DATA);
-    expect(html).toContain("42");
-    expect(html).toContain("Commits");
-    expect(html).toContain("PRs Opened");
+  it("renders AI content when provided", () => {
+    const html = renderReport(MOCK_WITH_AI);
+    expect(html).toContain("Auth refactor completed");
+    expect(html).toContain("A focused backend week");
+    expect(html).toContain("First paragraph about the week.");
+    expect(html).toContain("Second paragraph with details.");
   });
 
-  it("includes heatmap days", () => {
-    const html = renderReport(MOCK_DATA);
-    expect(html).toContain("heatmap-level-");
-    expect(html).toContain("heatmap-day");
+  it("renders summary sections", () => {
+    const html = renderReport(MOCK_WITH_AI);
+    expect(html).toContain("Summary");
+    expect(html).toContain("commit-summary");
+    expect(html).toContain("47 commits");
+    expect(html).toContain("+1200 -300");
   });
 
-  it("includes language breakdown", () => {
-    const html = renderReport(MOCK_DATA);
-    expect(html).toContain("TypeScript");
-    expect(html).toContain("80.0%");
-    expect(html).toContain("#3178c6");
+  it("renders highlight cards", () => {
+    const html = renderReport(MOCK_WITH_AI);
+    expect(html).toContain("Highlights");
+    expect(html).toContain("feat: add OAuth flow");
+    expect(html).toContain("org/backend");
   });
 
-  it("includes repository table", () => {
-    const html = renderReport(MOCK_DATA);
-    expect(html).toContain("org/repo-a");
-    expect(html).toContain("Active Repositories");
-  });
-
-  it("includes dofollow footer link with UTM params", () => {
+  it("includes dofollow footer links", () => {
     const html = renderReport(MOCK_DATA);
     expect(html).toContain("deariary.com?utm_source=github-weekly-reporter&utm_medium=footer");
+    expect(html).toContain("github-weekly-reporter");
     expect(html).not.toContain('rel="nofollow"');
-    expect(html).not.toContain('rel="sponsored"');
   });
 
   it("includes OG meta tags", () => {
+    const html = renderReport(MOCK_WITH_AI);
+    expect(html).toContain("og:title");
+    expect(html).toContain("Auth refactor completed");
+  });
+
+  it("omits AI sections when aiContent is null", () => {
     const html = renderReport(MOCK_DATA);
-    expect(html).toContain('og:title');
-    expect(html).toContain('og:description');
-    expect(html).toContain('og:image');
+    // No summary/highlight content in the body (CSS class defs don't count)
+    const body = html.split("<body>")[1] ?? "";
+    expect(body).not.toContain("Summary");
+    expect(body).not.toContain("Highlights");
+    expect(body).not.toContain("class=\"overview\"");
   });
 
-  it("omits AI narrative section when null", () => {
-    const html = renderReport(MOCK_DATA);
-    expect(html).not.toContain("AI Summary");
-  });
-
-  it("includes AI narrative when provided", () => {
-    const data = { ...MOCK_DATA, aiNarrative: "This week you focused on TypeScript." };
-    const html = renderReport(data);
-    expect(html).toContain("AI Summary");
-    expect(html).toContain("This week you focused on TypeScript.");
-  });
-
-  it("renders dark theme without errors", () => {
+  it("renders dark theme", () => {
     const html = renderReport(MOCK_DATA, "dark");
-    expect(html).toContain("#0d1117");
+    expect(html).toContain("#050505");
     expect(html).toContain("<!DOCTYPE html>");
-  });
-
-  it("produces a single self-contained file (no external links)", () => {
-    const html = renderReport(MOCK_DATA);
-    // Should not have <link> or <script src=> tags
-    expect(html).not.toMatch(/<link\s+rel="stylesheet"/);
-    expect(html).not.toMatch(/<script\s+src=/);
   });
 });

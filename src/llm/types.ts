@@ -12,4 +12,4 @@ export type LLMProvider = {
   generate: (prompt: string) => Promise<string>;
 };
 
-export type NarrativeInput = Omit<WeeklyReportData, "aiNarrative">;
+export type NarrativeInput = Omit<WeeklyReportData, "aiContent">;
