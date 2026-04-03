@@ -87,6 +87,7 @@ export const renderReport = (
     css: buildCSS(theme, language),
     lang: language,
     i18n: locale,
+    baseUrl,
     canonicalUrl,
     ogImageUrl,
     prevWeek: opts.prevWeek,

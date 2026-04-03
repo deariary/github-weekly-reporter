@@ -34,6 +34,18 @@
     "datePublished": "{{{dateRange.to}}}"
   }
   </script>
+  {{#if canonicalUrl}}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{{baseUrl}}}/" },
+      { "@type": "ListItem", "position": 2, "name": "{{dateRange.from}} - {{dateRange.to}}", "item": "{{{canonicalUrl}}}" }
+    ]
+  }
+  </script>
+  {{/if}}
   <style>{{{css}}}</style>
 </head>
 <body>
