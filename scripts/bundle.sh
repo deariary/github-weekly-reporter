@@ -22,4 +22,5 @@ npx esbuild dist/cli/index.js \
   --outfile=bundle/cli/index.js
 
 # Copy templates (Handlebars reads them from fs at runtime)
+rm -rf bundle/templates
 cp -r src/renderer/templates bundle/templates
