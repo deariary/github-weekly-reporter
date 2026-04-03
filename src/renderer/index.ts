@@ -44,6 +44,8 @@ export type RenderOptions = {
   theme?: Theme;
   language?: Language;
   timezone?: string;
+  baseUrl?: string;
+  weekPath?: string;
   prevWeek?: string;
   nextWeek?: string;
 };
@@ -74,12 +76,19 @@ export const renderReport = (
   const hbs = createInstance(language, timezone);
   const template = hbs.compile(readTemplate("report.hbs"));
 
+  const baseUrl = opts.baseUrl?.replace(/\/+$/, "") ?? "";
+  const weekPath = opts.weekPath ?? "";
+  const canonicalUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/` : undefined;
+  const ogImageUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/og.png` : "og.png";
+
   return template({
     ...data,
     dailyCommits: computeHeatmapLevels(data.dailyCommits),
     css: buildCSS(theme, language),
     lang: language,
     i18n: locale,
+    canonicalUrl,
+    ogImageUrl,
     prevWeek: opts.prevWeek,
     nextWeek: opts.nextWeek,
   });

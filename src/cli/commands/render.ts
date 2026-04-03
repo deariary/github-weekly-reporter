@@ -16,6 +16,7 @@ const env = (key: string): string | undefined => process.env[key];
 type RenderOptions = {
   dataDir: string;
   outputDir: string;
+  baseUrl: string;
   theme: Theme;
   language: Language;
   timezone: string;
@@ -90,11 +91,15 @@ const run = async (options: RenderOptions): Promise<void> => {
   const prevWeek = currentIdx > 0 ? allPaths[currentIdx - 1] : undefined;
   const nextWeek = currentIdx < allPaths.length - 1 ? allPaths[currentIdx + 1] : undefined;
 
+  const base = options.baseUrl.replace(/\/+$/, "");
+
   console.log(`Rendering report (theme: ${options.theme}, lang: ${options.language})...`);
   const html = renderReport(data, {
     theme: options.theme,
     language: options.language,
     timezone: options.timezone,
+    baseUrl: base,
+    weekPath: weekId.path,
     prevWeek: prevWeek ? `../../${prevWeek}/` : undefined,
     nextWeek: nextWeek ? `../../${nextWeek}/` : undefined,
   });
@@ -135,11 +140,11 @@ const run = async (options: RenderOptions): Promise<void> => {
 
   // Generate sitemap.xml
   const sitemapEntries = allPaths
-    .map((p) => `  <url><loc>${p}/</loc></url>`)
+    .map((p) => `  <url><loc>${base}/${p}/</loc></url>`)
     .join("\n");
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>/</loc></url>
+  <url><loc>${base}/</loc></url>
 ${sitemapEntries}
 </urlset>`;
   const sitemapPath = join(options.outputDir, "sitemap.xml");
@@ -153,15 +158,20 @@ export const registerRender = (program: Command): void => {
     .description("Render HTML report from fetched data and LLM content")
     .option("--data-dir <dir>", "Data directory (env: DATA_DIR, default: ./data)")
     .option("-o, --output-dir <dir>", "Output directory for HTML (env: OUTPUT_DIR, default: ./output)")
+    .option("--base-url <url>", "Base URL for absolute links in OG tags, sitemap, canonical (env: BASE_URL)")
     .option("--theme <theme>", "Report theme (env: THEME, default: default)")
     .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, default: en)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
+        const baseUrl = opts.baseUrl ?? env("BASE_URL");
+        if (!baseUrl) throw new Error("Base URL required. Pass --base-url or set BASE_URL (e.g. https://user.github.io/repo).");
+
         const options: RenderOptions = {
           dataDir: opts.dataDir ?? env("DATA_DIR") ?? "./data",
           outputDir: opts.outputDir ?? env("OUTPUT_DIR") ?? "./output",
+          baseUrl,
           theme: (opts.theme ?? env("THEME") ?? "default") as Theme,
           language: (opts.language ?? env("LANGUAGE") ?? "en") as Language,
           timezone: opts.timezone ?? env("TIMEZONE") ?? "UTC",

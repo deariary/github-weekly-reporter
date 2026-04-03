@@ -8,7 +8,6 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Load a font for satori (bundled Inter subset or fallback)
 const loadFont = (): ArrayBuffer => {
   const fontPath = join(__dirname, "..", "..", "assets", "Inter-SemiBold.woff");
   try {
@@ -21,13 +20,24 @@ const loadFont = (): ArrayBuffer => {
   }
 };
 
-type OGImageData = {
+export type OGImageData = {
   title: string;
   subtitle: string;
   username: string;
   dateRange: string;
   stats: { commits: number; prs: number; reviews: number };
 };
+
+const statChip = (value: number, label: string, color: string) => ({
+  type: "div",
+  props: {
+    style: { display: "flex", alignItems: "baseline", gap: "8px" },
+    children: [
+      { type: "span", props: { style: { color, fontWeight: 600, fontSize: "24px" }, children: String(value) } },
+      { type: "span", props: { style: { color: "rgba(255,255,255,0.4)", fontSize: "20px" }, children: label } },
+    ],
+  },
+});
 
 const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> => {
   const element = {
@@ -39,7 +49,7 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
         justifyContent: "space-between",
         width: "100%",
         height: "100%",
-        padding: "60px 70px",
+        padding: "80px 90px",
         background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)",
         color: "#e0e0e0",
         fontFamily: "Inter",
@@ -48,13 +58,13 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
         {
           type: "div",
           props: {
-            style: { display: "flex", flexDirection: "column", gap: "12px" },
+            style: { display: "flex", flexDirection: "column", gap: "16px" },
             children: [
               {
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "18px",
+                    fontSize: "22px",
                     color: "#39d353",
                     letterSpacing: "0.15em",
                     textTransform: "uppercase",
@@ -66,11 +76,12 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "48px",
+                    fontSize: "56px",
                     fontWeight: 600,
                     lineHeight: 1.2,
                     letterSpacing: "-0.02em",
-                    maxWidth: "900px",
+                    maxWidth: "960px",
+                    color: "#ffffff",
                   },
                   children: data.title,
                 },
@@ -79,9 +90,10 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "22px",
-                    color: "rgba(255,255,255,0.6)",
-                    marginTop: "4px",
+                    fontSize: "26px",
+                    color: "rgba(255,255,255,0.55)",
+                    marginTop: "8px",
+                    maxWidth: "900px",
                   },
                   children: data.subtitle,
                 },
@@ -101,38 +113,11 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
               {
                 type: "div",
                 props: {
-                  style: { display: "flex", gap: "32px", fontSize: "16px" },
+                  style: { display: "flex", gap: "40px" },
                   children: [
-                    {
-                      type: "div",
-                      props: {
-                        style: { display: "flex", gap: "6px" },
-                        children: [
-                          { type: "span", props: { style: { color: "#39d353", fontWeight: 600 }, children: String(data.stats.commits) } },
-                          { type: "span", props: { style: { color: "rgba(255,255,255,0.4)" }, children: "commits" } },
-                        ],
-                      },
-                    },
-                    {
-                      type: "div",
-                      props: {
-                        style: { display: "flex", gap: "6px" },
-                        children: [
-                          { type: "span", props: { style: { color: "#8957e5", fontWeight: 600 }, children: String(data.stats.prs) } },
-                          { type: "span", props: { style: { color: "rgba(255,255,255,0.4)" }, children: "PRs" } },
-                        ],
-                      },
-                    },
-                    {
-                      type: "div",
-                      props: {
-                        style: { display: "flex", gap: "6px" },
-                        children: [
-                          { type: "span", props: { style: { color: "#58a6ff", fontWeight: 600 }, children: String(data.stats.reviews) } },
-                          { type: "span", props: { style: { color: "rgba(255,255,255,0.4)" }, children: "reviews" } },
-                        ],
-                      },
-                    },
+                    statChip(data.stats.commits, "commits", "#39d353"),
+                    statChip(data.stats.prs, "PRs", "#8957e5"),
+                    statChip(data.stats.reviews, "reviews", "#58a6ff"),
                   ],
                 },
               },
@@ -140,8 +125,8 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "18px",
-                    color: "rgba(255,255,255,0.5)",
+                    fontSize: "22px",
+                    color: "rgba(255,255,255,0.45)",
                   },
                   children: `@${data.username}`,
                 },
