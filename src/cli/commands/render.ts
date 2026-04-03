@@ -115,6 +115,7 @@ const run = async (options: RenderOptions): Promise<void> => {
     subtitle: aiContent.subtitle,
     username: githubData.username,
     dateRange: `${githubData.dateRange.from} - ${githubData.dateRange.to}`,
+    language: options.language,
     stats: {
       commits: githubData.stats.totalCommits,
       prs: githubData.stats.prsOpened,

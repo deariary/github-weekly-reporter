@@ -5,19 +5,31 @@ import sharp from "sharp";
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { Language } from "../types.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const ASSETS_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "..", "..", "assets",
+);
 
-const loadFont = (): ArrayBuffer => {
-  const fontPath = join(__dirname, "..", "..", "assets", "Inter-SemiBold.woff");
-  try {
-    const buf = readFileSync(fontPath);
-    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
-  } catch {
-    throw new Error(
-      `Font file not found at ${fontPath}. Ensure assets/Inter-SemiBold.woff exists.`,
-    );
-  }
+const FONT_FILES: Record<string, string> = {
+  en: "SchibstedGrotesk-SemiBold.ttf",
+  es: "SchibstedGrotesk-SemiBold.ttf",
+  fr: "SchibstedGrotesk-SemiBold.ttf",
+  de: "SchibstedGrotesk-SemiBold.ttf",
+  pt: "SchibstedGrotesk-SemiBold.ttf",
+  ja: "ZenKakuGothicNew-Medium.ttf",
+  "zh-CN": "NotoSansSC-SemiBold.ttf",
+  "zh-TW": "NotoSansTC-SemiBold.ttf",
+  ko: "IBMPlexSansKR-SemiBold.ttf",
+  ru: "Urbanist-SemiBold.ttf",
+};
+
+const loadFont = (language: Language): ArrayBuffer => {
+  const filename = FONT_FILES[language] ?? FONT_FILES.en;
+  const fontPath = join(ASSETS_DIR, filename);
+  const buf = readFileSync(fontPath);
+  return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
 };
 
 export type OGImageData = {
@@ -25,6 +37,7 @@ export type OGImageData = {
   subtitle: string;
   username: string;
   dateRange: string;
+  language: Language;
   stats: { commits: number; prs: number; reviews: number };
 };
 
@@ -52,7 +65,7 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
         padding: "80px 90px",
         background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)",
         color: "#e0e0e0",
-        fontFamily: "Inter",
+        fontFamily: "OGFont",
       },
       children: [
         {
@@ -143,7 +156,7 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
     height: 630,
     fonts: [
       {
-        name: "Inter",
+        name: "OGFont",
         data: font,
         weight: 600,
         style: "normal",
@@ -153,7 +166,7 @@ const buildSVG = async (data: OGImageData, font: ArrayBuffer): Promise<string> =
 };
 
 export const generateOGImage = async (data: OGImageData): Promise<Buffer> => {
-  const font = loadFont();
+  const font = loadFont(data.language);
   const svg = await buildSVG(data, font);
   return sharp(Buffer.from(svg)).png().toBuffer();
 };
