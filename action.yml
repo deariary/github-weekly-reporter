@@ -65,4 +65,7 @@ runs:
 
     - name: Deploy to GitHub Pages
       shell: bash
-      run: npx github-weekly-reporter@${{ inputs.version }} deploy -r https://x-access-token:${{ inputs.github-token }}@github.com/${{ github.repository }}.git
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+      run: npx github-weekly-reporter@${{ inputs.version }} deploy
