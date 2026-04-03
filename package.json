@@ -8,9 +8,12 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist/",
+    "src/renderer/templates/"
+  ],
   "scripts": {
     "build": "tsc",
-    "bundle": "bash scripts/bundle.sh",
     "dev": "tsc --watch",
     "lint": "eslint src/",
     "test": "vitest run",
@@ -44,7 +47,6 @@
   "devDependencies": {
     "@eslint/js": "^9.24.0",
     "@types/node": "^22.14.1",
-    "esbuild": "^0.28.0",
     "eslint": "^9.24.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.29.1",

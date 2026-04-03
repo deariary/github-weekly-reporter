@@ -1,6 +1,6 @@
 // Main report renderer: compiles Handlebars templates into a self-contained HTML file
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
@@ -8,27 +8,11 @@ import type { WeeklyReportData, Theme } from "../types.js";
 import { buildCSS } from "./themes.js";
 import { registerHelpers } from "./helpers.js";
 
-const getCurrentDir = (): string => {
-  try {
-    return dirname(fileURLToPath(import.meta.url));
-  } catch {
-    // CJS bundle fallback
-    return __dirname;
-  }
-};
-
-const resolveTemplatesDir = (): string => {
-  const currentDir = getCurrentDir();
-  const candidates = [
-    join(currentDir, "..", "..", "src", "renderer", "templates"), // dev (src/)
-    join(currentDir, "..", "templates"),                          // bundle
-  ];
-  const found = candidates.find((p) => existsSync(p));
-  if (!found) throw new Error("Templates directory not found");
-  return found;
-};
-
-const TEMPLATES_DIR = resolveTemplatesDir();
+// Templates live at src/renderer/templates/ (both dev and npm package)
+const TEMPLATES_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "..", "..", "src", "renderer", "templates",
+);
 
 const readTemplate = (path: string): string =>
   readFileSync(join(TEMPLATES_DIR, path), "utf-8");
