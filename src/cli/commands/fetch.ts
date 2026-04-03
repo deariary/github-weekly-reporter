@@ -18,7 +18,7 @@ const env = (key: string): string | undefined => process.env[key];
 type BaseOptions = {
   token: string;
   username: string;
-  output: string;
+  dataDir: string;
   timezone: string;
   date?: Date;
 };
@@ -32,7 +32,7 @@ const resolveBaseOptions = (
   if (!username) throw new Error("GitHub username required. Pass --username or set GITHUB_USERNAME.");
   const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
   const timezone = cli.timezone ?? env("TIMEZONE") ?? "UTC";
-  return { token, username, output: cli.output ?? env("OUTPUT_DIR") ?? "./report", date, timezone };
+  return { token, username, dataDir: cli.dataDir ?? env("DATA_DIR") ?? "./data", date, timezone };
 };
 
 const tryReadYaml = async <T>(path: string): Promise<T | null> => {
@@ -63,7 +63,7 @@ const extractPRRefs = (events: GitHubEvent[]): PRRef[] => {
 const runDailyFetch = async (options: BaseOptions): Promise<void> => {
   const weekId = getWeekId(options.date, options.timezone);
   const range = buildWeeklyRange(options.date, options.timezone);
-  const reportDir = join(options.output, weekId.path);
+  const reportDir = join(options.dataDir, weekId.path);
   await mkdir(reportDir, { recursive: true });
 
   console.log(`Fetching events for ${options.username} (${weekId.path})...`);
@@ -82,7 +82,7 @@ const runDailyFetch = async (options: BaseOptions): Promise<void> => {
 const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   const weekId = getWeekId(options.date, options.timezone);
   const range = buildWeeklyRange(options.date, options.timezone);
-  const reportDir = join(options.output, weekId.path);
+  const reportDir = join(options.dataDir, weekId.path);
   await mkdir(reportDir, { recursive: true });
 
   // Load accumulated events
@@ -146,7 +146,7 @@ const baseOptions = (cmd: Command): Command =>
   cmd
     .option("-t, --token <token>", "GitHub token (env: GITHUB_TOKEN)")
     .option("-u, --username <username>", "GitHub username (env: GITHUB_USERNAME)")
-    .option("-o, --output <dir>", "Output directory (env: OUTPUT_DIR, default: ./report)")
+    .option("--data-dir <dir>", "Data directory (env: DATA_DIR, default: ./data)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)");
 

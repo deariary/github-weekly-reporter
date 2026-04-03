@@ -51,7 +51,7 @@ export const registerDeploy = (program: Command): void => {
   program
     .command("deploy")
     .description("Deploy generated report to GitHub Pages (gh-pages branch)")
-    .option("-d, --directory <dir>", "Directory containing generated report files (env: OUTPUT_DIR, default: ./report)")
+    .option("-d, --directory <dir>", "Directory containing generated HTML files (env: OUTPUT_DIR, default: ./output)")
     .option("-r, --repo <slug>", "Repository (owner/repo or full URL, env: GITHUB_REPOSITORY)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .action(async (opts) => {
@@ -59,7 +59,7 @@ export const registerDeploy = (program: Command): void => {
         const timezone = opts.timezone ?? env("TIMEZONE") ?? "UTC";
         const repoUrl = buildRepoUrl(opts.repo);
         await run({
-          directory: opts.directory ?? env("OUTPUT_DIR") ?? "./report",
+          directory: opts.directory ?? env("OUTPUT_DIR") ?? "./output",
           repoUrl,
           timezone,
         });

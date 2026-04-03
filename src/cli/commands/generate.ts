@@ -11,7 +11,7 @@ import type { WeeklyReportData, LLMProvider, Language } from "../../types.js";
 const env = (key: string): string | undefined => process.env[key];
 
 type GenerateOptions = {
-  output: string;
+  dataDir: string;
   llmProvider: LLMProvider;
   llmApiKey: string;
   llmModel: string;
@@ -40,7 +40,7 @@ const resolveOptions = (
   const timezone = cli.timezone ?? env("TIMEZONE") ?? "UTC";
 
   return {
-    output: cli.output ?? env("OUTPUT_DIR") ?? "./report",
+    dataDir: cli.dataDir ?? env("DATA_DIR") ?? "./data",
     llmProvider,
     llmApiKey,
     llmModel,
@@ -52,8 +52,8 @@ const resolveOptions = (
 
 const run = async (options: GenerateOptions): Promise<void> => {
   const weekId = getWeekId(options.date, options.timezone);
-  const reportDir = join(options.output, weekId.path);
-  const dataPath = join(reportDir, "github-data.yaml");
+  const dataDir = join(options.dataDir, weekId.path);
+  const dataPath = join(dataDir, "github-data.yaml");
 
   console.log(`Reading ${dataPath}...`);
   const raw = await readFile(dataPath, "utf-8");
@@ -75,7 +75,7 @@ const run = async (options: GenerateOptions): Promise<void> => {
     process.exit(1);
   }
 
-  const llmDataPath = join(reportDir, "llm-data.yaml");
+  const llmDataPath = join(dataDir, "llm-data.yaml");
   await writeFile(llmDataPath, toYaml(aiContent, { lineWidth: 120 }), "utf-8");
   console.log(`LLM data written to ${llmDataPath}`);
 };
@@ -84,7 +84,7 @@ export const registerGenerate = (program: Command): void => {
   program
     .command("generate")
     .description("Generate AI content from fetched GitHub data")
-    .option("-o, --output <dir>", "Output directory (env: OUTPUT_DIR, default: ./report)")
+    .option("--data-dir <dir>", "Data directory (env: DATA_DIR, default: ./data)")
     .option("--llm-provider <provider>", "LLM provider (env: LLM_PROVIDER)")
     .option("--llm-api-key <key>", "LLM API key (env: OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY)")
     .option("--llm-model <model>", "LLM model name (env: LLM_MODEL)")

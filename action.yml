@@ -70,6 +70,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_USERNAME: ${{ inputs.username }}
         TIMEZONE: ${{ inputs.timezone }}
+        DATA_DIR: ./data
       run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch
 
     - name: Weekly fetch (build full data from accumulated events)
@@ -79,6 +80,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_USERNAME: ${{ inputs.username }}
         TIMEZONE: ${{ inputs.timezone }}
+        DATA_DIR: ./data
       run: npx github-weekly-reporter@${{ inputs.version }} weekly-fetch
 
     - name: Generate AI content
@@ -92,6 +94,7 @@ runs:
         LLM_MODEL: ${{ inputs.llm-model }}
         LANGUAGE: ${{ inputs.language }}
         TIMEZONE: ${{ inputs.timezone }}
+        DATA_DIR: ./data
       run: |
         if [ -n "$LLM_PROVIDER" ] && [ -n "$LLM_MODEL" ]; then
           npx github-weekly-reporter@${{ inputs.version }} generate
@@ -105,6 +108,8 @@ runs:
       env:
         LANGUAGE: ${{ inputs.language }}
         TIMEZONE: ${{ inputs.timezone }}
+        DATA_DIR: ./data
+        OUTPUT_DIR: ./output
       run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }}
 
     - name: Deploy to GitHub Pages
@@ -113,4 +118,5 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_REPOSITORY: ${{ github.repository }}
+        OUTPUT_DIR: ./output
       run: npx github-weekly-reporter@${{ inputs.version }} deploy
