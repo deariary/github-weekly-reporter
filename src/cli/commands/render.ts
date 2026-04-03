@@ -150,6 +150,12 @@ ${sitemapEntries}
   const sitemapPath = join(options.outputDir, "sitemap.xml");
   await writeFile(sitemapPath, sitemap, "utf-8");
   console.log(`Sitemap written to ${sitemapPath}`);
+
+  // Generate robots.txt
+  const robots = `User-agent: *\nAllow: /\nSitemap: ${base}/sitemap.xml\n`;
+  const robotsPath = join(options.outputDir, "robots.txt");
+  await writeFile(robotsPath, robots, "utf-8");
+  console.log(`robots.txt written to ${robotsPath}`);
 };
 
 export const registerRender = (program: Command): void => {
