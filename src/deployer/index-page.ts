@@ -41,7 +41,68 @@ const TEMPLATE = `<!DOCTYPE html>
   <meta name="view-transition" content="same-origin" />
   <style>{{{css}}}</style>
   <style>
-    /* INDEX NAV (matches report nav) */
+    /* HERO */
+    .hero {
+      position: relative;
+      background: linear-gradient(135deg, {{heroGradientFrom}}, {{heroGradientTo}});
+      padding: 7rem 2rem 3.5rem;
+      margin-bottom: 3rem;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: {{accentColor}}12;
+      filter: blur(80px);
+    }
+    .hero-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-profile {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      text-decoration: none;
+      color: inherit;
+    }
+    .hero-avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      border: 3px solid {{accentColor}}40;
+      box-shadow: 0 0 30px {{accentColor}}25, 0 0 60px {{accentColor}}10;
+      transition: all 0.4s ease;
+    }
+    .hero-profile:hover .hero-avatar {
+      box-shadow: 0 0 40px {{accentColor}}40, 0 0 80px {{accentColor}}20;
+      transform: scale(1.05);
+    }
+    .hero-name {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      transition: color 0.2s;
+    }
+    .hero-profile:hover .hero-name { color: {{accentColor}}; }
+    .hero-handle {
+      font-size: 0.875rem;
+      color: {{heroHandleColor}};
+      margin-top: 0.25rem;
+    }
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    /* NAV */
     .index-nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -63,62 +124,29 @@ const TEMPLATE = `<!DOCTYPE html>
       font-weight: 600;
     }
 
-    .index-page { max-width: 720px; margin: 0 auto; padding: 6rem 2rem 4rem; }
+    /* CONTENT */
+    .index-content { max-width: 720px; margin: 0 auto; padding: 0 2rem 4rem; }
 
-    /* AUTHOR */
-    .author {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 2.5rem;
-      text-decoration: none;
-      color: inherit;
-    }
-    .author:hover .author-name { color: {{accentColor}}; }
-    .author img {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .author-info { min-width: 0; }
-    .author-name {
-      font-size: 1.125rem;
-      font-weight: 600;
-      transition: color 0.2s;
-    }
-    .author-handle {
-      font-size: 0.8125rem;
-      color: {{tertiaryColor}};
-    }
-
-    .index-title {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 3rem;
-    }
-
-    .year-group { margin-bottom: 2.5rem; }
+    .year-group { margin-bottom: 3rem; }
     .year-label {
       font-family: {{monoFamily}};
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
       color: {{tertiaryColor}};
       margin-bottom: 1rem;
+      padding-left: 0.25rem;
     }
 
     .week-list {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
     .week-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.25rem 1.5rem;
-      border-radius: 10px;
+      display: block;
+      padding: 1.5rem 1.75rem;
+      border-radius: 12px;
       text-decoration: none;
       color: inherit;
       border: 1px solid {{borderColor}};
@@ -127,77 +155,83 @@ const TEMPLATE = `<!DOCTYPE html>
       position: relative;
       overflow: hidden;
     }
-    .week-item::after {
+    .week-item::before {
       content: '';
       position: absolute;
-      inset: 0;
-      border-radius: 10px;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: {{accentColor}};
       opacity: 0;
       transition: opacity 0.3s ease;
-      background: linear-gradient(135deg, {{accentColor}}08, transparent 60%);
     }
     .week-item:hover {
-      border-color: {{accentColor}};
-      transform: translateX(4px);
-      box-shadow: 0 0 20px {{accentColor}}15;
+      border-color: {{accentColor}}60;
+      box-shadow: 0 4px 24px {{accentColor}}12;
+      transform: translateY(-2px);
     }
-    .week-item:hover::after { opacity: 1; }
-    .week-item-left {
+    .week-item:hover::before { opacity: 1; }
+
+    .week-item-header {
       display: flex;
       align-items: baseline;
-      gap: 1rem;
-      min-width: 0;
-      flex: 1;
-      position: relative;
-      z-index: 1;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
     }
     .week-item-week {
       font-family: {{monoFamily}};
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-size: 0.75rem;
+      font-weight: 700;
       color: {{accentColor}};
+      background: {{accentColor}}12;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
       flex-shrink: 0;
     }
-    .week-item-content { min-width: 0; flex: 1; }
-    .week-item-title {
-      font-size: 1rem;
-      font-weight: 500;
-    }
-    .week-item-subtitle {
-      font-size: 0.8125rem;
-      color: {{secondaryColor}};
-      margin-top: 0.25rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
     .week-item-date {
-      font-size: 0.8125rem;
-      color: {{tertiaryColor}};
-      display: block;
-      margin-top: 0.25rem;
-    }
-    .week-item-stats {
-      display: flex;
-      gap: 1rem;
       font-family: {{monoFamily}};
       font-size: 0.6875rem;
       color: {{tertiaryColor}};
-      flex-shrink: 0;
-      position: relative;
-      z-index: 1;
     }
-    .week-item-stat { white-space: nowrap; }
-    .week-item-stat-value { font-weight: 600; }
+
+    .week-item-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.375rem;
+    }
+    .week-item-subtitle {
+      font-size: 0.875rem;
+      color: {{secondaryColor}};
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .week-item-stats {
+      display: flex;
+      gap: 1.25rem;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid {{borderColor}};
+      font-family: {{monoFamily}};
+      font-size: 0.6875rem;
+      color: {{tertiaryColor}};
+    }
+    .week-item-stat-value { font-weight: 700; margin-right: 0.25rem; }
     .stat-commits .week-item-stat-value { color: {{greenColor}}; }
     .stat-prs .week-item-stat-value { color: {{prColor}}; }
     .stat-reviews .week-item-stat-value { color: {{reviewColor}}; }
 
     @media (max-width: 600px) {
-      .index-nav-inner { padding: 1rem 1.25rem; }
-      .index-page { padding: 5rem 1.25rem 3rem; }
-      .author img { width: 40px; height: 40px; }
-      .week-item { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .hero { padding: 5.5rem 1.25rem 2.5rem; }
+      .hero-profile { gap: 1rem; }
+      .hero-avatar { width: 56px; height: 56px; }
+      .hero-name { font-size: 1.25rem; }
+      .index-nav-inner { padding: 0.75rem 1.25rem; }
+      .index-content { padding: 0 1.25rem 3rem; }
+      .week-item { padding: 1.25rem; }
       .week-item-stats { gap: 0.75rem; }
     }
   </style>
@@ -210,39 +244,39 @@ const TEMPLATE = `<!DOCTYPE html>
   </div>
 </nav>
 
-<div class="index-page">
+<section class="hero">
+  <div class="hero-inner">
+    {{#if username}}
+    <a href="https://github.com/{{username}}" class="hero-profile" target="_blank" rel="noopener nofollow">
+      {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" class="hero-avatar" width="72" height="72" loading="lazy" />{{/if}}
+      <div>
+        <div class="hero-name">{{username}}</div>
+        <div class="hero-handle">github.com/{{username}}</div>
+      </div>
+    </a>
+    {{/if}}
+    <h1 class="hero-title">{{weeklyReports}}</h1>
+  </div>
+</section>
 
-  {{#if username}}
-  <a href="https://github.com/{{username}}" class="author" target="_blank" rel="noopener nofollow">
-    {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="48" height="48" loading="lazy" />{{/if}}
-    <div class="author-info">
-      <div class="author-name">{{username}}</div>
-      <div class="author-handle">github.com/{{username}}</div>
-    </div>
-  </a>
-  {{/if}}
-
-  <h1 class="index-title">{{weeklyReports}}</h1>
-
+<div class="index-content">
   {{#each yearGroups}}
   <div class="year-group">
     <div class="year-label">{{this.year}}</div>
     <div class="week-list">
       {{#each this.reports}}
       <a href="{{this.path}}/" class="week-item">
-        <div class="week-item-left">
+        <div class="week-item-header">
           <span class="week-item-week">{{this.week}}</span>
-          <div class="week-item-content">
-            <div class="week-item-title">{{#if this.title}}{{this.title}}{{else}}Week {{this.week}}{{/if}}</div>
-            {{#if this.subtitle}}<div class="week-item-subtitle">{{this.subtitle}}</div>{{/if}}
-            <span class="week-item-date">{{this.dateLabel}}</span>
-          </div>
+          <span class="week-item-date">{{this.dateLabel}}</span>
         </div>
+        <div class="week-item-title">{{#if this.title}}{{this.title}}{{else}}Week {{this.week}}{{/if}}</div>
+        {{#if this.subtitle}}<div class="week-item-subtitle">{{this.subtitle}}</div>{{/if}}
         {{#if this.stats}}
         <div class="week-item-stats">
-          <span class="week-item-stat stat-commits"><span class="week-item-stat-value">{{this.stats.commits}}</span> commits</span>
-          <span class="week-item-stat stat-prs"><span class="week-item-stat-value">{{this.stats.prs}}</span> PRs</span>
-          <span class="week-item-stat stat-reviews"><span class="week-item-stat-value">{{this.stats.reviews}}</span> reviews</span>
+          <span class="week-item-stat stat-commits"><span class="week-item-stat-value">{{this.stats.commits}}</span>commits</span>
+          <span class="week-item-stat stat-prs"><span class="week-item-stat-value">{{this.stats.prs}}</span>PRs</span>
+          <span class="week-item-stat stat-reviews"><span class="week-item-stat-value">{{this.stats.reviews}}</span>reviews</span>
         </div>
         {{/if}}
       </a>
@@ -250,7 +284,6 @@ const TEMPLATE = `<!DOCTYPE html>
     </div>
   </div>
   {{/each}}
-
 </div>
 
 <footer class="footer">
@@ -304,14 +337,17 @@ export const renderIndexPage = (
     generatedWith: locale.generatedWith,
     monoFamily: fontConfig.monoFamily,
     bgColor: isDark ? "#050505" : "#ffffff",
-    borderColor: isDark ? "rgba(255,255,255,0.08)" : "#d0d7de",
-    cardBg: isDark ? "rgba(255,255,255,0.02)" : "#f6f8fa",
+    borderColor: isDark ? "rgba(255,255,255,0.08)" : "#e8ebef",
+    cardBg: isDark ? "rgba(255,255,255,0.02)" : "#ffffff",
     tertiaryColor: isDark ? "rgba(255,255,255,0.3)" : "#8b949e",
     secondaryColor: isDark ? "rgba(255,255,255,0.65)" : "#656d76",
     accentColor: isDark ? "#39d353" : "#0969da",
     greenColor: isDark ? "#3fb950" : "#1a7f37",
     prColor: isDark ? "#8957e5" : "#8250df",
     reviewColor: isDark ? "#58a6ff" : "#0969da",
+    heroGradientFrom: isDark ? "#050505" : "#f6f8fa",
+    heroGradientTo: isDark ? "#0d1117" : "#ffffff",
+    heroHandleColor: isDark ? "rgba(255,255,255,0.4)" : "#656d76",
   });
 };
 
