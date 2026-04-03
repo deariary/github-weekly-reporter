@@ -5,29 +5,93 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="{{aiContent.subtitle}}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <meta property="og:title" content="{{aiContent.title}}" />
   <meta property="og:description" content="{{aiContent.subtitle}}" />
-  <meta property="og:image" content="{{avatarUrl}}" />
-  <meta property="og:type" content="website" />
-  <meta name="view-transition" content="same-origin" />
+  <meta property="og:image" content="{{{ogImageUrl}}}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="article" />
+  {{#if canonicalUrl}}<meta property="og:url" content="{{{canonicalUrl}}}" />
+  {{/if}}<meta property="og:site_name" content="{{username}} Weekly Reports" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{aiContent.title}}" />
+  <meta name="twitter:description" content="{{aiContent.subtitle}}" />
+  <meta name="twitter:image" content="{{{ogImageUrl}}}" />
+  <meta name="author" content="{{username}}" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta property="article:published_time" content="{{dateRange.to}}" />
+  <meta property="article:author" content="https://github.com/{{username}}" />
+  <link rel="icon" href="{{avatarUrl}}" />
+  {{#if canonicalUrl}}<link rel="canonical" href="{{{canonicalUrl}}}" />
+  {{/if}}<meta name="view-transition" content="same-origin" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{{aiContent.title}}}",
+    "description": "{{{aiContent.subtitle}}}",
+    "author": {
+      "@type": "Person",
+      "name": "{{{username}}}",
+      "url": "https://github.com/{{{username}}}"
+    },
+    "image": "{{{ogImageUrl}}}",
+    "datePublished": "{{{dateRange.to}}}"
+  }
+  </script>
+  {{#if canonicalUrl}}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{{baseUrl}}}/" },
+      { "@type": "ListItem", "position": 2, "name": "{{dateRange.from}} - {{dateRange.to}}", "item": "{{{canonicalUrl}}}" }
+    ]
+  }
+  </script>
+  {{/if}}
   <style>{{{css}}}</style>
 </head>
 <body>
 
-<nav>
-  <a href="../../index.html" class="nav-left">
-    <img src="{{avatarUrl}}" alt="{{username}}" />
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<nav aria-label="Site navigation">
+  <a href="../../" class="nav-left">
+    <img src="{{avatarUrl}}" alt="{{username}}" width="28" height="28" />
     <span>{{username}}</span>
   </a>
-  <a href="../../index.html" class="nav-back">&larr; {{i18n.allWeeks}}</a>
+  <a href="../../" class="nav-back">&larr; {{i18n.allWeeks}}</a>
 </nav>
 
-<div class="page">
+<main id="main-content">
+<article class="page">
   {{> header}}
   {{> overview}}
   {{> summaries}}
   {{> highlights}}
-</div>
+</article>
+</main>
+
+{{#if prevWeek}}{{#if nextWeek}}
+<nav class="week-nav" aria-label="Week navigation">
+  <a href="{{prevWeek}}" class="week-nav-link">&larr; {{i18n.prevWeek}}</a>
+  <a href="{{nextWeek}}" class="week-nav-link">{{i18n.nextWeek}} &rarr;</a>
+</nav>
+{{else}}
+<nav class="week-nav" aria-label="Week navigation">
+  <a href="{{prevWeek}}" class="week-nav-link">&larr; {{i18n.prevWeek}}</a>
+  <span></span>
+</nav>
+{{/if}}{{else}}{{#if nextWeek}}
+<nav class="week-nav" aria-label="Week navigation">
+  <span></span>
+  <a href="{{nextWeek}}" class="week-nav-link">{{i18n.nextWeek}} &rarr;</a>
+</nav>
+{{/if}}{{/if}}
 
 {{> footer}}
 

@@ -90,6 +90,26 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
     @import url('${f.importUrl}');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ACCESSIBILITY */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      padding: 0.5rem 1rem;
+      background: ${c.accent};
+      color: ${c.bg};
+      border-radius: 0 0 6px 6px;
+      z-index: 200;
+      font-size: 0.875rem;
+      text-decoration: none;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible {
+      outline: 2px solid ${c.accent};
+      outline-offset: 2px;
+    }
+
     body {
       font-family: ${f.bodyFamily};
       background: ${c.bg};
@@ -428,6 +448,26 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
       color: ${c.textTertiary};
       font-size: 0.75rem;
     }
+
+    /* WEEK NAV (prev/next) */
+    .week-nav {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 2rem 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .week-nav-link {
+      font-family: ${f.monoFamily};
+      font-size: 0.75rem;
+      color: ${c.textTertiary};
+      text-decoration: none;
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid ${c.chipBorder};
+      transition: all 0.2s;
+    }
+    .week-nav-link:hover { color: ${c.text}; border-color: ${c.border}; }
 
     /* FOOTER */
     .footer {

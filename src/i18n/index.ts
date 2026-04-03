@@ -12,6 +12,8 @@ export type LocaleStrings = {
   sectionSummary: string;
   sectionHighlights: string;
   allWeeks: string;
+  prevWeek: string;
+  nextWeek: string;
   poweredBy: string;
   weeklyReports: string;
   weeklyReport: string;
@@ -49,6 +51,8 @@ const en: Locale = {
   sectionSummary: "Summary",
   sectionHighlights: "Highlights",
   allWeeks: "All weeks",
+  prevWeek: "Previous week",
+  nextWeek: "Next week",
   poweredBy: "Powered by",
   weeklyReports: "Weekly Reports",
   weeklyReport: "Weekly Report",
@@ -62,6 +66,8 @@ const ja: Locale = {
   sectionSummary: "サマリー",
   sectionHighlights: "ハイライト",
   allWeeks: "すべての週",
+  prevWeek: "前の週",
+  nextWeek: "次の週",
   poweredBy: "Powered by",
   weeklyReports: "ウィークリーレポート",
   weeklyReport: "ウィークリーレポート",
@@ -75,6 +81,8 @@ const zhCN: Locale = {
   sectionSummary: "摘要",
   sectionHighlights: "亮点",
   allWeeks: "所有周报",
+  prevWeek: "上一周",
+  nextWeek: "下一周",
   poweredBy: "Powered by",
   weeklyReports: "每周报告",
   weeklyReport: "每周报告",
@@ -88,6 +96,8 @@ const zhTW: Locale = {
   sectionSummary: "摘要",
   sectionHighlights: "亮點",
   allWeeks: "所有週報",
+  prevWeek: "上一週",
+  nextWeek: "下一週",
   poweredBy: "Powered by",
   weeklyReports: "每週報告",
   weeklyReport: "每週報告",
@@ -101,6 +111,8 @@ const ko: Locale = {
   sectionSummary: "요약",
   sectionHighlights: "하이라이트",
   allWeeks: "모든 주",
+  prevWeek: "이전 주",
+  nextWeek: "다음 주",
   poweredBy: "Powered by",
   weeklyReports: "주간 보고서",
   weeklyReport: "주간 보고서",
@@ -114,6 +126,8 @@ const es: Locale = {
   sectionSummary: "Resumen",
   sectionHighlights: "Destacados",
   allWeeks: "Todas las semanas",
+  prevWeek: "Semana anterior",
+  nextWeek: "Semana siguiente",
   poweredBy: "Powered by",
   weeklyReports: "Informes semanales",
   weeklyReport: "Informe semanal",
@@ -127,6 +141,8 @@ const fr: Locale = {
   sectionSummary: "Resume",
   sectionHighlights: "Points forts",
   allWeeks: "Toutes les semaines",
+  prevWeek: "Semaine precedente",
+  nextWeek: "Semaine suivante",
   poweredBy: "Powered by",
   weeklyReports: "Rapports hebdomadaires",
   weeklyReport: "Rapport hebdomadaire",
@@ -140,6 +156,8 @@ const de: Locale = {
   sectionSummary: "Zusammenfassung",
   sectionHighlights: "Highlights",
   allWeeks: "Alle Wochen",
+  prevWeek: "Vorherige Woche",
+  nextWeek: "Naechste Woche",
   poweredBy: "Powered by",
   weeklyReports: "Wochenberichte",
   weeklyReport: "Wochenbericht",
@@ -153,6 +171,8 @@ const pt: Locale = {
   sectionSummary: "Resumo",
   sectionHighlights: "Destaques",
   allWeeks: "Todas as semanas",
+  prevWeek: "Semana anterior",
+  nextWeek: "Proxima semana",
   poweredBy: "Powered by",
   weeklyReports: "Relatorios semanais",
   weeklyReport: "Relatorio semanal",
@@ -166,6 +186,8 @@ const ru: Locale = {
   sectionSummary: "Итоги",
   sectionHighlights: "Основное",
   allWeeks: "Все недели",
+  prevWeek: "Предыдущая неделя",
+  nextWeek: "Следующая неделя",
   poweredBy: "Powered by",
   weeklyReports: "Еженедельные отчеты",
   weeklyReport: "Еженедельный отчет",
