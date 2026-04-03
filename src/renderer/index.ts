@@ -44,6 +44,8 @@ export type RenderOptions = {
   theme?: Theme;
   language?: Language;
   timezone?: string;
+  prevWeek?: string;
+  nextWeek?: string;
 };
 
 const createInstance = (language: Language, timezone: string): typeof Handlebars => {
@@ -78,5 +80,7 @@ export const renderReport = (
     css: buildCSS(theme, language),
     lang: language,
     i18n: locale,
+    prevWeek: opts.prevWeek,
+    nextWeek: opts.nextWeek,
   });
 };

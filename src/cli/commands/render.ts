@@ -8,6 +8,7 @@ import { renderReport } from "../../renderer/index.js";
 import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deployer/index-page.js";
 import { getWeekId } from "../../deployer/week.js";
 import { parseLocalDate } from "../../collector/date-range.js";
+import { generateOGImage } from "../../renderer/og-image.js";
 import type { WeeklyReportData, AIContent, Theme, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
@@ -81,11 +82,21 @@ const run = async (options: RenderOptions): Promise<void> => {
 
   const data: WeeklyReportData = { ...githubData, aiContent };
 
+  // Determine prev/next week paths for internal linking
+  const allPaths = (await listReportDirs(options.dataDir)).sort();
+  if (!allPaths.includes(weekId.path)) allPaths.push(weekId.path);
+  allPaths.sort();
+  const currentIdx = allPaths.indexOf(weekId.path);
+  const prevWeek = currentIdx > 0 ? allPaths[currentIdx - 1] : undefined;
+  const nextWeek = currentIdx < allPaths.length - 1 ? allPaths[currentIdx + 1] : undefined;
+
   console.log(`Rendering report (theme: ${options.theme}, lang: ${options.language})...`);
   const html = renderReport(data, {
     theme: options.theme,
     language: options.language,
     timezone: options.timezone,
+    prevWeek: prevWeek ? `../../${prevWeek}/` : undefined,
+    nextWeek: nextWeek ? `../../${nextWeek}/` : undefined,
   });
 
   await mkdir(outputWeekDir, { recursive: true });
@@ -93,9 +104,23 @@ const run = async (options: RenderOptions): Promise<void> => {
   await writeFile(reportPath, html, "utf-8");
   console.log(`Report written to ${reportPath}`);
 
+  // Generate OG image
+  const ogImage = await generateOGImage({
+    title: aiContent.title,
+    subtitle: aiContent.subtitle,
+    username: githubData.username,
+    dateRange: `${githubData.dateRange.from} - ${githubData.dateRange.to}`,
+    stats: {
+      commits: githubData.stats.totalCommits,
+      prs: githubData.stats.prsOpened,
+      reviews: githubData.stats.prsReviewed,
+    },
+  });
+  const ogPath = join(outputWeekDir, "og.png");
+  await writeFile(ogPath, ogImage);
+  console.log(`OG image written to ${ogPath}`);
+
   // Write index page with titles from each week's LLM data
-  const allPaths = await listReportDirs(options.dataDir);
-  if (!allPaths.includes(weekId.path)) allPaths.push(weekId.path);
   const entries = await buildReportEntries(options.dataDir, allPaths);
   const indexHtml = renderIndexPage(
     entries,
@@ -107,6 +132,19 @@ const run = async (options: RenderOptions): Promise<void> => {
   await mkdir(options.outputDir, { recursive: true });
   await writeFile(indexPath, indexHtml, "utf-8");
   console.log(`Index written to ${indexPath}`);
+
+  // Generate sitemap.xml
+  const sitemapEntries = allPaths
+    .map((p) => `  <url><loc>${p}/</loc></url>`)
+    .join("\n");
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>/</loc></url>
+${sitemapEntries}
+</urlset>`;
+  const sitemapPath = join(options.outputDir, "sitemap.xml");
+  await writeFile(sitemapPath, sitemap, "utf-8");
+  console.log(`Sitemap written to ${sitemapPath}`);
 };
 
 export const registerRender = (program: Command): void => {

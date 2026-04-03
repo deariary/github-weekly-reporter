@@ -7,9 +7,26 @@
   <meta name="description" content="{{aiContent.subtitle}}" />
   <meta property="og:title" content="{{aiContent.title}}" />
   <meta property="og:description" content="{{aiContent.subtitle}}" />
-  <meta property="og:image" content="{{avatarUrl}}" />
+  <meta property="og:image" content="og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:type" content="website" />
   <meta name="view-transition" content="same-origin" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{{aiContent.title}}}",
+    "description": "{{{aiContent.subtitle}}}",
+    "author": {
+      "@type": "Person",
+      "name": "{{{username}}}",
+      "url": "https://github.com/{{{username}}}"
+    },
+    "image": "{{{avatarUrl}}}",
+    "datePublished": "{{{dateRange.to}}}"
+  }
+  </script>
   <style>{{{css}}}</style>
 </head>
 <body>
@@ -28,6 +45,23 @@
   {{> summaries}}
   {{> highlights}}
 </div>
+
+{{#if prevWeek}}{{#if nextWeek}}
+<nav class="week-nav">
+  <a href="{{prevWeek}}" class="week-nav-link">&larr; {{i18n.prevWeek}}</a>
+  <a href="{{nextWeek}}" class="week-nav-link">{{i18n.nextWeek}} &rarr;</a>
+</nav>
+{{else}}
+<nav class="week-nav">
+  <a href="{{prevWeek}}" class="week-nav-link">&larr; {{i18n.prevWeek}}</a>
+  <span></span>
+</nav>
+{{/if}}{{else}}{{#if nextWeek}}
+<nav class="week-nav">
+  <span></span>
+  <a href="{{nextWeek}}" class="week-nav-link">{{i18n.nextWeek}} &rarr;</a>
+</nav>
+{{/if}}{{/if}}
 
 {{> footer}}
 

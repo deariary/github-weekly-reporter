@@ -429,6 +429,26 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
       font-size: 0.75rem;
     }
 
+    /* WEEK NAV (prev/next) */
+    .week-nav {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 2rem 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .week-nav-link {
+      font-family: ${f.monoFamily};
+      font-size: 0.75rem;
+      color: ${c.textTertiary};
+      text-decoration: none;
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid ${c.chipBorder};
+      transition: all 0.2s;
+    }
+    .week-nav-link:hover { color: ${c.text}; border-color: ${c.border}; }
+
     /* FOOTER */
     .footer {
       max-width: 720px;

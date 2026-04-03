@@ -45,6 +45,8 @@
     "handlebars": "^4.7.9",
     "marked": "^17.0.5",
     "openai": "^6.33.0",
+    "satori": "^0.26.0",
+    "sharp": "^0.34.5",
     "yaml": "^2.8.3"
   },
   "devDependencies": {
