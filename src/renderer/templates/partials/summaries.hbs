@@ -12,7 +12,7 @@
     <div class="section-heading">{{this.heading}}</div>
     <div class="section-body">{{this.body}}</div>
 
-    {{! Activity pattern: show mini heatmap }}
+    {{! Activity pattern: mini heatmap }}
     {{#eq this.type "activity-pattern"}}
     {{#if @root.dailyCommits.length}}
     <div class="mini-heatmap">
@@ -26,8 +26,38 @@
     {{/if}}
     {{/eq}}
 
-    {{! Chips for all types except activity-pattern (has its own visual) }}
-    {{#neq this.type "activity-pattern"}}
+    {{! Commit summary: additions/deletions bar }}
+    {{#eq this.type "commit-summary"}}
+    {{#if @root.stats.totalAdditions}}
+    <div class="diff-bar">
+      <div class="diff-add" style="flex:{{@root.stats.totalAdditions}}"></div>
+      <div class="diff-del" style="flex:{{@root.stats.totalDeletions}}"></div>
+    </div>
+    <div class="diff-labels">
+      <span class="diff-label-add">+{{formatNumber @root.stats.totalAdditions}}</span>
+      <span class="diff-label-del">-{{formatNumber @root.stats.totalDeletions}}</span>
+    </div>
+    {{/if}}
+    {{/eq}}
+
+    {{! Repo summary: mini bar chart }}
+    {{#eq this.type "repo-summary"}}
+    {{#if @root.repositories.length}}
+    <div class="repo-bars">
+      {{#each @root.repositories}}
+      <div class="repo-bar-item">
+        <div class="repo-bar-label">{{this.name}}</div>
+        <div class="repo-bar-track">
+          <div class="repo-bar-fill" style="width:{{repoBarWidth this.prsOpened @root.repositories}}%"></div>
+        </div>
+        <div class="repo-bar-value">{{this.prsOpened}} PRs</div>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+    {{/eq}}
+
+    {{! Chips }}
     {{#if this.chips}}
     <div class="data-chips">
       {{#each this.chips}}
@@ -35,7 +65,6 @@
       {{/each}}
     </div>
     {{/if}}
-    {{/neq}}
   </div>
   {{/each}}
 </div>

@@ -294,6 +294,67 @@ export const buildCSS = (theme: Theme): string => {
     .mh-level-3 { background: ${c.heatmap3}; }
     .mh-level-4 { background: ${c.heatmap4}; color: ${c.heatmap4Text}; }
 
+    /* DIFF BAR (commit-summary) */
+    .diff-bar {
+      display: flex;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .diff-add { background: ${c.green}; height: 100%; }
+    .diff-del { background: ${c.red}; height: 100%; }
+    .diff-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+    }
+    .diff-label-add { color: ${c.green}; }
+    .diff-label-del { color: ${c.red}; }
+
+    /* REPO BARS (repo-summary) */
+    .repo-bars {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .repo-bar-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+    }
+    .repo-bar-label {
+      font-family: 'JetBrains Mono', monospace;
+      color: ${c.textSecondary};
+      min-width: 160px;
+      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .repo-bar-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: ${c.chipBg};
+      overflow: hidden;
+    }
+    .repo-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: ${c.accent};
+      transition: width 0.3s;
+    }
+    .repo-bar-value {
+      font-family: 'JetBrains Mono', monospace;
+      color: ${c.textTertiary};
+      min-width: 50px;
+    }
+
     /* FOOTER */
     .footer {
       max-width: 720px;
