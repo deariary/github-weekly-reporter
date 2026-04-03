@@ -5,7 +5,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { graphql } from "@octokit/graphql";
-import { buildWeeklyRange, toISODate } from "../../collector/date-range.js";
+import { buildWeeklyRange, toISODate, parseLocalDate } from "../../collector/date-range.js";
 import { fetchEvents, dedupeEvents } from "../../collector/fetch-events.js";
 import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
@@ -30,8 +30,8 @@ const resolveBaseOptions = (
   if (!token) throw new Error("GitHub token required. Pass --token or set GITHUB_TOKEN.");
   const username = cli.username ?? env("GITHUB_USERNAME");
   if (!username) throw new Error("GitHub username required. Pass --username or set GITHUB_USERNAME.");
-  const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
   const timezone = cli.timezone ?? env("TIMEZONE") ?? "UTC";
+  const date = cli.date ? parseLocalDate(cli.date, timezone) : undefined;
   return { token, username, dataDir: cli.dataDir ?? env("DATA_DIR") ?? "./data", date, timezone };
 };
 

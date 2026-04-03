@@ -7,6 +7,7 @@ import { parse as parseYaml } from "yaml";
 import { renderReport } from "../../renderer/index.js";
 import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deployer/index-page.js";
 import { getWeekId } from "../../deployer/week.js";
+import { parseLocalDate } from "../../collector/date-range.js";
 import type { WeeklyReportData, AIContent, Theme, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
@@ -126,7 +127,7 @@ export const registerRender = (program: Command): void => {
           theme: (opts.theme ?? env("THEME") ?? "default") as Theme,
           language: (opts.language ?? env("LANGUAGE") ?? "en") as Language,
           timezone: opts.timezone ?? env("TIMEZONE") ?? "UTC",
-          date: opts.date ? new Date(opts.date + "T12:00:00Z") : undefined,
+          date: opts.date ? parseLocalDate(opts.date, opts.timezone ?? env("TIMEZONE") ?? "UTC") : undefined,
         };
         await run(options);
       } catch (error) {

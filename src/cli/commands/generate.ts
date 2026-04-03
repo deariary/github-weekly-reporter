@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { generateContent } from "../../llm/index.js";
 import { getWeekId } from "../../deployer/week.js";
+import { parseLocalDate } from "../../collector/date-range.js";
 import type { WeeklyReportData, LLMProvider, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
@@ -35,9 +36,9 @@ const resolveOptions = (
   const llmModel = cli.llmModel ?? env("LLM_MODEL");
   if (!llmModel) throw new Error("LLM model required. Pass --llm-model or set LLM_MODEL.");
 
-  const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
   const language = (cli.language ?? env("LANGUAGE") ?? "en") as Language;
   const timezone = cli.timezone ?? env("TIMEZONE") ?? "UTC";
+  const date = cli.date ? parseLocalDate(cli.date, timezone) : undefined;
 
   return {
     dataDir: cli.dataDir ?? env("DATA_DIR") ?? "./data",
