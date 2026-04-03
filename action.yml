@@ -14,6 +14,10 @@ inputs:
     description: 'GitHub username to generate the report for'
     required: false
     default: ${{ github.actor }}
+  mode:
+    description: 'Run mode: "daily" (accumulate events) or "weekly" (full report generation)'
+    required: false
+    default: 'daily'
   theme:
     description: 'Report theme (default, dark)'
     required: false
@@ -51,14 +55,24 @@ runs:
       with:
         node-version: '24'
 
-    - name: Fetch GitHub data
+    - name: Daily fetch (accumulate events)
+      if: inputs.mode == 'daily'
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_USERNAME: ${{ inputs.username }}
-      run: npx github-weekly-reporter@${{ inputs.version }} fetch
+      run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch
+
+    - name: Weekly fetch (build full data from accumulated events)
+      if: inputs.mode == 'weekly'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_USERNAME: ${{ inputs.username }}
+      run: npx github-weekly-reporter@${{ inputs.version }} weekly-fetch
 
     - name: Generate AI content
+      if: inputs.mode == 'weekly'
       shell: bash
       env:
         OPENAI_API_KEY: ${{ inputs.openai-api-key }}
@@ -74,10 +88,12 @@ runs:
         fi
 
     - name: Render HTML report
+      if: inputs.mode == 'weekly'
       shell: bash
       run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }}
 
     - name: Deploy to GitHub Pages
+      if: inputs.mode == 'weekly'
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}

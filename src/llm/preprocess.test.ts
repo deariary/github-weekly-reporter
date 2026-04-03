@@ -42,6 +42,7 @@ const MOCK_INPUT: NarrativeInput = {
   issues: [],
   events: [
     {
+      id: "12345",
       type: "PushEvent",
       repo: "org/repo-a",
       createdAt: "2026-04-01T10:00:00Z",

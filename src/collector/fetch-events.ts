@@ -1,13 +1,11 @@
-// Fetch user events from GitHub REST API (Events API has no GraphQL equivalent)
-// Focus on events that provide unique data not available from PR/Issue queries:
-// - PullRequestReviewEvent: reviews on external repos
-// - ReleaseEvent: releases published
-// - PushEvent: commit messages (when available)
+// Fetch user events from GitHub REST API
+// Daily fetch: grab all public events and accumulate
 
 import type { DateRange } from "./date-range.js";
 import type { GitHubEvent, EventPayload } from "../types.js";
 
 type RawEvent = {
+  id: string;
   type: string;
   public: boolean;
   repo: { name: string };
@@ -16,28 +14,15 @@ type RawEvent = {
 };
 
 const EVENTS_PER_PAGE = 100;
-const MAX_PAGES = 3;
+const MAX_PAGES = 10;
 
-const USEFUL_TYPES = new Set([
-  "PushEvent",
-  "PullRequestReviewEvent",
-  "PullRequestReviewCommentEvent",
-  "ReleaseEvent",
-]);
-
-const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayload | null => {
+const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayload => {
   switch (type) {
     case "PushEvent": {
       const commits = Array.isArray(raw.commits)
         ? (raw.commits as { message: string }[]).map((c) => c.message)
         : [];
-      // Skip PushEvents without commit messages (merges, force-pushes)
-      if (commits.length === 0) return null;
-      return {
-        kind: "push",
-        ref: String(raw.ref ?? ""),
-        commits,
-      };
+      return { kind: "push", ref: String(raw.ref ?? ""), commits };
     }
     case "PullRequestReviewEvent":
     case "PullRequestReviewCommentEvent": {
@@ -59,8 +44,26 @@ const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayl
         name: String(release.name ?? ""),
       };
     }
+    case "PullRequestEvent": {
+      const pr = (raw.pull_request ?? {}) as Record<string, unknown>;
+      return {
+        kind: "pull_request",
+        action: String(raw.action ?? ""),
+        number: Number(pr.number ?? raw.number ?? 0),
+        title: String(pr.title ?? ""),
+      };
+    }
+    case "IssuesEvent": {
+      const issue = (raw.issue ?? {}) as Record<string, unknown>;
+      return {
+        kind: "issues",
+        action: String(raw.action ?? ""),
+        number: Number(issue.number ?? raw.number ?? 0),
+        title: String(issue.title ?? ""),
+      };
+    }
     default:
-      return null;
+      return { kind: "generic", action: String(raw.action ?? "") };
   }
 };
 
@@ -102,17 +105,14 @@ export const fetchEvents = async (
     raw
       .filter((e) => e.public)
       .filter((e) => isInRange(e.created_at, range))
-      .filter((e) => USEFUL_TYPES.has(e.type))
       .forEach((e) => {
-        const payload = summarizePayload(e.type, e.payload);
-        if (payload) {
-          events.push({
-            type: e.type,
-            repo: e.repo.name,
-            createdAt: e.created_at,
-            payload,
-          });
-        }
+        events.push({
+          id: e.id,
+          type: e.type,
+          repo: e.repo.name,
+          createdAt: e.created_at,
+          payload: summarizePayload(e.type, e.payload),
+        });
       });
 
     const oldest = raw[raw.length - 1];
@@ -120,4 +120,13 @@ export const fetchEvents = async (
   }
 
   return events;
+};
+
+export const dedupeEvents = (events: GitHubEvent[]): GitHubEvent[] => {
+  const seen = new Set<string>();
+  return events.filter((e) => {
+    if (seen.has(e.id)) return false;
+    seen.add(e.id);
+    return true;
+  });
 };

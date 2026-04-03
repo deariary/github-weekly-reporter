@@ -1,4 +1,3 @@
-export { collectWeeklyData } from "./collector/index.js";
 export { renderReport } from "./renderer/index.js";
 export { generateContent } from "./llm/index.js";
 export type { LLMConfig } from "./llm/index.js";

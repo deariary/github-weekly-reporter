@@ -43,6 +43,7 @@ export type Issue = {
 };
 
 export type GitHubEvent = {
+  id: string;
   type: string;
   repo: string;
   createdAt: string;
@@ -52,7 +53,10 @@ export type GitHubEvent = {
 export type EventPayload =
   | PushEventPayload
   | PullRequestReviewEventPayload
-  | ReleaseEventPayload;
+  | ReleaseEventPayload
+  | PullRequestEventPayload
+  | IssuesEventPayload
+  | GenericEventPayload;
 
 export type PushEventPayload = {
   kind: "push";
@@ -73,6 +77,25 @@ export type ReleaseEventPayload = {
   action: string;
   tag: string;
   name: string;
+};
+
+export type PullRequestEventPayload = {
+  kind: "pull_request";
+  action: string;
+  number: number;
+  title: string;
+};
+
+export type IssuesEventPayload = {
+  kind: "issues";
+  action: string;
+  number: number;
+  title: string;
+};
+
+export type GenericEventPayload = {
+  kind: "generic";
+  action: string;
 };
 
 export type WeeklyStats = {
