@@ -31,10 +31,16 @@ export const SEARCH_PRS_QUERY = `
       nodes {
         ... on PullRequest {
           title
+          body
           url
           state
           createdAt
           mergedAt
+          additions
+          deletions
+          changedFiles
+          author { login }
+          labels(first: 10) { nodes { name } }
           repository {
             nameWithOwner
           }
@@ -54,10 +60,13 @@ export const SEARCH_ISSUES_QUERY = `
       nodes {
         ... on Issue {
           title
+          body
           url
           state
           createdAt
           closedAt
+          author { login }
+          labels(first: 10) { nodes { name } }
           repository {
             nameWithOwner
           }

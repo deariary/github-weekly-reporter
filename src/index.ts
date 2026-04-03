@@ -13,5 +13,6 @@ export type {
   DailyCommitCount,
   PullRequest,
   Issue,
+  GitHubEvent,
   Theme,
 } from "./types.js";

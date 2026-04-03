@@ -8,6 +8,8 @@ const MOCK_INPUT: NarrativeInput = {
   dateRange: { from: "2026-03-28", to: "2026-04-03" },
   stats: {
     totalCommits: 42,
+    totalAdditions: 1200,
+    totalDeletions: 300,
     prsOpened: 5,
     prsMerged: 3,
     prsReviewed: 8,
@@ -23,6 +25,7 @@ const MOCK_INPUT: NarrativeInput = {
   ],
   pullRequests: [],
   issues: [],
+  events: [],
 };
 
 describe("buildPrompt", () => {

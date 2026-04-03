@@ -5,6 +5,7 @@ import { buildWeeklyRange, toISODate } from "./date-range.js";
 import { fetchContributions } from "./fetch-contributions.js";
 import { fetchPullRequests } from "./fetch-pull-requests.js";
 import { fetchIssues } from "./fetch-issues.js";
+import { fetchEvents } from "./fetch-events.js";
 import { fetchLanguages } from "./fetch-languages.js";
 import { aggregateRepositories } from "./aggregate.js";
 import type { WeeklyReportData } from "../types.js";
@@ -19,10 +20,11 @@ export const collectWeeklyData = async (
 
   const range = buildWeeklyRange();
 
-  const [contributions, pullRequests, issues] = await Promise.all([
+  const [contributions, pullRequests, issues, events] = await Promise.all([
     fetchContributions(gql, username, range),
     fetchPullRequests(gql, username, range),
     fetchIssues(gql, username, range),
+    fetchEvents(token, username, range),
   ]);
 
   const activeRepoNames = [
@@ -35,6 +37,9 @@ export const collectWeeklyData = async (
     Promise.resolve(aggregateRepositories(pullRequests, issues)),
   ]);
 
+  const totalAdditions = pullRequests.reduce((sum, pr) => sum + pr.additions, 0);
+  const totalDeletions = pullRequests.reduce((sum, pr) => sum + pr.deletions, 0);
+
   return {
     username: contributions.username,
     avatarUrl: contributions.avatarUrl,
@@ -44,6 +49,8 @@ export const collectWeeklyData = async (
     },
     stats: {
       totalCommits: contributions.totalCommits,
+      totalAdditions,
+      totalDeletions,
       prsOpened: pullRequests.length,
       prsMerged: pullRequests.filter((pr) => pr.state === "merged").length,
       prsReviewed: contributions.prsReviewed,
@@ -55,6 +62,7 @@ export const collectWeeklyData = async (
     languages,
     pullRequests,
     issues,
+    events,
     aiNarrative: null,
   };
 };

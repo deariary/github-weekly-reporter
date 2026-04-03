@@ -3,6 +3,7 @@
 import { Command } from "commander";
 import { writeFile, mkdir, readdir } from "node:fs/promises";
 import { join } from "node:path";
+import { stringify as toYaml } from "yaml";
 import { collectWeeklyData } from "../../collector/index.js";
 import { renderReport } from "../../renderer/index.js";
 import { generateNarrative } from "../../llm/index.js";
@@ -93,12 +94,17 @@ const run = async (options: GenerateOptions): Promise<void> => {
   console.log(`Rendering report (theme: ${options.theme})...`);
   const html = renderReport(data, options.theme);
 
-  // Write report to week directory
+  // Write report and raw data to week directory
   const reportDir = join(options.output, weekId.path);
   await mkdir(reportDir, { recursive: true });
+
   const reportPath = join(reportDir, "index.html");
   await writeFile(reportPath, html, "utf-8");
   console.log(`Report written to ${reportPath}`);
+
+  const dataPath = join(reportDir, "data.yaml");
+  await writeFile(dataPath, toYaml(data, { lineWidth: 120 }), "utf-8");
+  console.log(`Raw data written to ${dataPath}`);
 
   // Write index page
   const allReports = await listReportDirs(options.output);
