@@ -20,6 +20,37 @@ type GenerateOptions = {
   llmModel?: string;
 };
 
+const env = (key: string): string | undefined => process.env[key];
+
+const resolveOptions = (opts: Record<string, string | undefined>): GenerateOptions => {
+  const token = opts.token ?? env("GITHUB_TOKEN");
+  if (!token) {
+    throw new Error("GitHub token is required. Pass --token or set GITHUB_TOKEN environment variable.");
+  }
+
+  const username = opts.username ?? env("GITHUB_USERNAME");
+  if (!username) {
+    throw new Error("GitHub username is required. Pass --username or set GITHUB_USERNAME environment variable.");
+  }
+
+  const llmProvider = (opts.llmProvider ?? env("LLM_PROVIDER")) as LLMProvider | undefined;
+  const llmApiKey = opts.llmApiKey
+    ?? env("OPENAI_API_KEY")
+    ?? env("ANTHROPIC_API_KEY")
+    ?? env("GEMINI_API_KEY");
+  const llmModel = opts.llmModel ?? env("LLM_MODEL");
+
+  return {
+    token,
+    username,
+    output: opts.output ?? "./report",
+    theme: (opts.theme ?? "default") as Theme,
+    llmProvider,
+    llmApiKey,
+    llmModel,
+  };
+};
+
 const listReportDirs = async (dir: string): Promise<string[]> => {
   const paths: string[] = [];
   let entries: string[] = [];
@@ -76,24 +107,17 @@ export const registerGenerate = (program: Command): void => {
   program
     .command("generate")
     .description("Collect GitHub data and generate a weekly report")
-    .requiredOption("-t, --token <token>", "GitHub personal access token (or set GITHUB_TOKEN)")
-    .requiredOption("-u, --username <username>", "GitHub username")
+    .option("-t, --token <token>", "GitHub token (or GITHUB_TOKEN env)")
+    .option("-u, --username <username>", "GitHub username (or GITHUB_USERNAME env)")
     .option("-o, --output <dir>", "Output directory", "./report")
     .option("--theme <theme>", "Report theme (default, dark)", "default")
-    .option("--llm-provider <provider>", "LLM provider (openai, anthropic, gemini)")
-    .option("--llm-api-key <key>", "LLM API key")
-    .option("--llm-model <model>", "LLM model name")
+    .option("--llm-provider <provider>", "LLM provider (or LLM_PROVIDER env)")
+    .option("--llm-api-key <key>", "LLM API key (or OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY env)")
+    .option("--llm-model <model>", "LLM model name (or LLM_MODEL env)")
     .action(async (opts) => {
       try {
-        await run({
-          token: opts.token ?? process.env.GITHUB_TOKEN,
-          username: opts.username,
-          output: opts.output,
-          theme: opts.theme as Theme,
-          llmProvider: opts.llmProvider as LLMProvider | undefined,
-          llmApiKey: opts.llmApiKey,
-          llmModel: opts.llmModel,
-        });
+        const options = resolveOptions(opts);
+        await run(options);
       } catch (error) {
         console.error("Error:", error instanceof Error ? error.message : error);
         process.exit(1);
