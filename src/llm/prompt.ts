@@ -17,6 +17,7 @@ Rules for writing:
 - Highlights should each have a 1-2 sentence body explaining why it matters.
 - Only include summary types and highlights that are meaningful for this data. Skip empty ones.
 - chips: label is the display name, value is the number/stat, color is "green" for positive, "red" for negative, "default" otherwise.
+- IMPORTANT: all YAML string values must be quoted with double quotes, especially values starting with + or containing special characters.
 
 Available summary types:
 - commit-summary: commit volume, patterns, notable changes

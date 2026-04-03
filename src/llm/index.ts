@@ -19,8 +19,12 @@ export type { LLMConfig } from "./types.js";
 const stripCodeFences = (text: string): string =>
   text.replace(/^```(?:ya?ml)?\s*\n?/m, "").replace(/\n?```\s*$/m, "").trim();
 
+const fixUnquotedValues = (yaml: string): string =>
+  // Fix unquoted values that start with + or contain special chars
+  yaml.replace(/: (\+[^\n"']*)/g, ': "$1"');
+
 const parseAIContent = (raw: string): AIContent => {
-  const cleaned = stripCodeFences(raw);
+  const cleaned = fixUnquotedValues(stripCodeFences(raw));
   const parsed = parseYaml(cleaned) as Record<string, unknown>;
 
   return {
