@@ -61,11 +61,26 @@ const fetchSinglePR = async (
   };
 };
 
+const CONCURRENCY = 5;
+
+const runWithConcurrency = async <T>(
+  items: T[],
+  fn: (item: T) => Promise<unknown>,
+): Promise<void> => {
+  const queue = [...items];
+  const workers = Array.from({ length: CONCURRENCY }, async () => {
+    while (queue.length > 0) {
+      const item = queue.shift();
+      if (item) await fn(item);
+    }
+  });
+  await Promise.all(workers);
+};
+
 export const fetchPRsByRefs = async (
   token: string,
   refs: PRRef[],
 ): Promise<PullRequest[]> => {
-  // Dedupe refs
   const unique = new Map<string, PRRef>();
   refs.forEach((ref) => {
     const key = `${ref.repo}#${ref.number}`;
@@ -74,11 +89,10 @@ export const fetchPRsByRefs = async (
 
   const prs: PullRequest[] = [];
 
-  // Sequential to avoid rate limits
-  for (const ref of unique.values()) {
+  await runWithConcurrency([...unique.values()], async (ref) => {
     const pr = await fetchSinglePR(token, ref);
     if (pr) prs.push(pr);
-  }
+  });
 
   return prs;
 };

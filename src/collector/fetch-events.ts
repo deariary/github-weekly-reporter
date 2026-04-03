@@ -14,7 +14,7 @@ type RawEvent = {
 };
 
 const EVENTS_PER_PAGE = 100;
-const MAX_PAGES = 10;
+const MAX_PAGES = 3; // GitHub Events API hard limit is 300 events (3 pages)
 
 const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayload => {
   switch (type) {
