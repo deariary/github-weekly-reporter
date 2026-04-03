@@ -24,7 +24,6 @@ describe("renderIndexPage", () => {
     const html = renderIndexPage(entries(["2025/W52", "2026/W01", "2026/W02"]));
     const year2026Pos = html.indexOf("2026");
     const year2025Pos = html.indexOf("2025");
-    // 2026 should come before 2025 (reverse chrono)
     expect(year2026Pos).toBeLessThan(year2025Pos);
   });
 
@@ -59,5 +58,17 @@ describe("renderIndexPage", () => {
     });
     expect(html).toContain("testuser");
     expect(html).toContain("https://example.com/avatar.png");
+  });
+
+  it("renders Japanese locale", () => {
+    const html = renderIndexPage(entries(["2026/W14"]), "default", undefined, "ja");
+    expect(html).toContain('lang="ja"');
+    expect(html).toContain("ウィークリーレポート");
+  });
+
+  it("defaults to English locale", () => {
+    const html = renderIndexPage(entries(["2026/W14"]));
+    expect(html).toContain('lang="en"');
+    expect(html).toContain("Weekly Reports");
   });
 });

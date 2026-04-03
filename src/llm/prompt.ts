@@ -2,11 +2,16 @@
 
 import type { NarrativeInput } from "./types.js";
 import { buildLLMContext } from "./preprocess.js";
+import { llmLanguageInstruction } from "../i18n/index.js";
 
-export const buildPrompt = (input: NarrativeInput): string => `
+export const buildPrompt = (input: NarrativeInput): string => {
+  const langInstruction = llmLanguageInstruction(input.language ?? "en");
+  const langBlock = langInstruction ? `\n${langInstruction}\n` : "";
+
+  return `
 You are generating structured content for a developer's personal weekly report.
 This is like a development diary: written from the developer's own perspective.
-
+${langBlock}
 Read the GitHub activity data and produce a YAML response matching the schema below.
 
 Writing style:
@@ -100,3 +105,4 @@ highlights:
 Activity data:
 ${buildLLMContext(input)}
 `.trim();
+};

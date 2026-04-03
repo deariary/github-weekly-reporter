@@ -22,6 +22,14 @@ inputs:
     description: 'Report theme (default, dark)'
     required: false
     default: 'default'
+  language:
+    description: 'Report language (en, ja)'
+    required: false
+    default: 'en'
+  timezone:
+    description: 'IANA timezone for date calculations (e.g. "Asia/Tokyo", "UTC")'
+    required: false
+    default: 'UTC'
   openai-api-key:
     description: 'OpenAI API key for AI narrative'
     required: false
@@ -61,6 +69,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_USERNAME: ${{ inputs.username }}
+        TIMEZONE: ${{ inputs.timezone }}
       run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch
 
     - name: Weekly fetch (build full data from accumulated events)
@@ -69,6 +78,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_USERNAME: ${{ inputs.username }}
+        TIMEZONE: ${{ inputs.timezone }}
       run: npx github-weekly-reporter@${{ inputs.version }} weekly-fetch
 
     - name: Generate AI content
@@ -80,6 +90,8 @@ runs:
         GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
         LLM_PROVIDER: ${{ inputs.llm-provider }}
         LLM_MODEL: ${{ inputs.llm-model }}
+        LANGUAGE: ${{ inputs.language }}
+        TIMEZONE: ${{ inputs.timezone }}
       run: |
         if [ -n "$LLM_PROVIDER" ] && [ -n "$LLM_MODEL" ]; then
           npx github-weekly-reporter@${{ inputs.version }} generate
@@ -90,6 +102,9 @@ runs:
     - name: Render HTML report
       if: inputs.mode == 'weekly'
       shell: bash
+      env:
+        LANGUAGE: ${{ inputs.language }}
+        TIMEZONE: ${{ inputs.timezone }}
       run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }}
 
     - name: Deploy to GitHub Pages

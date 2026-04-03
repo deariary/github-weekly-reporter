@@ -7,7 +7,7 @@ import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { generateContent } from "../../llm/index.js";
 import { getWeekId } from "../../deployer/week.js";
 import { loadConfig } from "../config.js";
-import type { WeeklyReportData, LLMProvider } from "../../types.js";
+import type { WeeklyReportData, LLMProvider, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
 
@@ -16,6 +16,8 @@ type GenerateOptions = {
   llmProvider: LLMProvider;
   llmApiKey: string;
   llmModel: string;
+  language: Language;
+  timezone: string;
   date?: Date;
 };
 
@@ -37,18 +39,22 @@ const resolveOptions = async (
   if (!llmModel) throw new Error("LLM model required. Pass --llm-model, set LLM_MODEL, or add to config file.");
 
   const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
+  const language = (cli.language ?? env("LANGUAGE") ?? config.language ?? "en") as Language;
+  const timezone = cli.timezone ?? env("TIMEZONE") ?? config.timezone ?? "UTC";
 
   return {
     output: cli.output ?? config.output ?? "./report",
     llmProvider,
     llmApiKey,
     llmModel,
+    language,
+    timezone,
     date,
   };
 };
 
 const run = async (options: GenerateOptions): Promise<void> => {
-  const weekId = getWeekId(options.date);
+  const weekId = getWeekId(options.date, options.timezone);
   const reportDir = join(options.output, weekId.path);
   const dataPath = join(reportDir, "github-data.yaml");
 
@@ -56,12 +62,16 @@ const run = async (options: GenerateOptions): Promise<void> => {
   const raw = await readFile(dataPath, "utf-8");
   const data = parseYaml(raw) as WeeklyReportData;
 
-  console.log(`Generating AI content (${options.llmProvider}/${options.llmModel})...`);
-  const aiContent = await generateContent(data, {
-    provider: options.llmProvider,
-    apiKey: options.llmApiKey,
-    model: options.llmModel,
-  });
+  console.log(`Generating AI content (${options.llmProvider}/${options.llmModel}, lang: ${options.language})...`);
+  const aiContent = await generateContent(
+    { ...data, language: options.language },
+    {
+      provider: options.llmProvider,
+      apiKey: options.llmApiKey,
+      model: options.llmModel,
+      language: options.language,
+    },
+  );
 
   if (!aiContent) {
     console.error("LLM returned no content.");
@@ -81,6 +91,8 @@ export const registerGenerate = (program: Command): void => {
     .option("--llm-provider <provider>", "LLM provider (env: LLM_PROVIDER, config: llm.provider)")
     .option("--llm-api-key <key>", "LLM API key (env: OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY)")
     .option("--llm-model <model>", "LLM model name (env: LLM_MODEL, config: llm.model)")
+    .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, config: language, default: en)")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, config: timezone, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {

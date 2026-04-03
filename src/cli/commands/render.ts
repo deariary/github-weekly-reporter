@@ -8,11 +8,13 @@ import { renderReport } from "../../renderer/index.js";
 import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deployer/index-page.js";
 import { getWeekId } from "../../deployer/week.js";
 import { loadConfig } from "../config.js";
-import type { WeeklyReportData, AIContent, Theme } from "../../types.js";
+import type { WeeklyReportData, AIContent, Theme, Language } from "../../types.js";
 
 type RenderOptions = {
   output: string;
   theme: Theme;
+  language: Language;
+  timezone: string;
   date?: Date;
 };
 
@@ -54,7 +56,7 @@ const buildReportEntries = async (
   );
 
 const run = async (options: RenderOptions): Promise<void> => {
-  const weekId = getWeekId(options.date);
+  const weekId = getWeekId(options.date, options.timezone);
   const reportDir = join(options.output, weekId.path);
 
   const githubDataPath = join(reportDir, "github-data.yaml");
@@ -75,8 +77,12 @@ const run = async (options: RenderOptions): Promise<void> => {
 
   const data: WeeklyReportData = { ...githubData, aiContent };
 
-  console.log(`Rendering report (theme: ${options.theme})...`);
-  const html = renderReport(data, options.theme);
+  console.log(`Rendering report (theme: ${options.theme}, lang: ${options.language})...`);
+  const html = renderReport(data, {
+    theme: options.theme,
+    language: options.language,
+    timezone: options.timezone,
+  });
 
   const reportPath = join(reportDir, "index.html");
   await writeFile(reportPath, html, "utf-8");
@@ -86,10 +92,12 @@ const run = async (options: RenderOptions): Promise<void> => {
   const allPaths = await listReportDirs(options.output);
   if (!allPaths.includes(weekId.path)) allPaths.push(weekId.path);
   const entries = await buildReportEntries(options.output, allPaths);
-  const indexHtml = renderIndexPage(entries, options.theme, {
-    username: githubData.username,
-    avatarUrl: githubData.avatarUrl,
-  });
+  const indexHtml = renderIndexPage(
+    entries,
+    options.theme,
+    { username: githubData.username, avatarUrl: githubData.avatarUrl },
+    options.language,
+  );
   const indexPath = join(options.output, "index.html");
   await writeFile(indexPath, indexHtml, "utf-8");
   console.log(`Index written to ${indexPath}`);
@@ -101,6 +109,8 @@ export const registerRender = (program: Command): void => {
     .description("Render HTML report from fetched data and LLM content")
     .option("-o, --output <dir>", "Output directory (config: output)")
     .option("--theme <theme>", "Report theme (config: theme)")
+    .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, config: language, default: en)")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, config: timezone, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
@@ -108,6 +118,8 @@ export const registerRender = (program: Command): void => {
         const options: RenderOptions = {
           output: opts.output ?? config.output ?? "./report",
           theme: (opts.theme ?? config.theme ?? "default") as Theme,
+          language: (opts.language ?? process.env.LANGUAGE ?? config.language ?? "en") as Language,
+          timezone: opts.timezone ?? process.env.TIMEZONE ?? config.timezone ?? "UTC",
           date: opts.date ? new Date(opts.date + "T12:00:00Z") : undefined,
         };
         await run(options);

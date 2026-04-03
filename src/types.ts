@@ -172,10 +172,14 @@ export type LLMProvider = "openai" | "anthropic" | "gemini";
 
 export type Theme = "default" | "dark";
 
+export type Language = "en" | "ja";
+
 export type ReportConfig = {
   githubToken: string;
   llmProvider: LLMProvider | null;
   llmApiKey: string | null;
   llmModel: string | null;
   theme: Theme;
+  language: Language;
+  timezone: string; // IANA timezone (e.g. "Asia/Tokyo", "UTC")
 };

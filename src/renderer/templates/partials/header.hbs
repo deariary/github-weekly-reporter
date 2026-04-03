@@ -1,5 +1,5 @@
 <div class="header">
   <div class="header-week">{{weekLabel dateRange.from dateRange.to}}</div>
-  <h1 class="header-title">{{#if aiContent}}{{aiContent.title}}{{else}}{{username}}'s Weekly Report{{/if}}</h1>
+  <h1 class="header-title">{{#if aiContent}}{{aiContent.title}}{{else}}{{userWeek username}}{{/if}}</h1>
   {{#if aiContent}}<p class="header-sub">{{aiContent.subtitle}}</p>{{/if}}
 </div>

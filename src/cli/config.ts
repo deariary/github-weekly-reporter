@@ -8,6 +8,8 @@ export type FileConfig = {
   username?: string;
   theme?: string;
   output?: string;
+  language?: string;
+  timezone?: string;
   llm?: {
     provider?: string;
     model?: string;

@@ -5,7 +5,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { graphql } from "@octokit/graphql";
-import { buildWeeklyRange } from "../../collector/date-range.js";
+import { buildWeeklyRange, toISODate } from "../../collector/date-range.js";
 import { fetchEvents, dedupeEvents } from "../../collector/fetch-events.js";
 import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
@@ -20,6 +20,7 @@ type BaseOptions = {
   token: string;
   username: string;
   output: string;
+  timezone: string;
   date?: Date;
 };
 
@@ -32,7 +33,8 @@ const resolveBaseOptions = async (
   const username = cli.username ?? env("GITHUB_USERNAME") ?? config.username;
   if (!username) throw new Error("GitHub username required. Pass --username, set GITHUB_USERNAME, or add to config file.");
   const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
-  return { token, username, output: cli.output ?? config.output ?? "./report", date };
+  const timezone = cli.timezone ?? env("TIMEZONE") ?? config.timezone ?? "UTC";
+  return { token, username, output: cli.output ?? config.output ?? "./report", date, timezone };
 };
 
 const tryReadYaml = async <T>(path: string): Promise<T | null> => {
@@ -61,8 +63,8 @@ const extractPRRefs = (events: GitHubEvent[]): PRRef[] => {
 
 // daily-fetch: accumulate events
 const runDailyFetch = async (options: BaseOptions): Promise<void> => {
-  const weekId = getWeekId(options.date);
-  const range = buildWeeklyRange(options.date);
+  const weekId = getWeekId(options.date, options.timezone);
+  const range = buildWeeklyRange(options.date, options.timezone);
   const reportDir = join(options.output, weekId.path);
   await mkdir(reportDir, { recursive: true });
 
@@ -80,8 +82,8 @@ const runDailyFetch = async (options: BaseOptions): Promise<void> => {
 
 // weekly-fetch: use accumulated events to find PRs, fetch each individually
 const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
-  const weekId = getWeekId(options.date);
-  const range = buildWeeklyRange(options.date);
+  const weekId = getWeekId(options.date, options.timezone);
+  const range = buildWeeklyRange(options.date, options.timezone);
   const reportDir = join(options.output, weekId.path);
   await mkdir(reportDir, { recursive: true });
 
@@ -111,7 +113,10 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   const data: WeeklyReportData = {
     username: contributions.username,
     avatarUrl: contributions.avatarUrl,
-    dateRange: { from: range.from.toISOString().split("T")[0], to: range.to.toISOString().split("T")[0] },
+    dateRange: {
+      from: toISODate(range.from, options.timezone),
+      to: toISODate(range.to, options.timezone),
+    },
     stats: {
       totalCommits: contributions.totalCommits,
       totalAdditions,
@@ -144,6 +149,7 @@ const baseOptions = (cmd: Command): Command =>
     .option("-t, --token <token>", "GitHub token (env: GITHUB_TOKEN)")
     .option("-u, --username <username>", "GitHub username (env: GITHUB_USERNAME, config: username)")
     .option("-o, --output <dir>", "Output directory (config: output)")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, config: timezone, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)");
 
 export const registerFetch = (program: Command): void => {

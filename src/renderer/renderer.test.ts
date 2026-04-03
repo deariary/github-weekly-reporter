@@ -109,16 +109,35 @@ describe("renderReport", () => {
 
   it("omits AI sections when aiContent is null", () => {
     const html = renderReport(MOCK_DATA);
-    // No summary/highlight content in the body (CSS class defs don't count)
     const body = html.split("<body>")[1] ?? "";
     expect(body).not.toContain("Summary");
     expect(body).not.toContain("Highlights");
-    expect(body).not.toContain("class=\"overview\"");
+    expect(body).not.toContain('class="overview"');
   });
 
-  it("renders dark theme", () => {
+  it("renders dark theme (string argument for backward compatibility)", () => {
     const html = renderReport(MOCK_DATA, "dark");
     expect(html).toContain("#050505");
     expect(html).toContain("<!DOCTYPE html>");
+  });
+
+  it("renders with RenderOptions object", () => {
+    const html = renderReport(MOCK_DATA, { theme: "dark", language: "en" });
+    expect(html).toContain("#050505");
+    expect(html).toContain('lang="en"');
+  });
+
+  it("renders Japanese locale", () => {
+    const html = renderReport(MOCK_WITH_AI, { language: "ja" });
+    expect(html).toContain('lang="ja"');
+    expect(html).toContain("サマリー");
+    expect(html).toContain("ハイライト");
+    expect(html).toContain("すべての週");
+  });
+
+  it("defaults to lang=en", () => {
+    const html = renderReport(MOCK_DATA);
+    expect(html).toContain('lang="en"');
+    expect(html).toContain("All weeks");
   });
 });

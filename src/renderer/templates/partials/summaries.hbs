@@ -1,9 +1,9 @@
 {{#if aiContent.summaries.length}}
 <div class="section-group">
   <div class="section-group-header">
-    <h2 class="section-group-title">Summary</h2>
+    <h2 class="section-group-title">{{i18n.sectionSummary}}</h2>
     <div class="section-group-line"></div>
-    <span class="section-group-count">{{aiContent.summaries.length}} sections</span>
+    <span class="section-group-count">{{sectionsCount aiContent.summaries.length}}</span>
   </div>
 
   {{#each aiContent.summaries}}

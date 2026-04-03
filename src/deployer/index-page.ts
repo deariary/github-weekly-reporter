@@ -1,7 +1,8 @@
 // Generate the index.html that lists all archived reports
 
 import Handlebars from "handlebars";
-import type { Theme } from "../types.js";
+import type { Theme, Language } from "../types.js";
+import { getLocale } from "../i18n/index.js";
 import { buildCSS } from "../renderer/themes.js";
 
 export type IndexPageData = {
@@ -23,9 +24,9 @@ type YearGroup = {
 };
 
 const TEMPLATE = `<!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
-  <title>Weekly Reports{{#if username}} — {{username}}{{/if}}</title>
+  <title>{{weeklyReports}}{{#if username}} - {{username}}{{/if}}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Archive of weekly GitHub activity reports" />
@@ -144,7 +145,7 @@ const TEMPLATE = `<!DOCTYPE html>
   </div>
   {{/if}}
 
-  <h1 class="index-title">Weekly Reports</h1>
+  <h1 class="index-title">{{weeklyReports}}</h1>
 
   {{#each yearGroups}}
   <div class="year-group">
@@ -168,7 +169,7 @@ const TEMPLATE = `<!DOCTYPE html>
 </div>
 
 <footer class="footer">
-  Powered by <a href="https://deariary.com?utm_source=github-weekly-reporter&utm_medium=footer">deariary</a>
+  {{poweredBy}} <a href="https://deariary.com?utm_source=github-weekly-reporter&utm_medium=footer">deariary</a>
   &nbsp;&middot;&nbsp;
   <a href="https://github.com/deariary/github-weekly-reporter">github-weekly-reporter</a>
 </footer>
@@ -198,14 +199,19 @@ export const renderIndexPage = (
   reports: ReportEntry[],
   theme: Theme = "default",
   pageData?: IndexPageData,
+  language: Language = "en",
 ): string => {
   const isDark = theme === "dark";
+  const locale = getLocale(language);
   const template = Handlebars.compile(TEMPLATE);
   return template({
     yearGroups: groupByYear(reports),
     css: buildCSS(theme),
     username: pageData?.username,
     avatarUrl: pageData?.avatarUrl,
+    lang: language,
+    weeklyReports: locale.weeklyReports,
+    poweredBy: locale.poweredBy,
     borderColor: isDark ? "rgba(255,255,255,0.06)" : "#d0d7de",
     borderHoverColor: isDark ? "rgba(255,255,255,0.12)" : "#8b949e",
     cardBg: isDark ? "rgba(255,255,255,0.02)" : "#f6f8fa",
