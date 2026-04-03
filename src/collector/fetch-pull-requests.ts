@@ -60,7 +60,7 @@ export const fetchPullRequests = async (
 ): Promise<PullRequest[]> => {
   const from = toISODate(range.from);
   const to = toISODate(range.to);
-  const query = `author:${username} is:pr created:${from}..${to}`;
+  const query = `author:${username} is:pr is:public created:${from}..${to}`;
 
   const nodes = await searchAllPages(gql, query);
 

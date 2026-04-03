@@ -57,7 +57,7 @@ export const fetchIssues = async (
 ): Promise<Issue[]> => {
   const from = toISODate(range.from);
   const to = toISODate(range.to);
-  const query = `author:${username} is:issue created:${from}..${to}`;
+  const query = `author:${username} is:issue is:public created:${from}..${to}`;
 
   const nodes = await searchAllPages(gql, query);
 

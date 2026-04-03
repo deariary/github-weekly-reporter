@@ -9,6 +9,7 @@ import type { GitHubEvent, EventPayload } from "../types.js";
 
 type RawEvent = {
   type: string;
+  public: boolean;
   repo: { name: string };
   created_at: string;
   payload: Record<string, unknown>;
@@ -99,6 +100,7 @@ export const fetchEvents = async (
     if (raw.length === 0) break;
 
     raw
+      .filter((e) => e.public)
       .filter((e) => isInRange(e.created_at, range))
       .filter((e) => USEFUL_TYPES.has(e.type))
       .forEach((e) => {
