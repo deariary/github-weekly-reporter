@@ -45,10 +45,8 @@ const formatEvent = (event: GitHubEvent): Record<string, unknown> | null => {
       const rel = event.payload as ReleaseEventPayload;
       return { ...base, tag: rel.tag, name: rel.name };
     }
-    case "create":
-      return { ...base, refType: event.payload.refType, ref: event.payload.ref };
     default:
-      return null; // skip generic events for LLM
+      return null;
   }
 };
 

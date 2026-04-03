@@ -1,4 +1,8 @@
 // Fetch user events from GitHub REST API (Events API has no GraphQL equivalent)
+// Focus on events that provide unique data not available from PR/Issue queries:
+// - PullRequestReviewEvent: reviews on external repos
+// - ReleaseEvent: releases published
+// - PushEvent: commit messages (when available)
 
 import type { DateRange } from "./date-range.js";
 import type { GitHubEvent, EventPayload } from "../types.js";
@@ -13,16 +17,27 @@ type RawEvent = {
 const EVENTS_PER_PAGE = 100;
 const MAX_PAGES = 3;
 
-const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayload => {
+const USEFUL_TYPES = new Set([
+  "PushEvent",
+  "PullRequestReviewEvent",
+  "PullRequestReviewCommentEvent",
+  "ReleaseEvent",
+]);
+
+const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayload | null => {
   switch (type) {
-    case "PushEvent":
+    case "PushEvent": {
+      const commits = Array.isArray(raw.commits)
+        ? (raw.commits as { message: string }[]).map((c) => c.message)
+        : [];
+      // Skip PushEvents without commit messages (merges, force-pushes)
+      if (commits.length === 0) return null;
       return {
         kind: "push",
         ref: String(raw.ref ?? ""),
-        commits: Array.isArray(raw.commits)
-          ? (raw.commits as { message: string }[]).map((c) => c.message)
-          : [],
+        commits,
       };
+    }
     case "PullRequestReviewEvent":
     case "PullRequestReviewCommentEvent": {
       const pr = (raw.pull_request ?? {}) as Record<string, unknown>;
@@ -43,17 +58,8 @@ const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayl
         name: String(release.name ?? ""),
       };
     }
-    case "CreateEvent":
-      return {
-        kind: "create",
-        refType: String(raw.ref_type ?? ""),
-        ref: raw.ref ? String(raw.ref) : null,
-      };
     default:
-      return {
-        kind: "generic",
-        action: raw.action ? String(raw.action) : null,
-      };
+      return null;
   }
 };
 
@@ -81,9 +87,6 @@ const isInRange = (eventDate: string, range: DateRange): boolean => {
   return t >= range.from.getTime() && t <= range.to.getTime();
 };
 
-const isPullRequestEvent = (type: string): boolean =>
-  type === "PullRequestEvent";
-
 export const fetchEvents = async (
   token: string,
   username: string,
@@ -95,20 +98,21 @@ export const fetchEvents = async (
     const raw = await fetchPage(token, username, page);
     if (raw.length === 0) break;
 
-    const mapped = raw
+    raw
       .filter((e) => isInRange(e.created_at, range))
-      // Skip PullRequestEvent (data already in pullRequests)
-      .filter((e) => !isPullRequestEvent(e.type))
-      .map((e) => ({
-        type: e.type,
-        repo: e.repo.name,
-        createdAt: e.created_at,
-        payload: summarizePayload(e.type, e.payload),
-      }));
+      .filter((e) => USEFUL_TYPES.has(e.type))
+      .forEach((e) => {
+        const payload = summarizePayload(e.type, e.payload);
+        if (payload) {
+          events.push({
+            type: e.type,
+            repo: e.repo.name,
+            createdAt: e.created_at,
+            payload,
+          });
+        }
+      });
 
-    events.push(...mapped);
-
-    // If the oldest event on this page is before our range, no need for more pages
     const oldest = raw[raw.length - 1];
     if (oldest && new Date(oldest.created_at).getTime() < range.from.getTime()) break;
   }

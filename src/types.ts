@@ -59,14 +59,12 @@ export type GitHubEvent = {
 export type EventPayload =
   | PushEventPayload
   | PullRequestReviewEventPayload
-  | ReleaseEventPayload
-  | CreateEventPayload
-  | GenericEventPayload;
+  | ReleaseEventPayload;
 
 export type PushEventPayload = {
   kind: "push";
   ref: string;
-  commits: string[]; // commit messages
+  commits: string[];
 };
 
 export type PullRequestReviewEventPayload = {
@@ -82,17 +80,6 @@ export type ReleaseEventPayload = {
   action: string;
   tag: string;
   name: string;
-};
-
-export type CreateEventPayload = {
-  kind: "create";
-  refType: string; // branch, tag, repository
-  ref: string | null;
-};
-
-export type GenericEventPayload = {
-  kind: "generic";
-  action: string | null;
 };
 
 export type WeeklyStats = {

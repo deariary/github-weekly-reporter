@@ -4,9 +4,8 @@ import type { graphql } from "@octokit/graphql";
 import { SEARCH_PRS_QUERY } from "./queries.js";
 import type { DateRange } from "./date-range.js";
 import { toISODate } from "./date-range.js";
+import { cleanBody } from "./clean-body.js";
 import type { PullRequest } from "../types.js";
-
-const MAX_BODY_LENGTH = 500;
 
 type PRNode = {
   title: string;
@@ -32,13 +31,6 @@ type SearchResponse = {
 
 const mapState = (state: PRNode["state"]): PullRequest["state"] =>
   state.toLowerCase() as PullRequest["state"];
-
-const truncateBody = (body: string | null): string | null => {
-  if (!body) return null;
-  return body.length > MAX_BODY_LENGTH
-    ? body.slice(0, MAX_BODY_LENGTH) + "..."
-    : body;
-};
 
 const searchAllPages = async (
   gql: typeof graphql,
@@ -74,7 +66,7 @@ export const fetchPullRequests = async (
 
   return nodes.map((pr) => ({
     title: pr.title,
-    body: truncateBody(pr.body),
+    body: cleanBody(pr.body),
     url: pr.url,
     repository: pr.repository.nameWithOwner,
     state: mapState(pr.state),

@@ -4,9 +4,8 @@ import type { graphql } from "@octokit/graphql";
 import { SEARCH_ISSUES_QUERY } from "./queries.js";
 import type { DateRange } from "./date-range.js";
 import { toISODate } from "./date-range.js";
+import { cleanBody } from "./clean-body.js";
 import type { Issue } from "../types.js";
-
-const MAX_BODY_LENGTH = 300;
 
 type IssueNode = {
   title: string;
@@ -29,13 +28,6 @@ type SearchResponse = {
 
 const mapState = (state: IssueNode["state"]): Issue["state"] =>
   state.toLowerCase() as Issue["state"];
-
-const truncateBody = (body: string | null): string | null => {
-  if (!body) return null;
-  return body.length > MAX_BODY_LENGTH
-    ? body.slice(0, MAX_BODY_LENGTH) + "..."
-    : body;
-};
 
 const searchAllPages = async (
   gql: typeof graphql,
@@ -71,7 +63,7 @@ export const fetchIssues = async (
 
   return nodes.map((issue) => ({
     title: issue.title,
-    body: truncateBody(issue.body),
+    body: cleanBody(issue.body),
     url: issue.url,
     repository: issue.repository.nameWithOwner,
     state: mapState(issue.state),
