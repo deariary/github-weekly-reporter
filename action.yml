@@ -50,6 +50,10 @@ inputs:
     description: 'LLM model name'
     required: false
     default: ''
+  date:
+    description: 'Target date within the week (YYYY-MM-DD). Defaults to today. Use to generate reports for past weeks.'
+    required: false
+    default: ''
   version:
     description: 'CLI version to use (e.g. "1.2.0", "latest")'
     required: false
@@ -79,7 +83,7 @@ runs:
         GITHUB_USERNAME: ${{ inputs.username }}
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
-      run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch
+      run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
 
     - name: Commit data (daily)
       if: inputs.mode == 'daily'
@@ -105,7 +109,7 @@ runs:
         GITHUB_USERNAME: ${{ inputs.username }}
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
-      run: npx github-weekly-reporter@${{ inputs.version }} weekly-fetch
+      run: npx github-weekly-reporter@${{ inputs.version }} weekly-fetch ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
 
     - name: Generate AI content
       if: inputs.mode == 'weekly'
@@ -121,7 +125,7 @@ runs:
         DATA_DIR: ./data
       run: |
         if [ -n "$LLM_PROVIDER" ] && [ -n "$LLM_MODEL" ]; then
-          npx github-weekly-reporter@${{ inputs.version }} generate
+          npx github-weekly-reporter@${{ inputs.version }} generate ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
         else
           echo "No LLM provider configured, skipping AI content generation"
         fi
@@ -148,7 +152,7 @@ runs:
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
         OUTPUT_DIR: ./output
-      run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }}
+      run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }} ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
 
     - name: Deploy to GitHub Pages
       if: inputs.mode == 'weekly'
