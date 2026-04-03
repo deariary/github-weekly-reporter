@@ -8,6 +8,7 @@ import { renderReport } from "../../renderer/index.js";
 import { generateNarrative } from "../../llm/index.js";
 import { renderIndexPage } from "../../deployer/index-page.js";
 import { getWeekId } from "../../deployer/week.js";
+import { loadConfig } from "../config.js";
 import type { Theme, LLMProvider } from "../../types.js";
 
 type GenerateOptions = {
@@ -22,29 +23,34 @@ type GenerateOptions = {
 
 const env = (key: string): string | undefined => process.env[key];
 
-const resolveOptions = (opts: Record<string, string | undefined>): GenerateOptions => {
-  const token = opts.token ?? env("GITHUB_TOKEN");
+// Priority: CLI flag > env var > config file
+const resolveOptions = async (
+  cli: Record<string, string | undefined>,
+): Promise<GenerateOptions> => {
+  const config = await loadConfig();
+
+  const token = cli.token ?? env("GITHUB_TOKEN");
   if (!token) {
-    throw new Error("GitHub token is required. Pass --token or set GITHUB_TOKEN environment variable.");
+    throw new Error("GitHub token required. Pass --token or set GITHUB_TOKEN.");
   }
 
-  const username = opts.username ?? env("GITHUB_USERNAME");
+  const username = cli.username ?? env("GITHUB_USERNAME") ?? config.username;
   if (!username) {
-    throw new Error("GitHub username is required. Pass --username or set GITHUB_USERNAME environment variable.");
+    throw new Error("GitHub username required. Pass --username, set GITHUB_USERNAME, or add to config file.");
   }
 
-  const llmProvider = (opts.llmProvider ?? env("LLM_PROVIDER")) as LLMProvider | undefined;
-  const llmApiKey = opts.llmApiKey
+  const llmProvider = (cli.llmProvider ?? env("LLM_PROVIDER") ?? config.llm?.provider) as LLMProvider | undefined;
+  const llmApiKey = cli.llmApiKey
     ?? env("OPENAI_API_KEY")
     ?? env("ANTHROPIC_API_KEY")
     ?? env("GEMINI_API_KEY");
-  const llmModel = opts.llmModel ?? env("LLM_MODEL");
+  const llmModel = cli.llmModel ?? env("LLM_MODEL") ?? config.llm?.model;
 
   return {
     token,
     username,
-    output: opts.output ?? "./report",
-    theme: (opts.theme ?? "default") as Theme,
+    output: cli.output ?? config.output ?? "./report",
+    theme: (cli.theme ?? config.theme ?? "default") as Theme,
     llmProvider,
     llmApiKey,
     llmModel,
@@ -107,16 +113,16 @@ export const registerGenerate = (program: Command): void => {
   program
     .command("generate")
     .description("Collect GitHub data and generate a weekly report")
-    .option("-t, --token <token>", "GitHub token (or GITHUB_TOKEN env)")
-    .option("-u, --username <username>", "GitHub username (or GITHUB_USERNAME env)")
-    .option("-o, --output <dir>", "Output directory", "./report")
-    .option("--theme <theme>", "Report theme (default, dark)", "default")
-    .option("--llm-provider <provider>", "LLM provider (or LLM_PROVIDER env)")
-    .option("--llm-api-key <key>", "LLM API key (or OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY env)")
-    .option("--llm-model <model>", "LLM model name (or LLM_MODEL env)")
+    .option("-t, --token <token>", "GitHub token (env: GITHUB_TOKEN)")
+    .option("-u, --username <username>", "GitHub username (env: GITHUB_USERNAME, config: username)")
+    .option("-o, --output <dir>", "Output directory (config: output)")
+    .option("--theme <theme>", "Report theme (config: theme)")
+    .option("--llm-provider <provider>", "LLM provider (env: LLM_PROVIDER, config: llm.provider)")
+    .option("--llm-api-key <key>", "LLM API key (env: OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY)")
+    .option("--llm-model <model>", "LLM model name (env: LLM_MODEL, config: llm.model)")
     .action(async (opts) => {
       try {
-        const options = resolveOptions(opts);
+        const options = await resolveOptions(opts);
         await run(options);
       } catch (error) {
         console.error("Error:", error instanceof Error ? error.message : error);
