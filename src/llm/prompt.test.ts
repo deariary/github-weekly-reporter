@@ -59,4 +59,14 @@ describe("buildPrompt", () => {
     expect(prompt).toContain("+320 -45");
     expect(prompt).toContain("org/repo-a");
   });
+
+  it("does not include language instruction for English", () => {
+    const prompt = buildPrompt({ ...MOCK_INPUT, language: "en" });
+    expect(prompt).not.toContain("Write ALL text content in Japanese");
+  });
+
+  it("includes Japanese language instruction", () => {
+    const prompt = buildPrompt({ ...MOCK_INPUT, language: "ja" });
+    expect(prompt).toContain("Write ALL text content in Japanese");
+  });
 });

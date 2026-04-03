@@ -2,11 +2,16 @@
 
 import type { NarrativeInput } from "./types.js";
 import { buildLLMContext } from "./preprocess.js";
+import { llmLanguageInstruction } from "../i18n/index.js";
 
-export const buildPrompt = (input: NarrativeInput): string => `
+export const buildPrompt = (input: NarrativeInput): string => {
+  const langInstruction = llmLanguageInstruction(input.language ?? "en");
+  const langBlock = langInstruction ? `\n${langInstruction}\n` : "";
+
+  return `
 You are generating structured content for a developer's personal weekly report.
 This is like a development diary: written from the developer's own perspective.
-
+${langBlock}
 Read the GitHub activity data and produce a YAML response matching the schema below.
 
 Writing style:
@@ -17,10 +22,14 @@ Writing style:
 - Notice patterns: focus shifts between projects, burst days, collaboration dynamics.
 
 Section requirements:
-- title: a punchy one-line title capturing the week's theme
-- subtitle: one sentence expanding on the title
-- overview: 2 short paragraphs MAX. Keep it tight. This is a brief intro, not an essay.
-  Just set the scene and mention the key themes. Details go in summaries below.
+- title: a specific one-line title that could ONLY describe THIS week.
+  MUST reference a concrete detail: a repo name, feature name, PR topic, or technical concept.
+  BAD (too generic): "A Productive Week", "Lots of Progress", "Bug Fixes and Features"
+  GOOD (specific): "OAuth2 PKCE lands in the auth service", "ecma262 editorial sprint", "Migrating the payment flow to Stripe v3"
+- subtitle: one sentence expanding on the title with additional concrete details
+- overview: 2-3 paragraphs. Set the scene, describe the main narrative arc of the week,
+  and mention what made it interesting. Each paragraph should be 2-4 sentences.
+  This is the reader's first impression, so make it engaging and substantive.
 - summaries: ORDER BY what's most interesting this week. Lead with the most compelling story.
   Skip types that would just repeat obvious stats with nothing insightful to say.
   Include 3-6 sections total. You can mix predefined types with custom free-form sections.
@@ -60,9 +69,11 @@ Schema:
 title: "one-line title"
 subtitle: "one sentence"
 overview: |
-  Brief paragraph setting the scene.
+  First paragraph setting the scene and describing what drove the week.
 
-  Second paragraph with key themes.
+  Second paragraph diving into the main narrative arc. What shifted, what was interesting.
+
+  Third paragraph (optional) wrapping up the themes or looking ahead.
 summaries:
   - type: "repo-summary"
     heading: "heading"
@@ -100,3 +111,4 @@ highlights:
 Activity data:
 ${buildLLMContext(input)}
 `.trim();
+};

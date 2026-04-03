@@ -3,10 +3,12 @@
 import { Command } from "commander";
 import { deploy } from "../../deployer/index.js";
 import { getWeekId } from "../../deployer/week.js";
+import { loadConfig } from "../config.js";
 
 type DeployCommandOptions = {
   directory: string;
   repoUrl: string;
+  timezone: string;
 };
 
 const env = (key: string): string | undefined => process.env[key];
@@ -35,7 +37,7 @@ const buildRepoUrl = (repo: string | undefined): string => {
 };
 
 const run = async (options: DeployCommandOptions): Promise<void> => {
-  const weekId = getWeekId();
+  const weekId = getWeekId(undefined, options.timezone);
 
   console.log(`Deploying ${options.directory} to gh-pages...`);
   await deploy({
@@ -52,12 +54,16 @@ export const registerDeploy = (program: Command): void => {
     .description("Deploy generated report to GitHub Pages (gh-pages branch)")
     .option("-d, --directory <dir>", "Directory containing generated report files", "./report")
     .option("-r, --repo <slug>", "Repository (owner/repo or full URL, env: GITHUB_REPOSITORY)")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, config: timezone, default: UTC)")
     .action(async (opts) => {
       try {
+        const config = await loadConfig();
+        const timezone = opts.timezone ?? env("TIMEZONE") ?? config.timezone ?? "UTC";
         const repoUrl = buildRepoUrl(opts.repo);
         await run({
-          directory: opts.directory,
+          directory: opts.directory ?? config.output ?? "./report",
           repoUrl,
+          timezone,
         });
       } catch (error) {
         console.error("Error:", error instanceof Error ? error.message : error);

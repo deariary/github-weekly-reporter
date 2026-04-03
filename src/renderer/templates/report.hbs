@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
-  <title>{{#if aiContent}}{{aiContent.title}}{{else}}{{username}}'s Week{{/if}} — {{dateRange.from}} - {{dateRange.to}}</title>
+  <title>{{#if aiContent}}{{aiContent.title}}{{else}}{{userWeek username}}{{/if}} - {{dateRange.from}} - {{dateRange.to}}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="{{#if aiContent}}{{aiContent.subtitle}}{{else}}Weekly report for {{username}}{{/if}}" />
-  <meta property="og:title" content="{{#if aiContent}}{{aiContent.title}}{{else}}{{username}}'s Week{{/if}}" />
-  <meta property="og:description" content="{{#if aiContent}}{{aiContent.subtitle}}{{else}}Weekly report{{/if}}" />
+  <meta name="description" content="{{#if aiContent}}{{aiContent.subtitle}}{{else}}{{i18n.weeklyReport}} for {{username}}{{/if}}" />
+  <meta property="og:title" content="{{#if aiContent}}{{aiContent.title}}{{else}}{{userWeek username}}{{/if}}" />
+  <meta property="og:description" content="{{#if aiContent}}{{aiContent.subtitle}}{{else}}{{i18n.weeklyReport}}{{/if}}" />
   <meta property="og:image" content="{{avatarUrl}}" />
   <meta property="og:type" content="website" />
   <meta name="view-transition" content="same-origin" />
@@ -19,7 +19,7 @@
     <img src="{{avatarUrl}}" alt="{{username}}" />
     <span>{{username}}</span>
   </a>
-  <a href="../../index.html" class="nav-back">&larr; All weeks</a>
+  <a href="../../index.html" class="nav-back">&larr; {{i18n.allWeeks}}</a>
 </nav>
 
 <div class="page">

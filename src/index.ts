@@ -17,4 +17,5 @@ export type {
   GitHubEvent,
   ExternalContribution,
   Theme,
+  Language,
 } from "./types.js";

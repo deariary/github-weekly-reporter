@@ -4,7 +4,8 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
-import type { WeeklyReportData, Theme, DailyCommitCount } from "../types.js";
+import type { WeeklyReportData, Theme, Language, DailyCommitCount } from "../types.js";
+import { getLocale } from "../i18n/index.js";
 import { buildCSS } from "./themes.js";
 import { registerHelpers } from "./helpers.js";
 
@@ -39,9 +40,15 @@ const computeHeatmapLevels = (dailyCommits: DailyCommitCount[]): DailyCommitWith
   });
 };
 
-const createInstance = (): typeof Handlebars => {
+export type RenderOptions = {
+  theme?: Theme;
+  language?: Language;
+  timezone?: string;
+};
+
+const createInstance = (language: Language, timezone: string): typeof Handlebars => {
   const hbs = Handlebars.create();
-  registerHelpers(hbs);
+  registerHelpers(hbs, { language, timezone });
 
   PARTIAL_NAMES.forEach((name) => {
     hbs.registerPartial(name, readTemplate(`partials/${name}.hbs`));
@@ -52,14 +59,24 @@ const createInstance = (): typeof Handlebars => {
 
 export const renderReport = (
   data: WeeklyReportData,
-  theme: Theme = "default",
+  themeOrOptions: Theme | RenderOptions = "default",
 ): string => {
-  const hbs = createInstance();
+  const opts: RenderOptions = typeof themeOrOptions === "string"
+    ? { theme: themeOrOptions }
+    : themeOrOptions;
+  const theme = opts.theme ?? "default";
+  const language = opts.language ?? "en";
+  const timezone = opts.timezone ?? "UTC";
+  const locale = getLocale(language);
+
+  const hbs = createInstance(language, timezone);
   const template = hbs.compile(readTemplate("report.hbs"));
 
   return template({
     ...data,
     dailyCommits: computeHeatmapLevels(data.dailyCommits),
-    css: buildCSS(theme),
+    css: buildCSS(theme, language),
+    lang: language,
+    i18n: locale,
   });
 };

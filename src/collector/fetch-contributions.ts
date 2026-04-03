@@ -37,6 +37,7 @@ export const fetchContributions = async (
   gql: typeof graphql,
   username: string,
   range: DateRange,
+  timezone: string = "UTC",
 ): Promise<ContributionsSummary> => {
   const { user } = await gql<ContributionsResponse>(USER_CONTRIBUTIONS_QUERY, {
     username,
@@ -44,8 +45,11 @@ export const fetchContributions = async (
     to: range.to.toISOString(),
   });
 
-  const fromDate = toISODate(range.from);
-  const toDate = toISODate(range.to);
+  // Filter daily commits by the local date range in the user's timezone.
+  // contributionCalendar dates are YYYY-MM-DD strings (UTC-based from GitHub).
+  // We compare against our range boundaries formatted in the user's timezone.
+  const fromDate = toISODate(range.from, timezone);
+  const toDate = toISODate(range.to, timezone);
 
   const dailyCommits = user.contributionsCollection.contributionCalendar.weeks
     .flatMap((w) => w.contributionDays)

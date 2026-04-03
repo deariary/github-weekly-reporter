@@ -1,6 +1,7 @@
 // Theme CSS definitions for report rendering
 
-import type { Theme } from "../types.js";
+import type { Theme, Language } from "../types.js";
+import { getFontConfig } from "../i18n/index.js";
 
 type ThemeColors = {
   bg: string;
@@ -81,18 +82,33 @@ const THEMES: Record<Theme, ThemeColors> = {
 export const getThemeColors = (theme: Theme): ThemeColors =>
   THEMES[theme] ?? THEMES.dark;
 
-export const buildCSS = (theme: Theme): string => {
+export const buildCSS = (theme: Theme, language: Language = "en"): string => {
   const c = getThemeColors(theme);
+  const f = getFontConfig(language);
 
   return `
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    @import url('${f.importUrl}');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: ${f.bodyFamily};
       background: ${c.bg};
       color: ${c.text};
       line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    }
+
+    /* INLINE CODE */
+    code {
+      font-family: ${f.monoFamily};
+      font-size: 0.875em;
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      background: ${c.chipBg};
+      border: 1px solid ${c.chipBorder};
     }
 
     /* NAV */
@@ -113,7 +129,7 @@ export const buildCSS = (theme: Theme): string => {
     .nav-left img { width: 28px; height: 28px; border-radius: 50%; }
     .nav-left span { font-size: 0.875rem; font-weight: 500; }
     .nav-back {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.75rem;
       color: ${c.textTertiary};
       padding: 0.375rem 0.75rem;
@@ -128,7 +144,7 @@ export const buildCSS = (theme: Theme): string => {
     /* HEADER */
     .header { margin-bottom: 3rem; }
     .header-week {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.75rem;
       color: ${c.textTertiary};
       letter-spacing: 0.15em;
@@ -187,7 +203,7 @@ export const buildCSS = (theme: Theme): string => {
       background: ${c.border};
     }
     .section-group-count {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.6875rem;
       color: ${c.textTertiary};
       letter-spacing: 0.1em;
@@ -223,7 +239,7 @@ export const buildCSS = (theme: Theme): string => {
       transform: translateY(-2px);
     }
     .section-summary .section-type {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.6875rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
@@ -250,7 +266,7 @@ export const buildCSS = (theme: Theme): string => {
       margin-top: 1rem;
     }
     .chip {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.6875rem;
       padding: 0.3rem 0.65rem;
       border-radius: 6px;
@@ -286,7 +302,7 @@ export const buildCSS = (theme: Theme): string => {
       transform: translateY(-2px);
     }
     .highlight-badge {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.5625rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -306,7 +322,7 @@ export const buildCSS = (theme: Theme): string => {
       margin-bottom: 0.375rem;
     }
     .highlight-meta {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.6875rem;
       color: ${c.textTertiary};
       margin-bottom: 0.75rem;
@@ -325,7 +341,7 @@ export const buildCSS = (theme: Theme): string => {
     .mh-block {
       width: 44px; height: 44px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.8125rem; font-weight: 600;
       transition: all 0.2s ease;
     }
@@ -354,7 +370,7 @@ export const buildCSS = (theme: Theme): string => {
     .diff-labels {
       display: flex;
       justify-content: space-between;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       font-size: 0.75rem;
     }
     .diff-label-add { color: ${c.green}; }
@@ -374,7 +390,7 @@ export const buildCSS = (theme: Theme): string => {
       margin-bottom: 0.25rem;
     }
     .repo-bar-label {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       color: ${c.textSecondary};
       font-size: 0.75rem;
     }
@@ -392,7 +408,7 @@ export const buildCSS = (theme: Theme): string => {
       transition: width 0.5s ease;
     }
     .repo-bar-value {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: ${f.monoFamily};
       color: ${c.textTertiary};
       font-size: 0.75rem;
     }
