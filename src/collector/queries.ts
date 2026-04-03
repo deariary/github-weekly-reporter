@@ -22,8 +22,8 @@ export const USER_CONTRIBUTIONS_QUERY = `
 `;
 
 export const SEARCH_PRS_QUERY = `
-  query($query: String!, $cursor: String) {
-    search(query: $query, type: ISSUE, first: 100, after: $cursor) {
+  query($searchQuery: String!, $cursor: String) {
+    search(query: $searchQuery, type: ISSUE, first: 100, after: $cursor) {
       pageInfo {
         hasNextPage
         endCursor
@@ -51,8 +51,8 @@ export const SEARCH_PRS_QUERY = `
 `;
 
 export const SEARCH_ISSUES_QUERY = `
-  query($query: String!, $cursor: String) {
-    search(query: $query, type: ISSUE, first: 100, after: $cursor) {
+  query($searchQuery: String!, $cursor: String) {
+    search(query: $searchQuery, type: ISSUE, first: 100, after: $cursor) {
       pageInfo {
         hasNextPage
         endCursor

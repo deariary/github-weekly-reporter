@@ -51,7 +51,7 @@ const searchAllPages = async (
   while (hasNextPage) {
     const response: SearchResponse = await gql<SearchResponse>(
       SEARCH_PRS_QUERY,
-      { query, cursor },
+      { searchQuery: query, cursor },
     );
     nodes.push(...response.search.nodes);
     hasNextPage = response.search.pageInfo.hasNextPage;
