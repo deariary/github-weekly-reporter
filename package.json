@@ -32,8 +32,11 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
+    "@google/generative-ai": "^0.24.1",
     "@octokit/graphql": "^8.2.1",
-    "handlebars": "^4.7.9"
+    "handlebars": "^4.7.9",
+    "openai": "^6.33.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",

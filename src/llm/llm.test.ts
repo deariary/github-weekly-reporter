@@ -1,0 +1,37 @@
+import { describe, it, expect, vi } from "vitest";
+import { generateNarrative, type LLMKeys } from "./index.js";
+import type { NarrativeInput } from "./types.js";
+
+const MOCK_INPUT: NarrativeInput = {
+  username: "testuser",
+  avatarUrl: "https://example.com/avatar.png",
+  dateRange: { from: "2026-03-28", to: "2026-04-03" },
+  stats: { totalCommits: 10, prsOpened: 2, prsMerged: 1, prsReviewed: 3, issuesOpened: 1, issuesClosed: 0 },
+  dailyCommits: [],
+  repositories: [],
+  languages: [],
+  pullRequests: [],
+  issues: [],
+};
+
+describe("generateNarrative", () => {
+  it("returns null when no API keys are provided", async () => {
+    const result = await generateNarrative(MOCK_INPUT, {});
+    expect(result).toBeNull();
+  });
+
+  it("returns null when LLM call fails (graceful degradation)", async () => {
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    // Use an invalid key to trigger an error
+    const keys: LLMKeys = { openaiApiKey: "invalid-key" };
+    const result = await generateNarrative(MOCK_INPUT, keys);
+
+    expect(result).toBeNull();
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining("LLM narrative generation failed"),
+    );
+
+    spy.mockRestore();
+  });
+});
