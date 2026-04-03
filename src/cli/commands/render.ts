@@ -141,7 +141,7 @@ const run = async (options: RenderOptions): Promise<void> => {
   const indexHtml = renderIndexPage(
     entries,
     options.theme,
-    { username: githubData.username, avatarUrl: githubData.avatarUrl },
+    { username: githubData.username, avatarUrl: githubData.avatarUrl, profile: githubData.profile },
     options.language,
     options.siteTitle,
   );

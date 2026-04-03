@@ -9,7 +9,14 @@ import type { DailyCommitCount } from "../types.js";
 type ContributionsResponse = {
   user: {
     login: string;
+    name: string | null;
     avatarUrl: string;
+    bio: string | null;
+    company: string | null;
+    location: string | null;
+    followers: { totalCount: number };
+    following: { totalCount: number };
+    repositories: { totalCount: number };
     contributionsCollection: {
       totalCommitContributions: number;
       totalPullRequestReviewContributions: number;
@@ -25,9 +32,20 @@ type ContributionsResponse = {
   };
 };
 
+export type UserProfile = {
+  name: string | null;
+  bio: string | null;
+  company: string | null;
+  location: string | null;
+  followers: number;
+  following: number;
+  publicRepos: number;
+};
+
 export type ContributionsSummary = {
   username: string;
   avatarUrl: string;
+  profile: UserProfile;
   totalCommits: number;
   prsReviewed: number;
   dailyCommits: DailyCommitCount[];
@@ -59,6 +77,15 @@ export const fetchContributions = async (
   return {
     username: user.login,
     avatarUrl: user.avatarUrl,
+    profile: {
+      name: user.name,
+      bio: user.bio,
+      company: user.company,
+      location: user.location,
+      followers: user.followers.totalCount,
+      following: user.following.totalCount,
+      publicRepos: user.repositories.totalCount,
+    },
     totalCommits:
       user.contributionsCollection.totalCommitContributions,
     prsReviewed:

@@ -115,9 +115,20 @@ export type ExternalContribution = {
   pullRequests: PullRequest[];
 };
 
+export type UserProfile = {
+  name: string | null;
+  bio: string | null;
+  company: string | null;
+  location: string | null;
+  followers: number;
+  following: number;
+  publicRepos: number;
+};
+
 export type WeeklyReportData = {
   username: string;
   avatarUrl: string;
+  profile?: UserProfile;
   dateRange: { from: string; to: string };
   stats: WeeklyStats;
   dailyCommits: DailyCommitCount[];

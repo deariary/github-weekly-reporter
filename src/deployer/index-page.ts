@@ -1,13 +1,14 @@
 // Generate the index.html that lists all archived reports
 
 import Handlebars from "handlebars";
-import type { Theme, Language } from "../types.js";
+import type { Theme, Language, UserProfile } from "../types.js";
 import { getLocale, getFontConfig } from "../i18n/index.js";
 import { buildCSS } from "../renderer/themes.js";
 
 export type IndexPageData = {
   username?: string;
   avatarUrl?: string;
+  profile?: UserProfile;
 };
 
 export type ReportEntryStats = {
@@ -44,19 +45,20 @@ const TEMPLATE = `<!DOCTYPE html>
     /* HERO */
     .hero {
       position: relative;
-      background: linear-gradient(135deg, {{heroGradientFrom}}, {{heroGradientTo}});
-      padding: 7rem 2rem 3.5rem;
+      background: #0a0a0a;
+      color: #e8e8e8;
+      padding: 7rem 2rem 4rem;
       margin-bottom: 3rem;
       overflow: hidden;
     }
     .hero::before {
       content: '';
       position: absolute;
-      top: -50%; right: -20%;
-      width: 600px; height: 600px;
-      border-radius: 50%;
-      background: {{accentColor}}12;
-      filter: blur(80px);
+      top: 20%; left: 50%;
+      width: 800px; height: 400px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse, {{accentColor}}15 0%, transparent 70%);
+      pointer-events: none;
     }
     .hero-inner {
       max-width: 720px;
@@ -68,38 +70,48 @@ const TEMPLATE = `<!DOCTYPE html>
       display: flex;
       align-items: center;
       gap: 1.5rem;
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
       text-decoration: none;
       color: inherit;
     }
     .hero-avatar {
-      width: 72px; height: 72px;
+      width: 80px; height: 80px;
       border-radius: 50%;
-      border: 3px solid {{accentColor}}40;
-      box-shadow: 0 0 30px {{accentColor}}25, 0 0 60px {{accentColor}}10;
+      border: 2px solid {{accentColor}}60;
       transition: all 0.4s ease;
     }
     .hero-profile:hover .hero-avatar {
-      box-shadow: 0 0 40px {{accentColor}}40, 0 0 80px {{accentColor}}20;
-      transform: scale(1.05);
+      border-color: {{accentColor}};
+      box-shadow: 0 0 24px {{accentColor}}30;
     }
+    .hero-info { min-width: 0; }
     .hero-name {
-      font-size: 1.75rem;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.02em;
-      transition: color 0.2s;
+      color: #ffffff;
     }
-    .hero-profile:hover .hero-name { color: {{accentColor}}; }
-    .hero-handle {
+    .hero-bio {
       font-size: 0.875rem;
-      color: {{heroHandleColor}};
-      margin-top: 0.25rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 0.375rem;
+      line-height: 1.5;
     }
+    .hero-meta {
+      display: flex;
+      gap: 1.25rem;
+      margin-top: 0.5rem;
+      font-family: {{monoFamily}};
+      font-size: 0.6875rem;
+      color: rgba(255,255,255,0.35);
+    }
+    .hero-meta-value { color: rgba(255,255,255,0.7); font-weight: 600; }
     .hero-title {
-      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-size: clamp(2.5rem, 6vw, 3.5rem);
       font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      color: #ffffff;
     }
 
     /* NAV */
@@ -248,10 +260,15 @@ const TEMPLATE = `<!DOCTYPE html>
   <div class="hero-inner">
     {{#if username}}
     <a href="https://github.com/{{username}}" class="hero-profile" target="_blank" rel="noopener nofollow">
-      {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" class="hero-avatar" width="72" height="72" loading="lazy" />{{/if}}
-      <div>
-        <div class="hero-name">{{username}}</div>
-        <div class="hero-handle">github.com/{{username}}</div>
+      {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" class="hero-avatar" width="80" height="80" loading="lazy" />{{/if}}
+      <div class="hero-info">
+        <div class="hero-name">{{displayName}}</div>
+        {{#if profile.bio}}<div class="hero-bio">{{profile.bio}}</div>{{/if}}
+        <div class="hero-meta">
+          {{#if profile.followers}}<span><span class="hero-meta-value">{{profile.followers}}</span> followers</span>{{/if}}
+          {{#if profile.publicRepos}}<span><span class="hero-meta-value">{{profile.publicRepos}}</span> repos</span>{{/if}}
+          {{#if profile.location}}<span>{{profile.location}}</span>{{/if}}
+        </div>
       </div>
     </a>
     {{/if}}
@@ -330,6 +347,8 @@ export const renderIndexPage = (
     css: buildCSS(theme, language),
     username: pageData?.username,
     avatarUrl: pageData?.avatarUrl,
+    profile: pageData?.profile,
+    displayName: pageData?.profile?.name ?? pageData?.username,
     siteTitle: resolvedSiteTitle,
     lang: language,
     weeklyReports: locale.weeklyReports,
@@ -345,9 +364,7 @@ export const renderIndexPage = (
     greenColor: isDark ? "#3fb950" : "#1a7f37",
     prColor: isDark ? "#8957e5" : "#8250df",
     reviewColor: isDark ? "#58a6ff" : "#0969da",
-    heroGradientFrom: isDark ? "#050505" : "#f6f8fa",
-    heroGradientTo: isDark ? "#0d1117" : "#ffffff",
-    heroHandleColor: isDark ? "rgba(255,255,255,0.4)" : "#656d76",
+
   });
 };
 
