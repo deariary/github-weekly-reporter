@@ -6,7 +6,6 @@ import { join } from "node:path";
 import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { generateContent } from "../../llm/index.js";
 import { getWeekId } from "../../deployer/week.js";
-import { loadConfig } from "../config.js";
 import type { WeeklyReportData, LLMProvider, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
@@ -21,13 +20,11 @@ type GenerateOptions = {
   date?: Date;
 };
 
-const resolveOptions = async (
+const resolveOptions = (
   cli: Record<string, string | undefined>,
-): Promise<GenerateOptions> => {
-  const config = await loadConfig();
-
-  const llmProvider = (cli.llmProvider ?? env("LLM_PROVIDER") ?? config.llm?.provider) as LLMProvider | undefined;
-  if (!llmProvider) throw new Error("LLM provider required. Pass --llm-provider, set LLM_PROVIDER, or add to config file.");
+): GenerateOptions => {
+  const llmProvider = (cli.llmProvider ?? env("LLM_PROVIDER")) as LLMProvider | undefined;
+  if (!llmProvider) throw new Error("LLM provider required. Pass --llm-provider or set LLM_PROVIDER.");
 
   const llmApiKey = cli.llmApiKey
     ?? env("OPENAI_API_KEY")
@@ -35,15 +32,15 @@ const resolveOptions = async (
     ?? env("GEMINI_API_KEY");
   if (!llmApiKey) throw new Error("LLM API key required. Pass --llm-api-key or set OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY.");
 
-  const llmModel = cli.llmModel ?? env("LLM_MODEL") ?? config.llm?.model;
-  if (!llmModel) throw new Error("LLM model required. Pass --llm-model, set LLM_MODEL, or add to config file.");
+  const llmModel = cli.llmModel ?? env("LLM_MODEL");
+  if (!llmModel) throw new Error("LLM model required. Pass --llm-model or set LLM_MODEL.");
 
   const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
-  const language = (cli.language ?? env("LANGUAGE") ?? config.language ?? "en") as Language;
-  const timezone = cli.timezone ?? env("TIMEZONE") ?? config.timezone ?? "UTC";
+  const language = (cli.language ?? env("LANGUAGE") ?? "en") as Language;
+  const timezone = cli.timezone ?? env("TIMEZONE") ?? "UTC";
 
   return {
-    output: cli.output ?? config.output ?? "./report",
+    output: cli.output ?? env("OUTPUT_DIR") ?? "./report",
     llmProvider,
     llmApiKey,
     llmModel,
@@ -87,16 +84,16 @@ export const registerGenerate = (program: Command): void => {
   program
     .command("generate")
     .description("Generate AI content from fetched GitHub data")
-    .option("-o, --output <dir>", "Output directory (config: output)")
-    .option("--llm-provider <provider>", "LLM provider (env: LLM_PROVIDER, config: llm.provider)")
+    .option("-o, --output <dir>", "Output directory (env: OUTPUT_DIR, default: ./report)")
+    .option("--llm-provider <provider>", "LLM provider (env: LLM_PROVIDER)")
     .option("--llm-api-key <key>", "LLM API key (env: OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY)")
-    .option("--llm-model <model>", "LLM model name (env: LLM_MODEL, config: llm.model)")
-    .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, config: language, default: en)")
-    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, config: timezone, default: UTC)")
+    .option("--llm-model <model>", "LLM model name (env: LLM_MODEL)")
+    .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, default: en)")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
-        const options = await resolveOptions(opts);
+        const options = resolveOptions(opts);
         await run(options);
       } catch (error) {
         console.error("Error:", error instanceof Error ? error.message : error);
