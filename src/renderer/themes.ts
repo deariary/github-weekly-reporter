@@ -150,7 +150,8 @@ export const buildCSS = (theme: Theme): string => {
 
     /* OVERVIEW */
     .overview {
-      padding: 0 0 3rem;
+      padding: 2.5rem 0 3rem;
+      border-top: 1px solid ${c.border};
       margin-bottom: 4rem;
     }
     .overview p {
