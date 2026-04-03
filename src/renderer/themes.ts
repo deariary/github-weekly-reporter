@@ -449,6 +449,42 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
       font-size: 0.75rem;
     }
 
+    /* SHARE BAR */
+    .share-bar {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 2rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .share-label {
+      font-family: ${f.monoFamily};
+      font-size: 0.6875rem;
+      color: ${c.textTertiary};
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      border: 1px solid ${c.chipBorder};
+      background: ${c.chipBg};
+      color: ${c.textSecondary};
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .share-btn:hover {
+      border-color: ${c.accent};
+      color: ${c.text};
+      box-shadow: 0 0 8px ${c.accent}33;
+    }
+
     /* WEEK NAV (prev/next) */
     .week-nav {
       max-width: 720px;

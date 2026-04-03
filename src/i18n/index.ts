@@ -14,6 +14,7 @@ export type LocaleStrings = {
   allWeeks: string;
   prevWeek: string;
   nextWeek: string;
+  share: string;
   poweredBy: string;
   weeklyReports: string;
   weeklyReport: string;
@@ -53,6 +54,7 @@ const en: Locale = {
   allWeeks: "All weeks",
   prevWeek: "Previous week",
   nextWeek: "Next week",
+  share: "Share",
   poweredBy: "Powered by",
   weeklyReports: "Weekly Reports",
   weeklyReport: "Weekly Report",
@@ -68,6 +70,7 @@ const ja: Locale = {
   allWeeks: "すべての週",
   prevWeek: "前の週",
   nextWeek: "次の週",
+  share: "シェア",
   poweredBy: "Powered by",
   weeklyReports: "ウィークリーレポート",
   weeklyReport: "ウィークリーレポート",
@@ -83,6 +86,7 @@ const zhCN: Locale = {
   allWeeks: "所有周报",
   prevWeek: "上一周",
   nextWeek: "下一周",
+  share: "分享",
   poweredBy: "Powered by",
   weeklyReports: "每周报告",
   weeklyReport: "每周报告",
@@ -98,6 +102,7 @@ const zhTW: Locale = {
   allWeeks: "所有週報",
   prevWeek: "上一週",
   nextWeek: "下一週",
+  share: "分享",
   poweredBy: "Powered by",
   weeklyReports: "每週報告",
   weeklyReport: "每週報告",
@@ -113,6 +118,7 @@ const ko: Locale = {
   allWeeks: "모든 주",
   prevWeek: "이전 주",
   nextWeek: "다음 주",
+  share: "공유",
   poweredBy: "Powered by",
   weeklyReports: "주간 보고서",
   weeklyReport: "주간 보고서",
@@ -128,6 +134,7 @@ const es: Locale = {
   allWeeks: "Todas las semanas",
   prevWeek: "Semana anterior",
   nextWeek: "Semana siguiente",
+  share: "Compartir",
   poweredBy: "Powered by",
   weeklyReports: "Informes semanales",
   weeklyReport: "Informe semanal",
@@ -143,6 +150,7 @@ const fr: Locale = {
   allWeeks: "Toutes les semaines",
   prevWeek: "Semaine precedente",
   nextWeek: "Semaine suivante",
+  share: "Partager",
   poweredBy: "Powered by",
   weeklyReports: "Rapports hebdomadaires",
   weeklyReport: "Rapport hebdomadaire",
@@ -158,6 +166,7 @@ const de: Locale = {
   allWeeks: "Alle Wochen",
   prevWeek: "Vorherige Woche",
   nextWeek: "Naechste Woche",
+  share: "Teilen",
   poweredBy: "Powered by",
   weeklyReports: "Wochenberichte",
   weeklyReport: "Wochenbericht",
@@ -173,6 +182,7 @@ const pt: Locale = {
   allWeeks: "Todas as semanas",
   prevWeek: "Semana anterior",
   nextWeek: "Proxima semana",
+  share: "Compartilhar",
   poweredBy: "Powered by",
   weeklyReports: "Relatorios semanais",
   weeklyReport: "Relatorio semanal",
@@ -188,6 +198,7 @@ const ru: Locale = {
   allWeeks: "Все недели",
   prevWeek: "Предыдущая неделя",
   nextWeek: "Следующая неделя",
+  share: "Поделиться",
   poweredBy: "Powered by",
   weeklyReports: "Еженедельные отчеты",
   weeklyReport: "Еженедельный отчет",
