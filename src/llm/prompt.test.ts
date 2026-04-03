@@ -48,7 +48,7 @@ describe("buildPrompt", () => {
   it("includes system instructions", () => {
     const prompt = buildPrompt(MOCK_INPUT);
     expect(prompt).toContain("structured content");
-    expect(prompt).toContain("second person");
+    expect(prompt).toContain("First person");
   });
 
   it("includes activity data as YAML", () => {
