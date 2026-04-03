@@ -1,0 +1,45 @@
+{
+  "name": "github-weekly-reporter",
+  "version": "0.1.0",
+  "description": "Generate beautiful weekly GitHub activity reports with optional AI narratives",
+  "type": "module",
+  "bin": {
+    "github-weekly-reporter": "./dist/cli/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "github",
+    "weekly-report",
+    "activity",
+    "github-action",
+    "developer-tools"
+  ],
+  "author": "deariary",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deariary/github-weekly-reporter.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@octokit/graphql": "^8.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@types/node": "^22.14.1",
+    "eslint": "^9.24.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1",
+    "vitest": "^3.1.1"
+  }
+}
