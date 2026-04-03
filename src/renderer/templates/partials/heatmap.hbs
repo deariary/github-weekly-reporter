@@ -1,0 +1,11 @@
+<div class="section">
+  <h2>Contribution Graph</h2>
+  <div class="heatmap">
+    {{#each dailyCommits}}
+    <div class="heatmap-day heatmap-level-{{heatmapLevel this.count}}">
+      <span class="count">{{this.count}}</span>
+      <span>{{weekday this.date}}</span>
+    </div>
+    {{/each}}
+  </div>
+</div>

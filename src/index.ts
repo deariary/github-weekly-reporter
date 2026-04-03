@@ -1,4 +1,5 @@
 export { collectWeeklyData } from "./collector/index.js";
+export { renderReport } from "./renderer/index.js";
 export type {
   WeeklyReportData,
   ReportConfig,
@@ -8,4 +9,5 @@ export type {
   DailyCommitCount,
   PullRequest,
   Issue,
+  Theme,
 } from "./types.js";
