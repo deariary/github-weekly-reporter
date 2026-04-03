@@ -40,6 +40,8 @@ const TEMPLATE = `<!DOCTYPE html>
       align-items: center;
       gap: 1.25rem;
       margin-bottom: 4rem;
+      text-decoration: none;
+      color: inherit;
     }
     .profile img {
       width: 56px; height: 56px;
@@ -136,13 +138,13 @@ const TEMPLATE = `<!DOCTYPE html>
 <div class="index-page">
 
   {{#if username}}
-  <div class="profile">
+  <a href="https://github.com/{{username}}" class="profile" target="_blank" rel="noopener nofollow">
     {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" />{{/if}}
     <div>
       <div class="profile-name">{{username}}</div>
       <div class="profile-handle">@{{username}}</div>
     </div>
-  </div>
+  </a>
   {{/if}}
 
   <h1 class="index-title">{{weeklyReports}}</h1>

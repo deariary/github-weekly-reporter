@@ -143,6 +143,22 @@ export const buildCSS = (theme: Theme, language: Language = "en"): string => {
 
     /* HEADER */
     .header { margin-bottom: 3rem; }
+    .header-author {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: ${c.textSecondary};
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      transition: color 0.2s;
+    }
+    .header-author:hover { color: ${c.accent}; }
+    .header-author img {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+    }
     .header-week {
       font-family: ${f.monoFamily};
       font-size: 0.75rem;
