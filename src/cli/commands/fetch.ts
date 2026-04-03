@@ -14,6 +14,7 @@ type FetchOptions = {
   token: string;
   username: string;
   output: string;
+  date?: Date;
 };
 
 const resolveOptions = async (
@@ -27,18 +28,21 @@ const resolveOptions = async (
   const username = cli.username ?? env("GITHUB_USERNAME") ?? config.username;
   if (!username) throw new Error("GitHub username required. Pass --username, set GITHUB_USERNAME, or add to config file.");
 
+  const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
+
   return {
     token,
     username,
     output: cli.output ?? config.output ?? "./report",
+    date,
   };
 };
 
 const run = async (options: FetchOptions): Promise<void> => {
-  const weekId = getWeekId();
+  const weekId = getWeekId(options.date);
 
-  console.log(`Collecting GitHub data for ${options.username}...`);
-  const data = await collectWeeklyData(options.token, options.username);
+  console.log(`Collecting GitHub data for ${options.username} (${weekId.path})...`);
+  const data = await collectWeeklyData(options.token, options.username, options.date);
 
   const reportDir = join(options.output, weekId.path);
   await mkdir(reportDir, { recursive: true });
@@ -56,6 +60,7 @@ export const registerFetch = (program: Command): void => {
     .option("-t, --token <token>", "GitHub token (env: GITHUB_TOKEN)")
     .option("-u, --username <username>", "GitHub username (env: GITHUB_USERNAME, config: username)")
     .option("-o, --output <dir>", "Output directory (config: output)")
+    .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
         const options = await resolveOptions(opts);

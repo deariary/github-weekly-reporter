@@ -16,6 +16,7 @@ type GenerateOptions = {
   llmProvider: LLMProvider;
   llmApiKey: string;
   llmModel: string;
+  date?: Date;
 };
 
 const resolveOptions = async (
@@ -35,16 +36,19 @@ const resolveOptions = async (
   const llmModel = cli.llmModel ?? env("LLM_MODEL") ?? config.llm?.model;
   if (!llmModel) throw new Error("LLM model required. Pass --llm-model, set LLM_MODEL, or add to config file.");
 
+  const date = cli.date ? new Date(cli.date + "T12:00:00Z") : undefined;
+
   return {
     output: cli.output ?? config.output ?? "./report",
     llmProvider,
     llmApiKey,
     llmModel,
+    date,
   };
 };
 
 const run = async (options: GenerateOptions): Promise<void> => {
-  const weekId = getWeekId();
+  const weekId = getWeekId(options.date);
   const reportDir = join(options.output, weekId.path);
   const dataPath = join(reportDir, "github-data.yaml");
 
@@ -77,6 +81,7 @@ export const registerGenerate = (program: Command): void => {
     .option("--llm-provider <provider>", "LLM provider (env: LLM_PROVIDER, config: llm.provider)")
     .option("--llm-api-key <key>", "LLM API key (env: OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY)")
     .option("--llm-model <model>", "LLM model name (env: LLM_MODEL, config: llm.model)")
+    .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
         const options = await resolveOptions(opts);

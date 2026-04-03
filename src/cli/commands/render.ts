@@ -13,6 +13,7 @@ import type { WeeklyReportData, AIContent, Theme } from "../../types.js";
 type RenderOptions = {
   output: string;
   theme: Theme;
+  date?: Date;
 };
 
 const listReportDirs = async (dir: string): Promise<string[]> => {
@@ -53,7 +54,7 @@ const buildReportEntries = async (
   );
 
 const run = async (options: RenderOptions): Promise<void> => {
-  const weekId = getWeekId();
+  const weekId = getWeekId(options.date);
   const reportDir = join(options.output, weekId.path);
 
   const githubDataPath = join(reportDir, "github-data.yaml");
@@ -100,12 +101,14 @@ export const registerRender = (program: Command): void => {
     .description("Render HTML report from fetched data and LLM content")
     .option("-o, --output <dir>", "Output directory (config: output)")
     .option("--theme <theme>", "Report theme (config: theme)")
+    .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
         const config = await loadConfig();
         const options: RenderOptions = {
           output: opts.output ?? config.output ?? "./report",
           theme: (opts.theme ?? config.theme ?? "default") as Theme,
+          date: opts.date ? new Date(opts.date + "T12:00:00Z") : undefined,
         };
         await run(options);
       } catch (error) {

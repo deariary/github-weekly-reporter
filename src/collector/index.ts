@@ -15,12 +15,13 @@ import type { WeeklyReportData, ExternalContribution } from "../types.js";
 export const collectWeeklyData = async (
   token: string,
   username: string,
+  date?: Date,
 ): Promise<WeeklyReportData> => {
   const gql = graphql.defaults({
     headers: { authorization: `token ${token}` },
   });
 
-  const range = buildWeeklyRange();
+  const range = buildWeeklyRange(date);
 
   const [contributions, pullRequests, issues, events, userOrgs] = await Promise.all([
     fetchContributions(gql, username, range),
