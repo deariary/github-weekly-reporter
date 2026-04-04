@@ -143,9 +143,9 @@ The action needs a PAT to read activity across all your repositories. The defaul
 5. Value: your personal access token (the same one from the Prerequisites)
 6. Click **Add secret**
 
-### LLM API Key (optional)
+### LLM API Key (required)
 
-If you configured an LLM provider, add the API key as another secret:
+Add your LLM provider's API key as a secret:
 
 1. Click **New repository secret**
 2. Name: the secret name from the table above (e.g. `GROQ_API_KEY`)
@@ -165,15 +165,15 @@ If the `gh-pages` branch doesn't exist yet, it will be created automatically on 
 
 ### Daily Fetch (Collect Events)
 
-The workflow runs automatically on the cron schedule. You can also trigger it manually:
+The daily fetch runs automatically on the cron schedule. You can also trigger it manually:
 
 1. Go to **Actions** tab
-2. Click **Weekly Report** workflow
+2. Click **Daily Fetch** workflow
 3. Click **Run workflow**
-4. Leave mode as `daily`
-5. Click **Run workflow**
 
 ### Weekly Report (Generate Full Report)
+
+The weekly report runs automatically every Monday. You can also trigger it manually:
 
 1. Go to **Actions** tab
 2. Click **Weekly Report** workflow
@@ -202,7 +202,7 @@ Set these in the `env:` block of your workflow:
 
 ### Action Inputs
 
-See the full list of inputs in the [README](../README.md#action-inputs).
+See the full list of inputs in [action.yml](../action.yml).
 
 ### Custom Domain
 
@@ -255,7 +255,7 @@ permissions:
 
 ### LLM generation fails
 
-LLM errors are non-fatal. The report will still be generated without the AI narrative. Check:
+LLM errors will cause the workflow to fail. Check:
 
 - Is the API key set correctly as a repository secret?
 - Is the model name correct? Check the provider's models page.

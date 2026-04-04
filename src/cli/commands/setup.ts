@@ -355,7 +355,7 @@ name: Weekly Report
 
 on:
   schedule:
-    - cron: '${weeklyCron}'  # Monday midnight ${opts.timezone}
+    - cron: '${weeklyCron}'  # Monday, 1 hour after daily fetch (${opts.timezone})
   workflow_dispatch:
 
 permissions:
@@ -501,7 +501,7 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
   // 4. Site title
   const siteTitle = await input({
     message: "Site title (shown in header and hero):",
-    default: "Dev\nPulse",
+    default: "Dev\\nPulse",
   });
 
   // 5. Language
@@ -777,7 +777,7 @@ const run = async (cliRepo?: string): Promise<void> => {
     ok("Secret configured.");
   }
 
-  // 3. Workflows
+  // 4. Workflows
   step("Adding workflows...");
   const workflowOpts: WorkflowOpts = {
     username: config.username,
@@ -807,7 +807,7 @@ const run = async (cliRepo?: string): Promise<void> => {
   );
   ok("weekly-report.yml added.");
 
-  // 4. README
+  // 5. README
   step("Adding README...");
   const readme = buildReadme({
     siteTitle: config.siteTitle,
@@ -828,7 +828,7 @@ const run = async (cliRepo?: string): Promise<void> => {
   );
   ok("README added.");
 
-  // 5. GitHub Pages
+  // 6. GitHub Pages
   step("Enabling GitHub Pages...");
   try {
     const url = await enablePages(config.token, fullRepo);
@@ -838,7 +838,7 @@ const run = async (cliRepo?: string): Promise<void> => {
     ok(`Enable at: https://github.com/${fullRepo}/settings/pages`);
   }
 
-  // 6. Trigger first weekly report
+  // 7. Trigger first weekly report
   step("Generating first weekly report...");
   const dispatchRes = await ghPost(
     config.token,

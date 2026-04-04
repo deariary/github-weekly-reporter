@@ -83,7 +83,7 @@ OpenRouter and Groq are recommended for free usage. Both offer high-quality mode
 - Anthropic: https://docs.anthropic.com/en/docs/about-claude/models
 - Grok: https://docs.x.ai/docs/models
 
-If the LLM call fails, the report is still generated without the AI section.
+If the LLM call fails, the workflow will stop with an error. Make sure your API key and model name are correct.
 
 ## Supported Languages
 
