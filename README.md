@@ -1,5 +1,9 @@
 # GitHub Weekly Reporter
 
+[![CI](https://github.com/deariary/github-weekly-reporter/actions/workflows/ci.yml/badge.svg)](https://github.com/deariary/github-weekly-reporter/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/deariary/github-weekly-reporter/graph/badge.svg)](https://codecov.io/gh/deariary/github-weekly-reporter)
+[![npm](https://img.shields.io/npm/v/github-weekly-reporter)](https://www.npmjs.com/package/github-weekly-reporter)
+
 **Your GitHub activity, turned into a beautiful weekly report. Automatically.**
 
 <video src="https://github.com/user-attachments/assets/96828826-d694-4338-89b9-974094b0950d" autoplay loop muted playsinline></video>
