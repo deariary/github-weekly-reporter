@@ -156,10 +156,8 @@ Add your LLM provider's API key as a secret:
 
 1. Go to **Settings > Pages**
 2. Under **Source**, select **Deploy from a branch**
-3. Select the `gh-pages` branch and `/ (root)` folder
+3. Select the `main` branch and `/output` folder
 4. Click **Save**
-
-If the `gh-pages` branch doesn't exist yet, it will be created automatically on the first weekly report deployment.
 
 ## Step 5: Run the Workflow
 
@@ -214,7 +212,7 @@ https://YOUR_USERNAME.github.io/REPO_NAME
 
 If you use a custom domain:
 
-1. Add a `CNAME` file to your `gh-pages` branch with your domain
+1. Add a `CNAME` file to your `output/` directory with your domain
 2. Configure the custom domain in **Settings > Pages > Custom domain**
 3. Add `BASE_URL` to your workflow env:
 
@@ -264,5 +262,5 @@ LLM errors will cause the workflow to fail. Check:
 ### GitHub Pages not showing
 
 - Make sure Pages is enabled in Settings > Pages
-- Check that the `gh-pages` branch exists
+- Check that the `output/` directory exists on the `main` branch
 - Wait a few minutes for the first deployment to propagate

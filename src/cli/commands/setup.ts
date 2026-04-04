@@ -692,28 +692,9 @@ const enablePages = async (
   token: string,
   repo: string,
 ): Promise<string> => {
-  // Ensure gh-pages branch exists
-  const mainRef = await ghGet(token, `/repos/${repo}/git/ref/heads/main`);
-  if (!mainRef.ok) throw new Error("Cannot find main branch");
-  const { object } = (await mainRef.json()) as { object: { sha: string } };
-
-  const ghPagesRef = await ghGet(
-    token,
-    `/repos/${repo}/git/ref/heads/gh-pages`,
-  );
-  if (!ghPagesRef.ok) {
-    const createRef = await ghPost(token, `/repos/${repo}/git/refs`, {
-      ref: "refs/heads/gh-pages",
-      sha: object.sha,
-    });
-    if (!createRef.ok) {
-      throw new Error("Failed to create gh-pages branch");
-    }
-  }
-
-  // Enable Pages (may already be enabled)
+  // Enable Pages from main branch, /output directory (may already be enabled)
   await ghPost(token, `/repos/${repo}/pages`, {
-    source: { branch: "gh-pages", path: "/" },
+    source: { branch: "main", path: "/output" },
   });
 
   const [owner, name] = repo.split("/");

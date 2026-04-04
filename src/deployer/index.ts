@@ -1,11 +1,11 @@
-// Deploy a directory to gh-pages branch
+// Deploy output directory by committing to the current branch and pushing
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
 const exec = promisify(execFile);
 
-const git = (args: string[], cwd: string) =>
+const git = (args: string[], cwd?: string) =>
   exec("git", args, { cwd });
 
 export type DeployOptions = {
@@ -15,13 +15,17 @@ export type DeployOptions = {
 };
 
 export const deploy = async (options: DeployOptions): Promise<void> => {
-  const { repoUrl, directory, message = "deploy" } = options;
+  const { directory, message = "deploy" } = options;
 
-  await git(["init"], directory);
-  await git(["checkout", "--orphan", "gh-pages"], directory);
-  await git(["add", "."], directory);
-  await git(["config", "user.name", "github-weekly-reporter"], directory);
-  await git(["config", "user.email", "github-weekly-reporter@users.noreply.github.com"], directory);
-  await git(["commit", "-m", message], directory);
-  await git(["push", repoUrl, "gh-pages", "--force"], directory);
+  // Stage output files and commit to current branch
+  await git(["add", "-f", directory]);
+
+  const { stdout } = await git(["status", "--porcelain"]);
+  if (!stdout.trim()) {
+    console.log("No changes to deploy.");
+    return;
+  }
+
+  await git(["commit", "-m", message]);
+  await git(["push"]);
 };
