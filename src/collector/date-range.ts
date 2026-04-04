@@ -124,25 +124,30 @@ export const buildWeeklyRange = (
 ): DateRange => {
   const { year, month, day } = localDateParts(now, timezone);
 
-  // "to" is end of today in the user's timezone (23:59:59.999)
-  // Use next day's midnight - 1ms to handle DST days that are 23 or 25 hours
-  const nextDay = new Date(Date.UTC(year, month, day + 1));
-  const nextDayParts = {
+  // Find the Monday of the current ISO week
+  const d = new Date(Date.UTC(year, month, day));
+  const dow = d.getUTCDay() || 7; // 1=Mon..7=Sun
+  const thisMonday = new Date(Date.UTC(year, month, day - (dow - 1)));
+
+  // Previous ISO week: Monday to Sunday
+  const prevMonday = new Date(thisMonday.getTime() - 7 * 86_400_000);
+  const prevSunday = new Date(thisMonday.getTime() - 86_400_000);
+
+  const fromParts = {
+    year: prevMonday.getUTCFullYear(),
+    month: prevMonday.getUTCMonth(),
+    day: prevMonday.getUTCDate(),
+  };
+  const from = midnightInTz(fromParts.year, fromParts.month, fromParts.day, timezone);
+
+  // "to" is end of Sunday (next day's midnight - 1ms)
+  const nextDay = new Date(prevSunday.getTime() + 86_400_000);
+  const toParts = {
     year: nextDay.getUTCFullYear(),
     month: nextDay.getUTCMonth(),
     day: nextDay.getUTCDate(),
   };
-  const tomorrowMidnight = midnightInTz(nextDayParts.year, nextDayParts.month, nextDayParts.day, timezone);
-  const to = new Date(tomorrowMidnight.getTime() - 1);
-
-  // "from" is start of (today - 6 days) in the user's timezone (00:00:00.000)
-  const fromDate = new Date(Date.UTC(year, month, day - 6));
-  const fromParts = {
-    year: fromDate.getUTCFullYear(),
-    month: fromDate.getUTCMonth(),
-    day: fromDate.getUTCDate(),
-  };
-  const from = midnightInTz(fromParts.year, fromParts.month, fromParts.day, timezone);
+  const to = new Date(midnightInTz(toParts.year, toParts.month, toParts.day, timezone).getTime() - 1);
 
   return { from, to };
 };

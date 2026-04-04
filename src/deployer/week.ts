@@ -32,8 +32,14 @@ export const getWeekId = (
   date: Date = new Date(),
   timezone: string = "UTC",
 ): WeekId => {
-  const { year } = localDateParts(date, timezone);
-  const week = getISOWeekNumber(date, timezone);
-  const padded = String(week).padStart(2, "0");
-  return { year, week, path: `${year}/W${padded}` };
+  // Target the previous ISO week (the one we are reporting on)
+  const { year, month, day } = localDateParts(date, timezone);
+  const d = new Date(Date.UTC(year, month, day));
+  const dow = d.getUTCDay() || 7; // 1=Mon..7=Sun
+  // Go to previous week's Thursday (ISO week is identified by its Thursday)
+  const prevThursday = new Date(Date.UTC(year, month, day - (dow - 1) - 7 + 3));
+  const prevWeek = getISOWeekNumber(prevThursday, timezone);
+  const prevYear = localDateParts(prevThursday, timezone).year;
+  const padded = String(prevWeek).padStart(2, "0");
+  return { year: prevYear, week: prevWeek, path: `${prevYear}/W${padded}` };
 };
