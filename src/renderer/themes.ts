@@ -243,26 +243,22 @@ export const buildCSS = (language: Language = "en"): string => {
       transform: translateY(-4px);
       box-shadow: 0 12px 48px ${c.accent}15, 0 4px 16px rgba(0,0,0,0.5);
     }
-    /* heading breaks out above card */
+    /* heading breaks out left of card */
     .section-summary .section-heading {
       font-size: 1.75rem; font-weight: 800;
       letter-spacing: -0.03em;
-      margin: -4.5rem 0 1.25rem -1rem;
-      position: relative;
+      margin-left: -4rem;
+      margin-bottom: 1rem;
       color: #ffffff;
     }
     .section-summary:first-child .section-heading {
-      margin-top: -5rem;
-      margin-left: -1.5rem;
+      margin-left: -5rem;
       font-size: 2.25rem;
     }
     .section-summary .section-type {
       font-family: ${f.monoFamily}; font-size: 0.5rem;
       text-transform: uppercase; letter-spacing: 0.3em;
-      color: ${c.accent}; margin-bottom: 3.5rem;
-    }
-    .section-summary:first-child .section-type {
-      margin-bottom: 4rem;
+      color: ${c.accent}; margin-bottom: 0.75rem;
     }
     .section-summary .section-body {
       font-size: 1rem; color: ${c.textSecondary}; line-height: 1.85;
@@ -401,10 +397,8 @@ export const buildCSS = (language: Language = "en"): string => {
       .page { padding: 0 1.5rem 3rem; }
       .section-summary { max-width: 100%; }
       .section-summary:first-child { max-width: 100%; padding: 2rem; }
-      .section-summary .section-heading { margin-top: -3rem; margin-left: -0.5rem; font-size: 1.25rem; }
-      .section-summary .section-type { margin-bottom: 2rem; }
-      .section-summary:first-child .section-heading { margin-top: -3.5rem; font-size: 1.5rem; }
-      .section-summary:first-child .section-type { margin-bottom: 2.5rem; }
+      .section-summary .section-heading { margin-left: -0.5rem; font-size: 1.25rem; }
+      .section-summary:first-child .section-heading { margin-left: -0.5rem; font-size: 1.5rem; }
       .highlight-grid { grid-template-columns: 1fr; }
       .highlight-grid { grid-template-columns: 1fr; }
     }
