@@ -117,6 +117,29 @@ const run = async (options: RenderOptions): Promise<void> => {
   await writeFile(reportPath, html, "utf-8");
   console.log(`Report written to ${reportPath}`);
 
+  // Re-render previous week's report so its "next week" link points here
+  if (prevWeek) {
+    const prevGhData = await tryReadYaml<WeeklyReportData>(join(options.dataDir, prevWeek, "github-data.yaml"));
+    const prevAiContent = await tryReadYaml<AIContent>(join(options.dataDir, prevWeek, "llm-data.yaml"));
+    if (prevGhData && prevAiContent) {
+      const prevIdx = currentIdx - 1;
+      const prevPrev = prevIdx > 0 ? allPaths[prevIdx - 1] : undefined;
+      const prevHtml = renderReport({ ...prevGhData, aiContent: prevAiContent }, {
+        language: options.language,
+        timezone: options.timezone,
+        baseUrl: base,
+        weekPath: prevWeek,
+        siteTitle: options.siteTitle,
+        prevWeek: prevPrev ? `../../${prevPrev}/` : undefined,
+        nextWeek: `../../${weekId.path}/`,
+      });
+      const prevOutputDir = join(options.outputDir, prevWeek);
+      await mkdir(prevOutputDir, { recursive: true });
+      await writeFile(join(prevOutputDir, "index.html"), prevHtml, "utf-8");
+      console.log(`Updated previous week (${prevWeek}) with next-week link.`);
+    }
+  }
+
   // Generate OG image
   const ogImage = await generateOGImage({
     title: aiContent.title,
