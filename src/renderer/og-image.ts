@@ -206,7 +206,7 @@ const buildIndexSVG = async (
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "72px",
+                    fontSize: "96px",
                     fontWeight: 600,
                     lineHeight: 1.1,
                     letterSpacing: "-0.03em",
@@ -219,7 +219,7 @@ const buildIndexSVG = async (
                 type: "div",
                 props: {
                   style: {
-                    fontSize: "30px",
+                    fontSize: "40px",
                     color: "rgba(255,255,255,0.5)",
                   },
                   children: `Weekly reports by @${data.username}`,
@@ -245,14 +245,14 @@ const buildIndexSVG = async (
                     {
                       type: "span",
                       props: {
-                        style: { color: "#39d353", fontWeight: 600, fontSize: "24px" },
+                        style: { color: "#39d353", fontWeight: 600, fontSize: "36px" },
                         children: String(data.reportCount),
                       },
                     },
                     {
                       type: "span",
                       props: {
-                        style: { color: "rgba(255,255,255,0.4)", fontSize: "20px" },
+                        style: { color: "rgba(255,255,255,0.4)", fontSize: "30px" },
                         children: data.reportCount === 1 ? "report" : "reports",
                       },
                     },
@@ -262,7 +262,7 @@ const buildIndexSVG = async (
               {
                 type: "div",
                 props: {
-                  style: { fontSize: "20px", color: "rgba(255,255,255,0.3)" },
+                  style: { fontSize: "28px", color: "rgba(255,255,255,0.3)" },
                   children: "github-weekly-reporter",
                 },
               },
