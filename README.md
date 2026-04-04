@@ -4,18 +4,36 @@ Generate beautiful weekly GitHub activity reports with AI-powered narratives.
 
 Collect your commits, pull requests, issues, and code reviews from the past week, render them as a polished static HTML page, and deploy to GitHub Pages automatically.
 
-## Quick Start (Automatic Setup)
+## Prerequisites
+
+Before running setup, have these ready:
+
+1. **GitHub fine-grained PAT** with `All repositories` access and these permissions (all Read & Write):
+   `Administration`, `Contents`, `Actions`, `Secrets`, `Pages`, `Workflows`
+   ([Create one](https://github.com/settings/personal-access-tokens/new))
+
+2. **LLM API key** from one of the supported providers.
+   Groq and OpenRouter offer free tiers (no credit card required):
+   - Groq: https://console.groq.com/keys
+   - OpenRouter: https://openrouter.ai/settings/keys
+
+3. **LLM model name** for your chosen provider.
+   Check available models at the provider's docs:
+   - Groq: https://console.groq.com/docs/models
+   - OpenRouter: https://openrouter.ai/models
+
+## Quick Start
 
 ```bash
 npx github-weekly-reporter setup
 ```
 
-This interactive command handles everything:
+The setup command will walk you through everything:
 - Creates a repository
-- Adds the workflow file
-- Configures your LLM API key as a secret
+- Adds workflow files (daily fetch + weekly report)
+- Configures secrets (PAT and LLM API key)
 - Enables GitHub Pages
-- Triggers the first run
+- Triggers your first weekly report
 
 See [Manual Setup](docs/manual-setup.md) if you prefer to configure everything yourself.
 
