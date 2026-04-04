@@ -156,7 +156,7 @@ const TEMPLATE = `<!DOCTYPE html>
 
     /* PROFILE - asymmetric, stacked */
     .hero-profile {
-      display: flex;
+      display: inline-flex;
       align-items: flex-start;
       gap: 4rem;
       text-decoration: none;
@@ -164,8 +164,8 @@ const TEMPLATE = `<!DOCTYPE html>
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .hero-profile:hover .hero-display-name {
-      color: #ffffff;
-      text-shadow: 0 0 20px {{accentColor}}80, 0 0 60px {{accentColor}}30;
+      color: {{accentColor}};
+      text-shadow: 0 0 30px {{accentColor}}80, 0 0 80px {{accentColor}}30;
     }
     .hero-profile:hover .hero-handle {
       text-shadow: 0 0 12px {{accentColor}}60;
