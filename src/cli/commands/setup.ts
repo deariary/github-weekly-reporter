@@ -866,7 +866,7 @@ const run = async (cliRepo?: string): Promise<void> => {
   ──────────────────────────────────────────────
 
   Repository:         https://github.com/${fullRepo}
-  Triggered workflow: ${runUrl}
+  Triggered build:    ${runUrl}
 
   Your first weekly report is being generated now.
   Once complete, it will be available at:
