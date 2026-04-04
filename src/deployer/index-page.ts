@@ -1,7 +1,7 @@
 // Generate the index.html that lists all archived reports
 
 import Handlebars from "handlebars";
-import type { Theme, Language, UserProfile } from "../types.js";
+import type { Language, UserProfile } from "../types.js";
 import { getLocale, getFontConfig } from "../i18n/index.js";
 import { buildCSS } from "../renderer/themes.js";
 
@@ -432,7 +432,6 @@ const groupByYear = (reports: ReportEntry[]): YearGroup[] => {
 
 export const renderIndexPage = (
   reports: ReportEntry[],
-  theme: Theme = "default",
   pageData?: IndexPageData,
   language: Language = "en",
   siteTitle?: string,
@@ -443,7 +442,7 @@ export const renderIndexPage = (
   const template = Handlebars.compile(TEMPLATE);
   return template({
     yearGroups: groupByYear(reports),
-    css: buildCSS(theme, language),
+    css: buildCSS(language),
     username: pageData?.username,
     avatarUrl: pageData?.avatarUrl,
     profile: pageData?.profile,

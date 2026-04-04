@@ -9,7 +9,7 @@ import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deplo
 import { getWeekId } from "../../deployer/week.js";
 import { parseLocalDate } from "../../collector/date-range.js";
 import { generateOGImage } from "../../renderer/og-image.js";
-import type { WeeklyReportData, AIContent, Theme, Language } from "../../types.js";
+import type { WeeklyReportData, AIContent, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
 
@@ -18,7 +18,6 @@ type RenderOptions = {
   outputDir: string;
   baseUrl: string;
   siteTitle?: string;
-  theme: Theme;
   language: Language;
   timezone: string;
   date?: Date;
@@ -102,9 +101,8 @@ const run = async (options: RenderOptions): Promise<void> => {
 
   const base = options.baseUrl.replace(/\/+$/, "");
 
-  console.log(`Rendering report (theme: ${options.theme}, lang: ${options.language})...`);
+  console.log(`Rendering report (lang: ${options.language})...`);
   const html = renderReport(data, {
-    theme: options.theme,
     language: options.language,
     timezone: options.timezone,
     baseUrl: base,
@@ -140,7 +138,6 @@ const run = async (options: RenderOptions): Promise<void> => {
   const entries = await buildReportEntries(options.dataDir, allPaths);
   const indexHtml = renderIndexPage(
     entries,
-    options.theme,
     { username: githubData.username, avatarUrl: githubData.avatarUrl, profile: githubData.profile },
     options.language,
     options.siteTitle,
@@ -186,7 +183,6 @@ export const registerRender = (program: Command): void => {
     .option("-o, --output-dir <dir>", "Output directory for HTML (env: OUTPUT_DIR, default: ./output)")
     .option("--base-url <url>", "Base URL for absolute links in OG tags, sitemap, canonical (env: BASE_URL)")
     .option("--site-title <title>", "Site title for nav header (env: SITE_TITLE, default: {username}'s Weekly Reports)")
-    .option("--theme <theme>", "Report theme (env: THEME, default: default)")
     .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, default: en)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
@@ -200,7 +196,6 @@ export const registerRender = (program: Command): void => {
           outputDir: opts.outputDir ?? env("OUTPUT_DIR") ?? "./output",
           baseUrl,
           siteTitle: opts.siteTitle ?? env("SITE_TITLE"),
-          theme: (opts.theme ?? env("THEME") ?? "default") as Theme,
           language: (opts.language ?? env("LANGUAGE") ?? "en") as Language,
           timezone: opts.timezone ?? env("TIMEZONE") ?? "UTC",
           date: opts.date ? parseLocalDate(opts.date, opts.timezone ?? env("TIMEZONE") ?? "UTC") : undefined,

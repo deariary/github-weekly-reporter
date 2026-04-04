@@ -52,7 +52,7 @@ describe("renderIndexPage", () => {
   });
 
   it("shows profile when provided", () => {
-    const html = renderIndexPage(entries(["2026/W14"]), "dark", {
+    const html = renderIndexPage(entries(["2026/W14"]), {
       username: "testuser",
       avatarUrl: "https://example.com/avatar.png",
     });
@@ -61,7 +61,7 @@ describe("renderIndexPage", () => {
   });
 
   it("renders Japanese locale", () => {
-    const html = renderIndexPage(entries(["2026/W14"]), "default", undefined, "ja");
+    const html = renderIndexPage(entries(["2026/W14"]), undefined, "ja");
     expect(html).toContain('lang="ja"');
     expect(html).toContain("ウィークリーレポート");
   });

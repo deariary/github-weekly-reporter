@@ -1,89 +1,35 @@
-// Theme CSS definitions for report rendering
+// CSS definitions for report rendering (dark theme)
 
-import type { Theme, Language } from "../types.js";
+import type { Language } from "../types.js";
 import { getFontConfig } from "../i18n/index.js";
 
-type ThemeColors = {
-  bg: string;
-  text: string;
-  textSecondary: string;
-  textTertiary: string;
-  border: string;
-  borderSubtle: string;
-  accent: string;
-  cardBg: string;
-  chipBg: string;
-  chipBorder: string;
-  green: string;
-  red: string;
-  badgePr: string;
-  badgeRelease: string;
-  badgeIssue: string;
-  badgeDiscussion: string;
-  heatmap0: string;
-  heatmap1: string;
-  heatmap2: string;
-  heatmap3: string;
-  heatmap4: string;
-  heatmap4Text: string;
+const COLORS = {
+  bg: "#050505",
+  text: "#e0e0e0",
+  textSecondary: "rgba(255,255,255,0.65)",
+  textTertiary: "rgba(255,255,255,0.3)",
+  border: "rgba(255,255,255,0.08)",
+  borderSubtle: "rgba(255,255,255,0.04)",
+  accent: "#39d353",
+  cardBg: "rgba(255,255,255,0.02)",
+  chipBg: "rgba(255,255,255,0.04)",
+  chipBorder: "rgba(255,255,255,0.08)",
+  green: "#3fb950",
+  red: "#f85149",
+  badgePr: "#8957e5",
+  badgeRelease: "#238636",
+  badgeIssue: "#d29922",
+  badgeDiscussion: "#58a6ff",
+  heatmap0: "rgba(255,255,255,0.03)",
+  heatmap1: "#0e4429",
+  heatmap2: "#006d32",
+  heatmap3: "#26a641",
+  heatmap4: "#39d353",
+  heatmap4Text: "#000",
 };
 
-const THEMES: Record<Theme, ThemeColors> = {
-  default: {
-    bg: "#ffffff",
-    text: "#1f2328",
-    textSecondary: "#656d76",
-    textTertiary: "#8b949e",
-    border: "#d0d7de",
-    borderSubtle: "#e8ebef",
-    accent: "#0969da",
-    cardBg: "#f6f8fa",
-    chipBg: "#f0f3f6",
-    chipBorder: "#d0d7de",
-    green: "#1a7f37",
-    red: "#cf222e",
-    badgePr: "#8250df",
-    badgeRelease: "#1a7f37",
-    badgeIssue: "#bf8700",
-    badgeDiscussion: "#0969da",
-    heatmap0: "#ebedf0",
-    heatmap1: "#9be9a8",
-    heatmap2: "#40c463",
-    heatmap3: "#30a14e",
-    heatmap4: "#216e39",
-    heatmap4Text: "#fff",
-  },
-  dark: {
-    bg: "#050505",
-    text: "#e0e0e0",
-    textSecondary: "rgba(255,255,255,0.65)",
-    textTertiary: "rgba(255,255,255,0.3)",
-    border: "rgba(255,255,255,0.08)",
-    borderSubtle: "rgba(255,255,255,0.04)",
-    accent: "#39d353",
-    cardBg: "rgba(255,255,255,0.02)",
-    chipBg: "rgba(255,255,255,0.04)",
-    chipBorder: "rgba(255,255,255,0.08)",
-    green: "#3fb950",
-    red: "#f85149",
-    badgePr: "#8957e5",
-    badgeRelease: "#238636",
-    badgeIssue: "#d29922",
-    badgeDiscussion: "#58a6ff",
-    heatmap0: "rgba(255,255,255,0.03)",
-    heatmap1: "#0e4429",
-    heatmap2: "#006d32",
-    heatmap3: "#26a641",
-    heatmap4: "#39d353",
-    heatmap4Text: "#000",
-  },
-};
-
-export const getThemeColors = (theme: Theme): ThemeColors =>
-  THEMES[theme] ?? THEMES.dark;
-
-export const buildCSS = (theme: Theme, language: Language = "en"): string => {
-  const c = getThemeColors(theme);
+export const buildCSS = (language: Language = "en"): string => {
+  const c = COLORS;
   const f = getFontConfig(language);
 
   return `

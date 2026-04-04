@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
-import type { WeeklyReportData, Theme, Language, DailyCommitCount } from "../types.js";
+import type { WeeklyReportData, Language, DailyCommitCount } from "../types.js";
 import { getLocale } from "../i18n/index.js";
 import { buildCSS } from "./themes.js";
 import { registerHelpers } from "./helpers.js";
@@ -41,7 +41,6 @@ const computeHeatmapLevels = (dailyCommits: DailyCommitCount[]): DailyCommitWith
 };
 
 export type RenderOptions = {
-  theme?: Theme;
   language?: Language;
   timezone?: string;
   baseUrl?: string;
@@ -64,37 +63,33 @@ const createInstance = (language: Language, timezone: string): typeof Handlebars
 
 export const renderReport = (
   data: WeeklyReportData,
-  themeOrOptions: Theme | RenderOptions = "default",
+  options: RenderOptions = {},
 ): string => {
-  const opts: RenderOptions = typeof themeOrOptions === "string"
-    ? { theme: themeOrOptions }
-    : themeOrOptions;
-  const theme = opts.theme ?? "default";
-  const language = opts.language ?? "en";
-  const timezone = opts.timezone ?? "UTC";
+  const language = options.language ?? "en";
+  const timezone = options.timezone ?? "UTC";
   const locale = getLocale(language);
 
   const hbs = createInstance(language, timezone);
   const template = hbs.compile(readTemplate("report.hbs"));
 
-  const baseUrl = opts.baseUrl?.replace(/\/+$/, "") ?? "";
-  const weekPath = opts.weekPath ?? "";
+  const baseUrl = options.baseUrl?.replace(/\/+$/, "") ?? "";
+  const weekPath = options.weekPath ?? "";
   const canonicalUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/` : undefined;
   const ogImageUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/og.png` : "og.png";
 
-  const siteTitle = opts.siteTitle ?? `${data.username}'s ${locale.weeklyReports}`;
+  const siteTitle = options.siteTitle ?? `${data.username}'s ${locale.weeklyReports}`;
 
   return template({
     ...data,
     dailyCommits: computeHeatmapLevels(data.dailyCommits),
-    css: buildCSS(theme, language),
+    css: buildCSS(language),
     lang: language,
     i18n: locale,
     baseUrl,
     canonicalUrl,
     ogImageUrl,
     siteTitle,
-    prevWeek: opts.prevWeek,
-    nextWeek: opts.nextWeek,
+    prevWeek: options.prevWeek,
+    nextWeek: options.nextWeek,
   });
 };
