@@ -1,5 +1,15 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { buildRepoUrl } from "./deploy.js";
+
+// Mock deploy module
+const mockDeploy = vi.fn().mockResolvedValue(undefined);
+vi.mock("../../deployer/index.js", () => ({
+  deploy: (...args: unknown[]) => mockDeploy(...args),
+}));
+
+vi.mock("../../deployer/week.js", () => ({
+  getWeekId: () => ({ year: 2026, week: 14, path: "2026/W14" }),
+}));
 
 describe("buildRepoUrl", () => {
   afterEach(() => {
@@ -56,5 +66,37 @@ describe("buildRepoUrl", () => {
     vi.stubEnv("GITHUB_TOKEN", "");
     const url = buildRepoUrl(undefined);
     expect(url).toBe("https://github.com/env-owner/env-repo.git");
+  });
+});
+
+describe("registerDeploy", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("calls deploy with correct options", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "ghp_test");
+    const { Command } = await import("commander");
+    const { registerDeploy } = await import("./deploy.js");
+    const program = new Command();
+    registerDeploy(program);
+
+    await program.parseAsync([
+      "node", "cli", "deploy",
+      "--directory", "./output",
+      "--repo", "owner/repo",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    expect(mockDeploy).toHaveBeenCalledWith({
+      repoUrl: expect.stringContaining("owner/repo"),
+      directory: "./output",
+      message: "report: 2026/W14",
+    });
   });
 });
