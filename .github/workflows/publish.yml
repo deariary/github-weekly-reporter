@@ -3,10 +3,14 @@ name: Publish
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version to publish (e.g. 0.1.0, 1.0.0)'
+      bump:
+        description: 'Version bump type'
         required: true
-        type: string
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   lint:
@@ -49,10 +53,13 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - name: Set version
+      - name: Bump version
+        id: version
         env:
-          INPUT_VERSION: ${{ inputs.version }}
-        run: npm version "$INPUT_VERSION" --no-git-tag-version
+          BUMP: ${{ inputs.bump }}
+        run: |
+          NEW_VERSION=$(npm version "$BUMP" --no-git-tag-version)
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Publish to npm
         run: npm publish --provenance --access public
@@ -60,14 +67,14 @@ jobs:
       - name: Create tag and release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          INPUT_VERSION: ${{ inputs.version }}
+          NEW_VERSION: ${{ steps.version.outputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add package.json package-lock.json
-          git commit -m "v${INPUT_VERSION}"
-          git tag "v${INPUT_VERSION}"
+          git commit -m "${NEW_VERSION}"
+          git tag "${NEW_VERSION}"
           git push origin main --tags
-          gh release create "v${INPUT_VERSION}" \
-            --title "v${INPUT_VERSION}" \
+          gh release create "${NEW_VERSION}" \
+            --title "${NEW_VERSION}" \
             --generate-notes
