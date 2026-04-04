@@ -150,42 +150,96 @@ const LANGUAGE_CHOICES: { name: string; value: Language }[] = [
   { name: "Russian (Русский)",    value: "ru" },
 ];
 
-type ModelChoice = { name: string; value: string };
+const MODEL_LIST_URLS: Record<string, string> = {
+  groq: "https://console.groq.com/docs/models",
+  openrouter: "https://openrouter.ai/models",
+  openai: "https://platform.openai.com/docs/models",
+  anthropic: "https://docs.anthropic.com/en/docs/about-claude/models",
+  gemini: "https://ai.google.dev/gemini-api/docs/models",
+  grok: "https://docs.x.ai/docs/models",
+};
 
-const MODEL_CHOICES: Record<string, ModelChoice[]> = {
-  groq: [
-    { name: "Llama 4 Scout 17B (MoE, 30K TPM free)",    value: "meta-llama/llama-4-scout-17b-16e-instruct" },
-    { name: "Llama 3.3 70B (stable, 12K TPM free)",      value: "llama-3.3-70b-versatile" },
-    { name: "Qwen 3 32B (multilingual, 6K TPM free)",    value: "qwen/qwen3-32b" },
-    { name: "Kimi K2 (Moonshot, top-tier, 10K TPM free)", value: "moonshotai/kimi-k2-instruct" },
-  ],
-  openrouter: [
-    { name: "Step 3.5 Flash (free, good quality)",           value: "stepfun/step-3.5-flash:free" },
-    { name: "NVIDIA Nemotron 3 Super 120B (free, large)",    value: "nvidia/nemotron-3-super-120b-a12b:free" },
-    { name: "Qwen 3.6 Plus (free, multilingual)",            value: "qwen/qwen3.6-plus:free" },
-    { name: "OpenAI GPT-oss 120B (free, 120B params)",       value: "openai/gpt-oss-120b:free" },
-    { name: "MiniMax M2.5 (free)",                           value: "minimax/minimax-m2.5:free" },
-  ],
-  openai: [
-    { name: "GPT-4.1 (latest flagship)",          value: "gpt-4.1" },
-    { name: "GPT-4.1 Mini (fast, affordable)",     value: "gpt-4.1-mini" },
-    { name: "GPT-4.1 Nano (cheapest)",             value: "gpt-4.1-nano" },
-    { name: "o3 (reasoning)",                      value: "o3" },
-    { name: "o4-mini (fast reasoning)",             value: "o4-mini" },
-  ],
-  anthropic: [
-    { name: "Claude Opus 4 (most capable)",         value: "claude-opus-4-20250514" },
-    { name: "Claude Sonnet 4 (balanced)",            value: "claude-sonnet-4-20250514" },
-    { name: "Claude Haiku 3.5 (fast, cheap)",        value: "claude-3-5-haiku-20241022" },
-  ],
-  gemini: [
-    { name: "Gemini 2.5 Flash (fast, free tier)",   value: "gemini-2.5-flash-preview-05-20" },
-    { name: "Gemini 2.5 Pro (most capable)",         value: "gemini-2.5-pro-preview-06-05" },
-  ],
-  grok: [
-    { name: "Grok 3 (flagship)",       value: "grok-3" },
-    { name: "Grok 3 Mini (fast)",      value: "grok-3-mini" },
-  ],
+// Validate model by making a minimal API call
+
+const validateModel = async (
+  provider: LLMProvider,
+  apiKey: string,
+  model: string,
+): Promise<{ valid: boolean; error?: string }> => {
+  const openaiCompatible = (baseURL: string) =>
+    fetch(`${baseURL}/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "user", content: "hi" }],
+        max_tokens: 1,
+      }),
+    });
+
+  try {
+    let res: Response;
+    switch (provider) {
+      case "openai":
+        res = await openaiCompatible("https://api.openai.com/v1");
+        break;
+      case "groq":
+        res = await openaiCompatible("https://api.groq.com/openai/v1");
+        break;
+      case "openrouter":
+        res = await openaiCompatible("https://openrouter.ai/api/v1");
+        break;
+      case "grok":
+        res = await openaiCompatible("https://api.x.ai/v1");
+        break;
+      case "anthropic":
+        res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": apiKey,
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: "user", content: "hi" }],
+            max_tokens: 1,
+          }),
+        });
+        break;
+      case "gemini":
+        res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: "hi" }] }],
+              generationConfig: { maxOutputTokens: 1 },
+            }),
+          },
+        );
+        break;
+      default:
+        return { valid: true };
+    }
+
+    if (res.ok) return { valid: true };
+
+    const body = await res.text();
+    // 404 or "model not found" means wrong model name
+    if (res.status === 404 || body.toLowerCase().includes("model")) {
+      return { valid: false, error: `Model "${model}" not found (${res.status})` };
+    }
+    // Rate limit or other non-model errors are fine (model exists)
+    if (res.status === 429) return { valid: true };
+    return { valid: false, error: `API error: ${res.status} ${body.slice(0, 200)}` };
+  } catch (e) {
+    return { valid: false, error: `Connection error: ${e instanceof Error ? e.message : String(e)}` };
+  }
 };
 
 // ── Cron calculation from timezone ───────────────────────────
@@ -420,7 +474,6 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
       ],
     })) as LLMProvider;
 
-    const models = MODEL_CHOICES[llmProvider] ?? [];
     const keyUrls: Record<string, string> = {
       groq: "https://console.groq.com/keys",
       openrouter: "https://openrouter.ai/settings/keys",
@@ -437,10 +490,30 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
       validate: (v) => (v.length > 0 ? true : "API key is required"),
     });
 
-    llmModel = (await select({
-      message: "Model:",
-      choices: models,
-    })) as string;
+    const modelListUrl = MODEL_LIST_URLS[llmProvider] ?? "";
+    console.log(`\n  Available models: ${modelListUrl}\n`);
+
+    let modelValidated = false;
+    while (!modelValidated) {
+      llmModel = await input({
+        message: "Model name:",
+        validate: (v) => (v.length > 0 ? true : "Model name is required"),
+      });
+
+      console.log("  Validating model...");
+      const result = await validateModel(llmProvider, llmApiKey, llmModel);
+      if (result.valid) {
+        console.log("  Model OK.\n");
+        modelValidated = true;
+      } else {
+        console.log(`  ${result.error}`);
+        console.log(`  Check available models at: ${modelListUrl}\n`);
+        const retry = await confirm({ message: "Try a different model?", default: true });
+        if (!retry) {
+          throw new Error("Setup cancelled: invalid model name.");
+        }
+      }
+    }
   }
 
   return {
