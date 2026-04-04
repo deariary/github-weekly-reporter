@@ -866,10 +866,12 @@ const run = async (cliRepo?: string): Promise<void> => {
   ──────────────────────────────────────────────
 
   Repository:  https://github.com/${fullRepo}
-  Reports:     ${pagesUrl}
   Workflow:    ${runUrl}
 
   Your first weekly report is being generated now.
+  Once complete, it will be available at:
+    ${pagesUrl}
+
   Daily fetches will run automatically at midnight ${config.timezone}.
 
   To change settings, edit:
