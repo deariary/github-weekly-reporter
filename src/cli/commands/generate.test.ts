@@ -1,5 +1,30 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { resolveOptions } from "./generate.js";
+
+// Mock fs/promises
+const mockReadFile = vi.fn();
+const mockWriteFile = vi.fn().mockResolvedValue(undefined);
+vi.mock("node:fs/promises", () => ({
+  readFile: (...args: unknown[]) => mockReadFile(...args),
+  writeFile: (...args: unknown[]) => mockWriteFile(...args),
+}));
+
+// Mock LLM
+const mockGenerateContent = vi.fn().mockResolvedValue({
+  title: "Test",
+  subtitle: "Sub",
+  overview: "Overview",
+  summaries: [],
+  highlights: [],
+});
+vi.mock("../../llm/index.js", () => ({
+  generateContent: (...args: unknown[]) => mockGenerateContent(...args),
+}));
+
+// Mock week
+vi.mock("../../deployer/week.js", () => ({
+  getWeekId: () => ({ year: 2026, week: 14, path: "2026/W14" }),
+}));
 
 describe("resolveOptions", () => {
   afterEach(() => {
@@ -128,5 +153,89 @@ describe("resolveOptions", () => {
       llmModel: "gpt-4o",
     });
     expect(result.date).toBeUndefined();
+  });
+});
+
+describe("registerGenerate", () => {
+  const GITHUB_DATA_YAML = `
+username: testuser
+avatarUrl: https://example.com/avatar.png
+dateRange:
+  from: "2026-03-28"
+  to: "2026-04-03"
+stats:
+  totalCommits: 42
+  totalAdditions: 1200
+  totalDeletions: 300
+  prsOpened: 5
+  prsMerged: 3
+  prsReviewed: 8
+  issuesOpened: 2
+  issuesClosed: 1
+dailyCommits: []
+repositories: []
+pullRequests: []
+issues: []
+events: []
+externalContributions: []
+`;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockReadFile.mockResolvedValue(GITHUB_DATA_YAML);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("reads github-data and calls generateContent", async () => {
+    const { Command } = await import("commander");
+    const { registerGenerate } = await import("./generate.js");
+    const program = new Command();
+    registerGenerate(program);
+
+    await program.parseAsync([
+      "node", "cli", "generate",
+      "--data-dir", "./data",
+      "--llm-provider", "openai",
+      "--llm-api-key", "sk-test",
+      "--llm-model", "gpt-4o",
+      "--language", "en",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    expect(mockGenerateContent).toHaveBeenCalledWith(
+      expect.objectContaining({ username: "testuser", language: "en" }),
+      expect.objectContaining({ provider: "openai", model: "gpt-4o" }),
+    );
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      expect.stringContaining("llm-data.yaml"),
+      expect.any(String),
+      "utf-8",
+    );
+  });
+
+  it("exits on error", async () => {
+    mockReadFile.mockRejectedValue(new Error("file not found"));
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => { throw new Error("process.exit"); }) as never);
+
+    const { Command } = await import("commander");
+    const { registerGenerate } = await import("./generate.js");
+    const program = new Command();
+    registerGenerate(program);
+
+    await expect(
+      program.parseAsync([
+        "node", "cli", "generate",
+        "--llm-provider", "openai",
+        "--llm-api-key", "sk-test",
+        "--llm-model", "gpt-4o",
+        "--date", "2026-04-01",
+      ]),
+    ).rejects.toThrow("process.exit");
+
+    exitSpy.mockRestore();
   });
 });

@@ -1,6 +1,53 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { resolveBaseOptions, extractPRRefs } from "./fetch.js";
 import type { GitHubEvent } from "../../types.js";
+
+// Mock fs/promises
+const mockReadFile = vi.fn();
+const mockWriteFile = vi.fn().mockResolvedValue(undefined);
+const mockMkdir = vi.fn().mockResolvedValue(undefined);
+vi.mock("node:fs/promises", () => ({
+  readFile: (...args: unknown[]) => mockReadFile(...args),
+  writeFile: (...args: unknown[]) => mockWriteFile(...args),
+  mkdir: (...args: unknown[]) => mockMkdir(...args),
+}));
+
+// Mock collector modules
+const mockFetchEvents = vi.fn().mockResolvedValue([]);
+const mockDedupeEvents = vi.fn().mockImplementation((events: GitHubEvent[]) => events);
+vi.mock("../../collector/fetch-events.js", () => ({
+  fetchEvents: (...args: unknown[]) => mockFetchEvents(...args),
+  dedupeEvents: (...args: unknown[]) => mockDedupeEvents(...args),
+}));
+
+vi.mock("../../collector/fetch-repo-prs.js", () => ({
+  fetchPRsByRefs: vi.fn().mockResolvedValue([]),
+  mapState: vi.fn(),
+}));
+
+const mockFetchContributions = vi.fn().mockResolvedValue({
+  username: "testuser",
+  avatarUrl: "https://example.com/avatar.png",
+  profile: { name: null, bio: null, company: null, location: null, followers: 0, following: 0, publicRepos: 0 },
+  totalCommits: 10,
+  prsReviewed: 3,
+  dailyCommits: [],
+});
+vi.mock("../../collector/fetch-contributions.js", () => ({
+  fetchContributions: (...args: unknown[]) => mockFetchContributions(...args),
+}));
+
+vi.mock("../../collector/aggregate.js", () => ({
+  aggregateRepositories: () => [],
+}));
+
+vi.mock("../../deployer/week.js", () => ({
+  getWeekId: () => ({ year: 2026, week: 14, path: "2026/W14" }),
+}));
+
+vi.mock("@octokit/graphql", () => ({
+  graphql: { defaults: () => vi.fn() },
+}));
 
 // -------------------------------------------------------------------
 // resolveBaseOptions
@@ -164,5 +211,104 @@ describe("extractPRRefs", () => {
       },
     ];
     expect(extractPRRefs(events)).toEqual([]);
+  });
+});
+
+// -------------------------------------------------------------------
+// registerFetch (daily-fetch and weekly-fetch commands)
+// -------------------------------------------------------------------
+
+describe("registerFetch (daily-fetch)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockReadFile.mockRejectedValue(new Error("not found")); // no existing events
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("calls fetchEvents and writes events.yaml", async () => {
+    const mockEvents: GitHubEvent[] = [
+      {
+        id: "1",
+        type: "PushEvent",
+        repo: "owner/repo",
+        createdAt: "2026-04-01T00:00:00Z",
+        payload: { kind: "push", ref: "refs/heads/main", commits: ["fix"] },
+      },
+    ];
+    mockFetchEvents.mockResolvedValue(mockEvents);
+    mockDedupeEvents.mockReturnValue(mockEvents);
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "daily-fetch",
+      "--token", "ghp_test",
+      "--username", "testuser",
+      "--data-dir", "./data",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    expect(mockFetchEvents).toHaveBeenCalledWith("ghp_test", "testuser", expect.any(Object));
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      expect.stringContaining("events.yaml"),
+      expect.any(String),
+      "utf-8",
+    );
+  });
+});
+
+describe("registerFetch (weekly-fetch)", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("fetches PRs and contributions, writes github-data.yaml", async () => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    mockReadFile.mockRejectedValue(new Error("not found"));
+    mockWriteFile.mockResolvedValue(undefined);
+    mockMkdir.mockResolvedValue(undefined);
+    mockFetchContributions.mockResolvedValue({
+      username: "testuser",
+      avatarUrl: "https://example.com/avatar.png",
+      profile: { name: null, bio: null, company: null, location: null, followers: 0, following: 0, publicRepos: 0 },
+      totalCommits: 10,
+      prsReviewed: 3,
+      dailyCommits: [],
+    });
+    const { fetchPRsByRefs } = await import("../../collector/fetch-repo-prs.js");
+    vi.mocked(fetchPRsByRefs).mockResolvedValue([]);
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({ items: [], total_count: 0 }), { status: 200 })),
+    );
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "weekly-fetch",
+      "--token", "ghp_test",
+      "--username", "testuser",
+      "--data-dir", "./data",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    expect(mockFetchContributions).toHaveBeenCalled();
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      expect.stringContaining("github-data.yaml"),
+      expect.any(String),
+      "utf-8",
+    );
   });
 });

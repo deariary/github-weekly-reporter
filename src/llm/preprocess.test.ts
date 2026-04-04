@@ -92,4 +92,147 @@ describe("buildLLMContext", () => {
     expect(context).not.toContain("\nissues:");
     expect(context).not.toContain("events:");
   });
+
+  it("includes issues when present", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      issues: [
+        {
+          title: "Bug in parser",
+          body: "Parser crashes on empty input",
+          url: "https://github.com/org/repo-a/issues/5",
+          repository: "org/repo-a",
+          state: "closed",
+          labels: ["bug"],
+          author: "testuser",
+          createdAt: "2026-04-01T00:00:00Z",
+          closedAt: "2026-04-02T00:00:00Z",
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("Bug in parser");
+    expect(context).toContain("Parser crashes");
+  });
+
+  it("truncates PRs to MAX_PRS limit", () => {
+    const manyPRs = Array.from({ length: 25 }, (_, i) => ({
+      ...MOCK_INPUT.pullRequests[0],
+      title: `PR #${i}`,
+    }));
+    const context = buildLLMContext({ ...MOCK_INPUT, pullRequests: manyPRs });
+    const matches = context.match(/PR #\d+/g) ?? [];
+    expect(matches.length).toBeLessThanOrEqual(20);
+  });
+
+  it("truncates events to MAX_EVENTS limit", () => {
+    const manyEvents = Array.from({ length: 50 }, (_, i) => ({
+      ...MOCK_INPUT.events[0],
+      id: String(i),
+    }));
+    const context = buildLLMContext({ ...MOCK_INPUT, events: manyEvents });
+    const refMatches = context.match(/refs\/heads\/main/g) ?? [];
+    expect(refMatches.length).toBeLessThanOrEqual(40);
+  });
+
+  it("truncates repositories to 8", () => {
+    const manyRepos = Array.from({ length: 12 }, (_, i) => ({
+      ...MOCK_INPUT.repositories[0],
+      name: `org/repo-${i}`,
+    }));
+    const context = buildLLMContext({ ...MOCK_INPUT, repositories: manyRepos });
+    const repoMatches = context.match(/org\/repo-\d+/g) ?? [];
+    expect(repoMatches.length).toBeLessThanOrEqual(8);
+  });
+
+  it("includes external contributions when present", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      externalContributions: [
+        {
+          repo: "external/lib",
+          events: [MOCK_INPUT.events[0]],
+          pullRequests: [MOCK_INPUT.pullRequests[0]],
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("external_contributions:");
+    expect(context).toContain("external/lib");
+  });
+
+  it("includes review events", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      events: [
+        {
+          id: "r1",
+          type: "PullRequestReviewEvent",
+          repo: "org/repo-a",
+          createdAt: "2026-04-01T10:00:00Z",
+          payload: { kind: "review", action: "submitted", prNumber: 42, prTitle: "Add feature", state: "approved" },
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("Add feature");
+    expect(context).toContain("approved");
+  });
+
+  it("includes release events", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      events: [
+        {
+          id: "rel1",
+          type: "ReleaseEvent",
+          repo: "org/repo-a",
+          createdAt: "2026-04-01T10:00:00Z",
+          payload: { kind: "release", action: "published", tag: "v2.0.0", name: "Major Release" },
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("v2.0.0");
+    expect(context).toContain("Major Release");
+  });
+
+  it("filters out non-push/review/release events", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      events: [
+        {
+          id: "g1",
+          type: "WatchEvent",
+          repo: "org/repo-a",
+          createdAt: "2026-04-01T10:00:00Z",
+          payload: { kind: "generic", action: "started" },
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).not.toContain("events:");
+  });
+
+  it("truncates commits per push event", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      events: [
+        {
+          id: "p1",
+          type: "PushEvent",
+          repo: "org/repo-a",
+          createdAt: "2026-04-01T10:00:00Z",
+          payload: {
+            kind: "push",
+            ref: "refs/heads/main",
+            commits: Array.from({ length: 10 }, (_, i) => `commit ${i}`),
+          },
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    const commitMatches = context.match(/commit \d+/g) ?? [];
+    expect(commitMatches.length).toBeLessThanOrEqual(5);
+  });
 });
