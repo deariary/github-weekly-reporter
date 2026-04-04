@@ -2,9 +2,13 @@
 
 import Handlebars from "handlebars";
 import { Marked } from "marked";
+import DOMPurify from "isomorphic-dompurify";
 import type { RepositoryActivity, Language } from "../types.js";
 import { getLocale, formatNumber as fmtNumber } from "../i18n/index.js";
 import { parseLocalDate } from "../collector/date-range.js";
+
+const sanitize = (html: string): string =>
+  DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
 
 const externalLinkRenderer = {
   link({ href, text }: { href: string; text: string }): string {
@@ -79,14 +83,25 @@ export const registerHelpers = (
     locale.userWeek(username),
   );
 
-  // Markdown rendering (all links get target="_blank" rel="noopener nofollow")
+  // Markdown rendering with HTML sanitization
+  // All links get target="_blank" rel="noopener nofollow",
+  // and DOMPurify strips any dangerous tags (script, iframe, etc.)
   hbs.registerHelper("md", (text: string): Handlebars.SafeString =>
-    new Handlebars.SafeString(marked.parse(text ?? "") as string),
+    new Handlebars.SafeString(sanitize(marked.parse(text ?? "") as string)),
   );
 
   hbs.registerHelper("mdInline", (text: string): Handlebars.SafeString =>
-    new Handlebars.SafeString(marked.parseInline(text ?? "") as string),
+    new Handlebars.SafeString(sanitize(marked.parseInline(text ?? "") as string)),
   );
+
+  // Escape a string for safe embedding inside a JSON-LD <script> block.
+  // Prevents breaking out of the JSON string or closing the script tag.
+  hbs.registerHelper("jsonLdEscape", (text: string): Handlebars.SafeString => {
+    const escaped = JSON.stringify(String(text ?? ""))
+      .slice(1, -1) // remove surrounding quotes added by JSON.stringify
+      .replace(/<\//g, "<\\/"); // prevent </script> injection
+    return new Handlebars.SafeString(escaped);
+  });
 
   hbs.registerHelper("eq", function (this: unknown, a: unknown, b: unknown, opts: Handlebars.HelperOptions) {
     return a === b ? opts.fn(this) : opts.inverse(this);

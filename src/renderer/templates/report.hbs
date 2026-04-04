@@ -30,15 +30,15 @@
   {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "{{{aiContent.title}}}",
-    "description": "{{{aiContent.subtitle}}}",
+    "headline": "{{jsonLdEscape aiContent.title}}",
+    "description": "{{jsonLdEscape aiContent.subtitle}}",
     "author": {
       "@type": "Person",
-      "name": "{{{username}}}",
-      "url": "https://github.com/{{{username}}}"
+      "name": "{{jsonLdEscape username}}",
+      "url": "https://github.com/{{jsonLdEscape username}}"
     },
-    "image": "{{{ogImageUrl}}}",
-    "datePublished": "{{{dateRange.to}}}"
+    "image": "{{jsonLdEscape ogImageUrl}}",
+    "datePublished": "{{jsonLdEscape dateRange.to}}"
   }
   </script>
   {{#if canonicalUrl}}
@@ -47,8 +47,8 @@
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{{baseUrl}}}/" },
-      { "@type": "ListItem", "position": 2, "name": "{{dateRange.from}} - {{dateRange.to}}", "item": "{{{canonicalUrl}}}" }
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{jsonLdEscape baseUrl}}/" },
+      { "@type": "ListItem", "position": 2, "name": "{{jsonLdEscape dateRange.from}} - {{jsonLdEscape dateRange.to}}", "item": "{{jsonLdEscape canonicalUrl}}" }
     ]
   }
   </script>

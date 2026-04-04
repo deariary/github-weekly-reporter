@@ -59,7 +59,7 @@ runs:
   using: 'composite'
   steps:
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
       with:
         node-version: '24'
 
@@ -79,7 +79,9 @@ runs:
         GITHUB_USERNAME: ${{ inputs.username }}
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
-      run: npx github-weekly-reporter@${{ inputs.version }} daily-fetch ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_DATE: ${{ inputs.date }}
+      run: npx "github-weekly-reporter@${INPUT_VERSION}" daily-fetch ${INPUT_DATE:+--date "$INPUT_DATE"}
 
     - name: Commit and push data (daily)
       if: inputs.mode == 'daily'
@@ -104,7 +106,9 @@ runs:
         GITHUB_USERNAME: ${{ inputs.username }}
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
-      run: npx github-weekly-reporter@${{ inputs.version }} weekly-fetch ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_DATE: ${{ inputs.date }}
+      run: npx "github-weekly-reporter@${INPUT_VERSION}" weekly-fetch ${INPUT_DATE:+--date "$INPUT_DATE"}
 
     - name: Generate AI content
       if: inputs.mode == 'weekly'
@@ -118,7 +122,9 @@ runs:
         LANGUAGE: ${{ inputs.language }}
         TIMEZONE: ${{ inputs.timezone }}
         DATA_DIR: ./data
-      run: npx github-weekly-reporter@${{ inputs.version }} generate ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_DATE: ${{ inputs.date }}
+      run: npx "github-weekly-reporter@${INPUT_VERSION}" generate ${INPUT_DATE:+--date "$INPUT_DATE"}
 
     - name: Commit and push data (weekly)
       if: inputs.mode == 'weekly'
@@ -142,7 +148,9 @@ runs:
         DATA_DIR: ./data
         OUTPUT_DIR: ./output
         BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
-      run: npx github-weekly-reporter@${{ inputs.version }} render ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_DATE: ${{ inputs.date }}
+      run: npx "github-weekly-reporter@${INPUT_VERSION}" render ${INPUT_DATE:+--date "$INPUT_DATE"}
 
     - name: Deploy to GitHub Pages
       if: inputs.mode == 'weekly'
@@ -151,4 +159,6 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         OUTPUT_DIR: ./output
-      run: npx github-weekly-reporter@${{ inputs.version }} deploy ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_DATE: ${{ inputs.date }}
+      run: npx "github-weekly-reporter@${INPUT_VERSION}" deploy ${INPUT_DATE:+--date "$INPUT_DATE"}

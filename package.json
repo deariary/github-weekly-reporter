@@ -43,6 +43,7 @@
     "@octokit/graphql": "^8.2.1",
     "commander": "^14.0.3",
     "handlebars": "^4.7.9",
+    "isomorphic-dompurify": "^3.7.1",
     "marked": "^17.0.5",
     "openai": "^6.33.0",
     "satori": "^0.26.0",
