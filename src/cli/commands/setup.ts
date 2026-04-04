@@ -451,6 +451,10 @@ Then configure the custom domain in **Settings > Pages > Custom domain**.
 ## Manual Report Generation
 
 Go to [Actions](https://github.com/${opts.repo}/actions), click **Weekly Report**, then **Run workflow** with \`mode: weekly\`.
+
+---
+
+Built with [deariary](https://deariary.com)
 `;
 
 // ── Interactive prompts ──────────────────────────────────────
