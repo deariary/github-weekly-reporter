@@ -174,7 +174,9 @@ export const buildCSS = (language: Language = "en"): string => {
     .overview {
       padding: 0 0 2rem;
       margin-bottom: 4rem;
-      max-width: 680px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
       animation: fade-up 0.5s ease both;
     }
     .overview p {
@@ -212,44 +214,54 @@ export const buildCSS = (language: Language = "en"): string => {
     .section-summary:nth-child(5) { animation-delay: 0.2s; }
     .section-summary:nth-child(6) { animation-delay: 0.25s; }
     .section-summary {
-      margin-bottom: 1.5rem;
-      padding: 2rem;
+      margin-bottom: 2rem;
+      padding: 2rem 2rem 2rem 2.5rem;
       border-radius: 12px;
       border: 1px solid ${c.chipBorder};
       background: ${c.cardBg};
+      max-width: 600px;
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       animation: card-enter 0.4s ease both;
+      position: relative;
     }
-    /* first card: featured */
+    /* first card: featured, wider */
     .section-summary:first-child {
+      max-width: 700px;
       padding: 2.5rem 3rem;
       border-color: ${c.accent}20;
       background: linear-gradient(135deg, rgba(57,211,83,0.03) 0%, transparent 60%);
     }
-    /* alternating offset for visual rhythm */
+    /* alternating offset */
     .section-summary:nth-child(even):not(:first-child) {
-      margin-left: 6rem;
+      margin-left: auto;
     }
     .section-summary:nth-child(odd):not(:first-child) {
-      margin-right: 6rem;
+      margin-right: auto;
     }
     .section-summary:hover {
-      border-color: ${c.accent}30;
-      transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border-color: ${c.accent}60;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 48px ${c.accent}15, 0 4px 16px rgba(0,0,0,0.5);
+    }
+    /* heading breaks out of card */
+    .section-summary .section-heading {
+      font-size: 1.5rem; font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: -3.5rem 0 1rem -0.5rem;
+      padding-top: 1rem;
+      position: relative;
+    }
+    .section-summary:first-child .section-heading {
+      margin-top: -4rem;
+      font-size: 1.75rem;
     }
     .section-summary .section-type {
       font-family: ${f.monoFamily}; font-size: 0.5625rem;
       text-transform: uppercase; letter-spacing: 0.25em;
-      color: ${c.accent}; margin-bottom: 0.75rem;
-    }
-    .section-summary .section-heading {
-      font-size: 1.375rem; font-weight: 700;
-      margin-bottom: 0.75rem; letter-spacing: -0.02em;
+      color: ${c.accent}; margin-bottom: 2.5rem;
     }
     .section-summary .section-body {
       font-size: 1rem; color: ${c.textSecondary}; line-height: 1.85;
-      max-width: 640px;
     }
 
     /* DATA CHIPS */
@@ -291,9 +303,9 @@ export const buildCSS = (language: Language = "en"): string => {
     .highlight-card:nth-child(4) { animation-delay: 0.15s; }
     .highlight-card:nth-child(5) { animation-delay: 0.2s; }
     .highlight-card:hover {
-      border-color: rgba(255,255,255,0.12);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border-color: ${c.badgePr}50;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 48px ${c.badgePr}15, 0 4px 16px rgba(0,0,0,0.5);
     }
     .highlight-badge {
       font-family: ${f.monoFamily}; font-size: 0.5rem;
@@ -349,7 +361,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .repo-bar-value { font-family: ${f.monoFamily}; color: ${c.textTertiary}; font-size: 0.6875rem; }
 
     /* SHARE BAR */
-    .share-bar { max-width: 960px; margin: 0 auto; padding: 2rem 2rem 0; display: flex; align-items: center; gap: 0.75rem; }
+    .share-bar { max-width: 960px; margin: 3rem auto 0; padding: 2rem 3rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
     .share-label { font-family: ${f.monoFamily}; font-size: 0.5rem; color: ${c.textTertiary}; text-transform: uppercase; letter-spacing: 0.2em; }
     .share-btn {
       display: inline-flex; align-items: center; justify-content: center;
@@ -386,9 +398,10 @@ export const buildCSS = (language: Language = "en"): string => {
       .report-hero { padding: 6rem 1.5rem 3rem; }
       .report-hero .header-title { font-size: clamp(2rem, 10vw, 3rem); max-width: 100%; }
       .page { padding: 0 1.5rem 3rem; }
-      .section-summary:first-child { padding: 2rem; }
-      .section-summary:nth-child(even):not(:first-child) { margin-left: 0; }
-      .section-summary:nth-child(odd):not(:first-child) { margin-right: 0; }
+      .section-summary { max-width: 100%; }
+      .section-summary:first-child { max-width: 100%; padding: 2rem; }
+      .section-summary .section-heading { margin-top: -2.5rem; font-size: 1.25rem; }
+      .section-summary:first-child .section-heading { margin-top: -3rem; font-size: 1.375rem; }
       .highlight-grid { grid-template-columns: 1fr; }
     }
   `;
