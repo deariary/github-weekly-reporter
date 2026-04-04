@@ -161,6 +161,22 @@ const TEMPLATE = `<!DOCTYPE html>
       gap: 4rem;
       text-decoration: none;
       color: inherit;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-profile:hover .hero-display-name {
+      color: #ffffff;
+      text-shadow: 0 0 20px {{accentColor}}80, 0 0 60px {{accentColor}}30;
+    }
+    .hero-profile:hover .hero-handle {
+      text-shadow: 0 0 12px {{accentColor}}60;
+    }
+    .hero-profile:hover .hero-avatar {
+      border-color: {{accentColor}};
+      box-shadow: 0 0 30px {{accentColor}}40;
+    }
+    .hero-profile:hover .hero-stat-value {
+      color: {{accentColor}};
+      text-shadow: 0 0 16px {{accentColor}}50;
     }
     .hero-name-block {}
     .hero-display-name {
@@ -169,12 +185,14 @@ const TEMPLATE = `<!DOCTYPE html>
       letter-spacing: 0.05em;
       color: rgba(255,255,255,0.9);
       margin-bottom: 0.5rem;
+      transition: all 0.4s ease;
     }
     .hero-handle {
       font-family: {{monoFamily}};
       font-size: 0.6875rem;
       color: {{accentColor}};
       letter-spacing: 0.05em;
+      transition: all 0.4s ease;
     }
     .hero-bio {
       font-size: 0.875rem;
@@ -201,6 +219,7 @@ const TEMPLATE = `<!DOCTYPE html>
       color: rgba(255,255,255,0.9);
       line-height: 1;
       margin-bottom: 0.125rem;
+      transition: all 0.4s ease;
     }
 
     /* CONTENT */
