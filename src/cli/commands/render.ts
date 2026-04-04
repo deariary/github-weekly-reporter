@@ -8,7 +8,7 @@ import { renderReport } from "../../renderer/index.js";
 import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deployer/index-page.js";
 import { getWeekId } from "../../deployer/week.js";
 import { parseLocalDate } from "../../collector/date-range.js";
-import { generateOGImage } from "../../renderer/og-image.js";
+import { generateOGImage, generateIndexOGImage } from "../../renderer/og-image.js";
 import type { WeeklyReportData, AIContent, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
@@ -164,11 +164,24 @@ const run = async (options: RenderOptions): Promise<void> => {
     { username: githubData.username, avatarUrl: githubData.avatarUrl, profile: githubData.profile },
     options.language,
     options.siteTitle,
+    base,
   );
   const indexPath = join(options.outputDir, "index.html");
   await mkdir(options.outputDir, { recursive: true });
   await writeFile(indexPath, indexHtml, "utf-8");
   console.log(`Index written to ${indexPath}`);
+
+  // Generate index OG image
+  const resolvedSiteTitle = (options.siteTitle ?? "Dev Pulse").replace(/\\n/g, " ");
+  const indexOGImage = await generateIndexOGImage({
+    siteTitle: resolvedSiteTitle,
+    username: githubData.username,
+    language: options.language,
+    reportCount: allPaths.length,
+  });
+  const indexOGPath = join(options.outputDir, "og.png");
+  await writeFile(indexOGPath, indexOGImage);
+  console.log(`Index OG image written to ${indexOGPath}`);
 
   // Generate sitemap.xml
   const sitemapEntries = allPaths

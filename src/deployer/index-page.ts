@@ -38,8 +38,19 @@ const TEMPLATE = `<!DOCTYPE html>
   <title>{{siteTitle}}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="{{siteTitle}}" />
+  <meta name="description" content="{{description}}" />
   <meta name="view-transition" content="same-origin" />
+  <meta property="og:title" content="{{siteTitleInline}}" />
+  <meta property="og:description" content="{{description}}" />
+  <meta property="og:type" content="website" />
+  {{#if ogImageUrl}}<meta property="og:image" content="{{ogImageUrl}}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />{{/if}}
+  {{#if baseUrl}}<meta property="og:url" content="{{baseUrl}}/" />{{/if}}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{siteTitleInline}}" />
+  <meta name="twitter:description" content="{{description}}" />
+  {{#if ogImageUrl}}<meta name="twitter:image" content="{{ogImageUrl}}" />{{/if}}
   <style>{{{css}}}</style>
   <style>
     body { background: #050505; color: #e8e8e8; overflow-x: hidden; }
@@ -449,21 +460,28 @@ export const renderIndexPage = (
   pageData?: IndexPageData,
   language: Language = "en",
   siteTitle?: string,
+  baseUrl?: string,
 ): string => {
   const locale = getLocale(language);
   const fontConfig = getFontConfig(language);
   const resolvedSiteTitle = (siteTitle ?? "Dev\nPulse").replace(/\\n/g, "\n");
   const siteTitleInline = resolvedSiteTitle.replace(/\n/g, " ");
+  const username = pageData?.username ?? "";
+  const description = `Weekly reports by @${username}`;
+  const ogImageUrl = baseUrl ? `${baseUrl}/og.png` : "og.png";
   const template = Handlebars.compile(TEMPLATE);
   return template({
     yearGroups: groupByYear(reports),
     css: buildCSS(language),
-    username: pageData?.username,
+    username,
     avatarUrl: pageData?.avatarUrl,
     profile: pageData?.profile,
-    displayName: pageData?.profile?.name ?? pageData?.username,
+    displayName: pageData?.profile?.name ?? username,
     siteTitle: resolvedSiteTitle,
     siteTitleInline,
+    description,
+    ogImageUrl,
+    baseUrl,
     lang: language,
     weeklyReports: locale.weeklyReports,
     poweredBy: locale.poweredBy,

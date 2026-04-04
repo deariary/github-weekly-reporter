@@ -170,3 +170,120 @@ export const generateOGImage = async (data: OGImageData): Promise<Buffer> => {
   const svg = await buildSVG(data, font);
   return sharp(Buffer.from(svg)).png().toBuffer();
 };
+
+export type IndexOGImageData = {
+  siteTitle: string;
+  username: string;
+  language: Language;
+  reportCount: number;
+};
+
+const buildIndexSVG = async (
+  data: IndexOGImageData,
+  font: ArrayBuffer,
+): Promise<string> => {
+  const element = {
+    type: "div",
+    props: {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        width: "100%",
+        height: "100%",
+        padding: "80px 90px",
+        background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)",
+        color: "#e0e0e0",
+        fontFamily: "OGFont",
+      },
+      children: [
+        {
+          type: "div",
+          props: {
+            style: { display: "flex", flexDirection: "column", gap: "24px" },
+            children: [
+              {
+                type: "div",
+                props: {
+                  style: {
+                    fontSize: "96px",
+                    fontWeight: 600,
+                    lineHeight: 1.1,
+                    letterSpacing: "-0.03em",
+                    color: "#ffffff",
+                  },
+                  children: data.siteTitle.replace(/\n/g, " "),
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: {
+                    fontSize: "40px",
+                    color: "rgba(255,255,255,0.5)",
+                  },
+                  children: `Weekly reports by @${data.username}`,
+                },
+              },
+            ],
+          },
+        },
+        {
+          type: "div",
+          props: {
+            style: {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+            },
+            children: [
+              {
+                type: "div",
+                props: {
+                  style: { display: "flex", gap: "8px", alignItems: "baseline" },
+                  children: [
+                    {
+                      type: "span",
+                      props: {
+                        style: { color: "#39d353", fontWeight: 600, fontSize: "36px" },
+                        children: String(data.reportCount),
+                      },
+                    },
+                    {
+                      type: "span",
+                      props: {
+                        style: { color: "rgba(255,255,255,0.4)", fontSize: "30px" },
+                        children: data.reportCount === 1 ? "report" : "reports",
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                type: "div",
+                props: {
+                  style: { fontSize: "28px", color: "rgba(255,255,255,0.3)" },
+                  children: "github-weekly-reporter",
+                },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  };
+
+  return satori(element as Parameters<typeof satori>[0], {
+    width: 1200,
+    height: 630,
+    fonts: [{ name: "OGFont", data: font, weight: 600, style: "normal" as const }],
+  });
+};
+
+export const generateIndexOGImage = async (
+  data: IndexOGImageData,
+): Promise<Buffer> => {
+  const font = loadFont(data.language);
+  const svg = await buildIndexSVG(data, font);
+  return sharp(Buffer.from(svg)).png().toBuffer();
+};
