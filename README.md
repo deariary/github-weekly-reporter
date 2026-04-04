@@ -85,6 +85,16 @@ OpenRouter and Groq are recommended for free usage. Both offer high-quality mode
 
 If the LLM call fails, the workflow will stop with an error. Make sure your API key and model name are correct.
 
+## Generating a Report Manually
+
+After setup, daily fetches run automatically. To generate a weekly report anytime:
+
+1. Go to your repository's **Actions** tab
+2. Click **Weekly Report**
+3. Click **Run workflow**
+
+The report will be built and deployed to GitHub Pages within a few minutes.
+
 ## Supported Languages
 
 | Code | Language |
