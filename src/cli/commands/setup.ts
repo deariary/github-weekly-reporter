@@ -76,37 +76,49 @@ const validateToken = async (
 
 // ── Secret encryption (sealed box via tweetsodium) ───────────
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 const setRepoSecret = async (
   token: string,
   repo: string,
   name: string,
   value: string,
-): Promise<void> => {
-  const keyRes = await ghGet(token, `/repos/${repo}/actions/secrets/public-key`);
-  if (!keyRes.ok) {
-    throw new Error(
-      `Cannot access secrets for ${repo} (${keyRes.status}).\n` +
-        "  Make sure Actions is enabled and the token has the required permissions.\n" +
-        "  Classic PAT: 'repo' scope\n" +
-        "  Fine-grained PAT: 'Secrets: Read and write' permission",
-    );
-  }
-  const { key, key_id } = (await keyRes.json()) as {
-    key: string;
-    key_id: string;
-  };
-
+): Promise<boolean> => {
   const tweetsodium = await import("tweetsodium");
   const seal = tweetsodium.default.seal;
-  const keyBytes = Uint8Array.from(atob(key), (c) => c.charCodeAt(0));
-  const encrypted = seal(new TextEncoder().encode(value), keyBytes);
-  const encryptedB64 = btoa(String.fromCharCode(...encrypted));
 
-  const res = await ghPut(token, `/repos/${repo}/actions/secrets/${name}`, {
-    encrypted_value: encryptedB64,
-    key_id,
-  });
-  if (!res.ok) throw new Error(`Failed to set secret ${name}: ${res.status}`);
+  // Retry up to 3 times with backoff (new repos may need time to propagate)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const keyRes = await ghGet(token, `/repos/${repo}/actions/secrets/public-key`);
+    if (!keyRes.ok) {
+      if (attempt < 2) {
+        await sleep(3000 * (attempt + 1));
+        continue;
+      }
+      return false;
+    }
+
+    const { key, key_id } = (await keyRes.json()) as {
+      key: string;
+      key_id: string;
+    };
+    const keyBytes = Uint8Array.from(atob(key), (c) => c.charCodeAt(0));
+    const encrypted = seal(new TextEncoder().encode(value), keyBytes);
+    const encryptedB64 = btoa(String.fromCharCode(...encrypted));
+
+    const res = await ghPut(token, `/repos/${repo}/actions/secrets/${name}`, {
+      encrypted_value: encryptedB64,
+      key_id,
+    });
+    if (res.ok) return true;
+
+    if (attempt < 2) {
+      await sleep(3000 * (attempt + 1));
+      continue;
+    }
+    return false;
+  }
+  return false;
 };
 
 // ── Constants ────────────────────────────────────────────────
@@ -700,15 +712,26 @@ const run = async (cliRepo?: string): Promise<void> => {
 
   // 2. PAT secret (needed to read activity across all repos)
   step("Setting secret GH_PAT...");
-  await setRepoSecret(config.token, fullRepo, "GH_PAT", config.token);
-  ok("GH_PAT configured.");
+  const manualSecrets: string[] = [];
+  const patOk = await setRepoSecret(config.token, fullRepo, "GH_PAT", config.token);
+  if (patOk) {
+    ok("GH_PAT configured.");
+  } else {
+    ok("Could not set GH_PAT automatically (token may lack Secrets permission).");
+    manualSecrets.push("GH_PAT");
+  }
 
   // 3. LLM secret
   if (config.llmProvider && config.llmApiKey) {
     const secretName = LLM_SECRET_NAMES[config.llmProvider];
     step(`Setting secret ${secretName}...`);
-    await setRepoSecret(config.token, fullRepo, secretName, config.llmApiKey);
-    ok("Secret configured.");
+    const llmOk = await setRepoSecret(config.token, fullRepo, secretName, config.llmApiKey);
+    if (llmOk) {
+      ok("Secret configured.");
+    } else {
+      ok(`Could not set ${secretName} automatically.`);
+      manualSecrets.push(secretName);
+    }
   }
 
   // 3. Workflow
@@ -797,6 +820,15 @@ const run = async (cliRepo?: string): Promise<void> => {
   To change settings, edit:
     .github/workflows/weekly-report.yml
 `);
+
+  if (manualSecrets.length > 0) {
+    console.log(`  !! Some secrets could not be set automatically.
+  Please add them manually:
+    1. Go to https://github.com/${fullRepo}/settings/secrets/actions
+    2. Click "New repository secret" for each:
+${manualSecrets.map((s) => `       - ${s}`).join("\n")}
+`);
+  }
 };
 
 // ── Command registration ─────────────────────────────────────
