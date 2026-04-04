@@ -42,13 +42,10 @@ const validateToken = async (
       "Invalid or expired token.\n\n" +
         "  Create a token at: https://github.com/settings/tokens\n\n" +
         "  Classic PAT scopes needed: repo, workflow\n" +
-        "  Fine-grained PAT permissions needed:\n" +
-        "    Administration: Read and write\n" +
-        "    Contents: Read and write\n" +
-        "    Actions: Read and write\n" +
-        "    Secrets: Read and write\n" +
-        "    Pages: Read and write\n" +
-        "    Workflows: Read and write",
+        "  Fine-grained PAT:\n" +
+        "    Repository access: All repositories\n" +
+        "    Permissions: Administration, Contents, Actions,\n" +
+        "                 Secrets, Pages, Workflows (all Read & Write)",
     );
   }
   if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
@@ -425,6 +422,7 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
   console.log("  Classic PAT (https://github.com/settings/tokens/new?scopes=repo,workflow):");
   console.log("    Scopes: repo, workflow\n");
   console.log("  Fine-grained PAT (https://github.com/settings/personal-access-tokens/new):");
+  console.log("    Repository access: All repositories");
   console.log("    Permissions: Administration, Contents, Actions,");
   console.log("                 Secrets, Pages, Workflows (all Read & Write)\n");
 
