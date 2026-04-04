@@ -4,7 +4,7 @@ import { Command } from "commander";
 import { input, select, password, confirm } from "@inquirer/prompts";
 import type { LLMProvider, Language } from "../../types.js";
 
-// GitHub API helpers using fetch (no extra dependency)
+// ── GitHub API helpers ───────────────────────────────────────
 
 type GitHubHeaders = Record<string, string>;
 
@@ -15,35 +15,56 @@ const ghHeaders = (token: string): GitHubHeaders => ({
   "Content-Type": "application/json",
 });
 
-const ghGet = async (token: string, path: string): Promise<Response> =>
-  fetch(`https://api.github.com${path}`, { headers: ghHeaders(token) });
-
-const ghPost = async (token: string, path: string, body: unknown): Promise<Response> =>
+const ghFetch = async (
+  token: string,
+  method: string,
+  path: string,
+  body?: unknown,
+): Promise<Response> =>
   fetch(`https://api.github.com${path}`, {
-    method: "POST",
+    method,
     headers: ghHeaders(token),
-    body: JSON.stringify(body),
+    ...(body ? { body: JSON.stringify(body) } : {}),
   });
 
-const ghPut = async (token: string, path: string, body: unknown): Promise<Response> =>
-  fetch(`https://api.github.com${path}`, {
-    method: "PUT",
-    headers: ghHeaders(token),
-    body: JSON.stringify(body),
-  });
+const ghGet = (token: string, path: string) => ghFetch(token, "GET", path);
+const ghPost = (token: string, path: string, body: unknown) => ghFetch(token, "POST", path, body);
+const ghPut = (token: string, path: string, body: unknown) => ghFetch(token, "PUT", path, body);
 
-// Token scope check
+// ── Token validation ─────────────────────────────────────────
 
-const checkTokenScopes = async (token: string): Promise<{ valid: boolean; missing: string[] }> => {
+const validateToken = async (
+  token: string,
+): Promise<{ login: string; scopes: string[] }> => {
   const res = await ghGet(token, "/user");
-  if (!res.ok) return { valid: false, missing: ["invalid token"] };
+  if (res.status === 401) {
+    throw new Error(
+      "Invalid token. Create one at:\n" +
+        "  https://github.com/settings/tokens/new\n" +
+        "  Required scopes: repo, workflow",
+    );
+  }
+  if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
 
-  const scopes = res.headers.get("x-oauth-scopes")?.split(",").map((s) => s.trim()) ?? [];
+  const scopes =
+    res.headers
+      .get("x-oauth-scopes")
+      ?.split(",")
+      .map((s) => s.trim()) ?? [];
   const missing = ["repo", "workflow"].filter((s) => !scopes.includes(s));
-  return { valid: missing.length === 0, missing };
+  if (missing.length > 0) {
+    throw new Error(
+      `Token is missing required scopes: ${missing.join(", ")}\n` +
+        "  Create a new token at: https://github.com/settings/tokens/new\n" +
+        "  Required scopes: repo, workflow",
+    );
+  }
+
+  const { login } = (await res.json()) as { login: string };
+  return { login, scopes };
 };
 
-// Set repository secret using sealed box encryption (tweetsodium)
+// ── Secret encryption (sealed box via tweetsodium) ───────────
 
 const setRepoSecret = async (
   token: string,
@@ -52,13 +73,20 @@ const setRepoSecret = async (
   value: string,
 ): Promise<void> => {
   const keyRes = await ghGet(token, `/repos/${repo}/actions/secrets/public-key`);
-  if (!keyRes.ok) throw new Error(`Failed to get public key for ${repo}`);
-  const { key, key_id } = (await keyRes.json()) as { key: string; key_id: string };
+  if (!keyRes.ok) {
+    throw new Error(
+      `Cannot access secrets for ${repo}.\n` +
+        "  Make sure Actions is enabled and the token has 'repo' scope.",
+    );
+  }
+  const { key, key_id } = (await keyRes.json()) as {
+    key: string;
+    key_id: string;
+  };
 
   const { seal } = await import("tweetsodium");
   const keyBytes = Uint8Array.from(atob(key), (c) => c.charCodeAt(0));
-  const messageBytes = new TextEncoder().encode(value);
-  const encrypted = seal(messageBytes, keyBytes);
+  const encrypted = seal(new TextEncoder().encode(value), keyBytes);
   const encryptedB64 = btoa(String.fromCharCode(...encrypted));
 
   const res = await ghPut(token, `/repos/${repo}/actions/secrets/${name}`, {
@@ -68,7 +96,7 @@ const setRepoSecret = async (
   if (!res.ok) throw new Error(`Failed to set secret ${name}: ${res.status}`);
 };
 
-// Workflow YAML template
+// ── Constants ────────────────────────────────────────────────
 
 const LLM_SECRET_NAMES: Record<string, string> = {
   openai: "OPENAI_API_KEY",
@@ -79,69 +107,219 @@ const LLM_SECRET_NAMES: Record<string, string> = {
   grok: "GROK_API_KEY",
 };
 
+const LLM_API_KEY_INPUT_NAMES: Record<string, string> = {
+  openai: "openai-api-key",
+  anthropic: "anthropic-api-key",
+  gemini: "gemini-api-key",
+  openrouter: "openrouter-api-key",
+  groq: "groq-api-key",
+  grok: "grok-api-key",
+};
+
+const TIMEZONE_CHOICES = [
+  { name: "UTC",                            value: "UTC" },
+  { name: "US/Pacific (Los Angeles)",       value: "America/Los_Angeles" },
+  { name: "US/Mountain (Denver)",           value: "America/Denver" },
+  { name: "US/Central (Chicago)",           value: "America/Chicago" },
+  { name: "US/Eastern (New York)",          value: "America/New_York" },
+  { name: "Europe/London",                  value: "Europe/London" },
+  { name: "Europe/Paris",                   value: "Europe/Paris" },
+  { name: "Europe/Berlin",                  value: "Europe/Berlin" },
+  { name: "Europe/Moscow",                  value: "Europe/Moscow" },
+  { name: "Asia/Dubai",                     value: "Asia/Dubai" },
+  { name: "Asia/Kolkata (India)",           value: "Asia/Kolkata" },
+  { name: "Asia/Bangkok",                   value: "Asia/Bangkok" },
+  { name: "Asia/Shanghai (China)",          value: "Asia/Shanghai" },
+  { name: "Asia/Tokyo (Japan)",             value: "Asia/Tokyo" },
+  { name: "Asia/Seoul (Korea)",             value: "Asia/Seoul" },
+  { name: "Australia/Sydney",               value: "Australia/Sydney" },
+  { name: "Pacific/Auckland (New Zealand)", value: "Pacific/Auckland" },
+  { name: "America/Sao_Paulo (Brazil)",     value: "America/Sao_Paulo" },
+];
+
+const LANGUAGE_CHOICES: { name: string; value: Language }[] = [
+  { name: "English",              value: "en" },
+  { name: "Japanese (日本語)",     value: "ja" },
+  { name: "Chinese Simplified (简体中文)", value: "zh-CN" },
+  { name: "Chinese Traditional (繁體中文)", value: "zh-TW" },
+  { name: "Korean (한국어)",       value: "ko" },
+  { name: "Spanish (Español)",    value: "es" },
+  { name: "French (Français)",    value: "fr" },
+  { name: "German (Deutsch)",     value: "de" },
+  { name: "Portuguese (Português)", value: "pt" },
+  { name: "Russian (Русский)",    value: "ru" },
+];
+
+type ModelChoice = { name: string; value: string };
+
+const MODEL_CHOICES: Record<string, ModelChoice[]> = {
+  groq: [
+    { name: "Llama 4 Scout 17B (MoE, 30K TPM free)",    value: "meta-llama/llama-4-scout-17b-16e-instruct" },
+    { name: "Llama 3.3 70B (stable, 12K TPM free)",      value: "llama-3.3-70b-versatile" },
+    { name: "Qwen 3 32B (multilingual, 6K TPM free)",    value: "qwen/qwen3-32b" },
+    { name: "Kimi K2 (Moonshot, top-tier, 10K TPM free)", value: "moonshotai/kimi-k2-instruct" },
+  ],
+  openrouter: [
+    { name: "Step 3.5 Flash (free, good quality)",           value: "stepfun/step-3.5-flash:free" },
+    { name: "NVIDIA Nemotron 3 Super 120B (free, large)",    value: "nvidia/nemotron-3-super-120b-a12b:free" },
+    { name: "Qwen 3.6 Plus (free, multilingual)",            value: "qwen/qwen3.6-plus:free" },
+    { name: "OpenAI GPT-oss 120B (free, 120B params)",       value: "openai/gpt-oss-120b:free" },
+    { name: "MiniMax M2.5 (free)",                           value: "minimax/minimax-m2.5:free" },
+  ],
+  openai: [
+    { name: "GPT-4.1 (latest flagship)",          value: "gpt-4.1" },
+    { name: "GPT-4.1 Mini (fast, affordable)",     value: "gpt-4.1-mini" },
+    { name: "GPT-4.1 Nano (cheapest)",             value: "gpt-4.1-nano" },
+    { name: "o3 (reasoning)",                      value: "o3" },
+    { name: "o4-mini (fast reasoning)",             value: "o4-mini" },
+  ],
+  anthropic: [
+    { name: "Claude Opus 4 (most capable)",         value: "claude-opus-4-20250514" },
+    { name: "Claude Sonnet 4 (balanced)",            value: "claude-sonnet-4-20250514" },
+    { name: "Claude Haiku 3.5 (fast, cheap)",        value: "claude-3-5-haiku-20241022" },
+  ],
+  gemini: [
+    { name: "Gemini 2.5 Flash (fast, free tier)",   value: "gemini-2.5-flash-preview-05-20" },
+    { name: "Gemini 2.5 Pro (most capable)",         value: "gemini-2.5-pro-preview-06-05" },
+  ],
+  grok: [
+    { name: "Grok 3 (flagship)",       value: "grok-3" },
+    { name: "Grok 3 Mini (fast)",      value: "grok-3-mini" },
+  ],
+};
+
+// ── Cron calculation from timezone ───────────────────────────
+// Daily fetch should run at midnight in the user's timezone.
+// GitHub Actions cron is always UTC, so we calculate the offset.
+
+const midnightCronUTC = (timezone: string): string => {
+  const now = new Date();
+  const utcMidnight = new Date(
+    now.toLocaleString("en-US", { timeZone: "UTC" }),
+  );
+  const localMidnight = new Date(
+    now.toLocaleString("en-US", { timeZone: timezone }),
+  );
+  const offsetMinutes = Math.round(
+    (utcMidnight.getTime() - localMidnight.getTime()) / 60000,
+  );
+  const utcHour = ((offsetMinutes / 60 + 24) % 24) | 0;
+  const utcMinute = ((offsetMinutes % 60) + 60) % 60;
+  return `${utcMinute} ${utcHour} * * *`;
+};
+
+// ── Workflow YAML template ───────────────────────────────────
+
 const buildWorkflow = (opts: {
   username: string;
   language: Language;
   timezone: string;
+  siteTitle: string;
   llmProvider?: LLMProvider;
   llmModel?: string;
   llmSecretName?: string;
 }): string => {
-  const llmInputs = opts.llmProvider && opts.llmModel && opts.llmSecretName
-    ? [
-        `        llm-provider: '${opts.llmProvider}'`,
-        `        llm-model: '${opts.llmModel}'`,
-        `        ${opts.llmProvider === "openai" ? "openai-api-key" : opts.llmProvider === "anthropic" ? "anthropic-api-key" : opts.llmProvider === "gemini" ? "gemini-api-key" : opts.llmProvider === "openrouter" ? "openrouter-api-key" : opts.llmProvider === "groq" ? "groq-api-key" : "grok-api-key"}: \${{ secrets.${opts.llmSecretName} }}`,
-      ].join("\n")
-    : "";
+  const cron = midnightCronUTC(opts.timezone);
+  const llmInputs =
+    opts.llmProvider && opts.llmModel && opts.llmSecretName
+      ? `          llm-provider: '${opts.llmProvider}'
+          llm-model: '${opts.llmModel}'
+          ${LLM_API_KEY_INPUT_NAMES[opts.llmProvider]}: \${{ secrets.${opts.llmSecretName} }}`
+      : "";
 
-  return `name: Weekly Report
+  return `# Generated by: github-weekly-reporter setup
+# Docs: https://github.com/deariary/github-weekly-reporter
+
+name: Weekly Report
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # daily at midnight UTC
+    - cron: '${cron}'  # midnight ${opts.timezone}
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Run mode'
+        type: choice
+        options: [daily, weekly]
+        default: daily
 
 permissions:
   contents: write
   pages: write
 
-jobs:
-  daily:
-    if: github.event.schedule == '0 0 * * *' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: deariary/github-weekly-reporter@main
-        with:
-          github-token: \${{ secrets.GITHUB_TOKEN }}
-          username: '${opts.username}'
-          mode: 'daily'
-          language: '${opts.language}'
-          timezone: '${opts.timezone}'
+env:
+  SITE_TITLE: '${opts.siteTitle}'
 
-  weekly:
-    if: github.event_name == 'workflow_dispatch'
+jobs:
+  report:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: deariary/github-weekly-reporter@main
         with:
           github-token: \${{ secrets.GITHUB_TOKEN }}
           username: '${opts.username}'
-          mode: 'weekly'
+          mode: \${{ github.event.inputs.mode || 'daily' }}
           language: '${opts.language}'
           timezone: '${opts.timezone}'
 ${llmInputs}
 `;
 };
 
-// Interactive prompts
+// ── README template ──────────────────────────────────────────
+
+const buildReadme = (opts: {
+  siteTitle: string;
+  username: string;
+  repo: string;
+  pagesUrl: string;
+  language: Language;
+  timezone: string;
+  llmProvider?: LLMProvider;
+  llmModel?: string;
+}): string => `# ${opts.siteTitle}
+
+Weekly GitHub activity reports for [@${opts.username}](https://github.com/${opts.username}), powered by [github-weekly-reporter](https://github.com/deariary/github-weekly-reporter).
+
+## Live Reports
+
+${opts.pagesUrl}
+
+## How It Works
+
+1. **Daily** (automatic): A scheduled workflow collects your GitHub events at midnight (${opts.timezone}).
+2. **Weekly** (manual): Trigger the workflow with \`mode: weekly\` from the [Actions tab](https://github.com/${opts.repo}/actions) to generate a full report${opts.llmProvider ? ` with AI narrative (${opts.llmProvider}/${opts.llmModel})` : ""}.
+3. The report is deployed to GitHub Pages automatically.
+
+## Configuration
+
+Edit \`.github/workflows/weekly-report.yml\` to change:
+
+| Setting | Current | Description |
+|---------|---------|-------------|
+| \`username\` | \`${opts.username}\` | GitHub user to report on |
+| \`language\` | \`${opts.language}\` | Report language (en, ja, zh-CN, zh-TW, ko, es, fr, de, pt, ru) |
+| \`timezone\` | \`${opts.timezone}\` | IANA timezone for date calculations |
+| \`SITE_TITLE\` | \`${opts.siteTitle}\` | Site title in the header and hero |
+${opts.llmProvider ? `| \`llm-provider\` | \`${opts.llmProvider}\` | LLM provider for AI narrative |\n| \`llm-model\` | \`${opts.llmModel}\` | Model name |\n` : ""}
+## Changing the LLM API Key
+
+1. Go to **Settings > Secrets and variables > Actions**
+2. Update the \`${opts.llmProvider ? LLM_SECRET_NAMES[opts.llmProvider] : "LLM_API_KEY"}\` secret
+
+## Manual Report Generation
+
+Go to [Actions](https://github.com/${opts.repo}/actions), click **Weekly Report**, then **Run workflow** with \`mode: weekly\`.
+`;
+
+// ── Interactive prompts ──────────────────────────────────────
 
 type SetupConfig = {
   token: string;
   username: string;
   repo: string;
+  siteTitle: string;
   language: Language;
   timezone: string;
   llmProvider?: LLMProvider;
@@ -150,58 +328,78 @@ type SetupConfig = {
 };
 
 const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
-  console.log("\n  GitHub Weekly Reporter Setup\n");
+  console.log("\n  GitHub Weekly Reporter - Interactive Setup\n");
+  console.log("  This will create a repository, add a workflow, and configure");
+  console.log("  everything you need for automatic weekly reports.\n");
 
+  // 1. Token
   const token = await password({
-    message: "GitHub personal access token (repo + workflow scopes):",
+    message: "GitHub personal access token:",
+    validate: (v) => (v.length > 0 ? true : "Token is required"),
   });
 
-  console.log("  Checking token scopes...");
-  const { valid, missing } = await checkTokenScopes(token);
-  if (!valid) {
-    throw new Error(
-      `Token is missing required scopes: ${missing.join(", ")}.\n` +
-        "Create a token at https://github.com/settings/tokens with 'repo' and 'workflow' scopes.",
-    );
-  }
-  console.log("  Token OK.\n");
+  console.log("\n  Validating token...");
+  const { login } = await validateToken(token);
+  console.log(`  Authenticated as ${login}\n`);
 
-  const userRes = await ghGet(token, "/user");
-  const userData = (await userRes.json()) as { login: string };
-
+  // 2. Username
   const username = await input({
-    message: "GitHub username:",
-    default: userData.login,
+    message: "GitHub username to report on:",
+    default: login,
   });
 
-  const repo = cliRepo
-    ? cliRepo
-    : await input({
-        message: "Repository name:",
-        default: "weekly-report",
-      });
+  // 3. Repository
+  const repo = cliRepo ?? await input({
+    message: "Repository name (will be created if it doesn't exist):",
+    default: "weekly-report",
+    validate: (v) =>
+      /^[a-zA-Z0-9._-]+$/.test(v) ? true : "Invalid repository name",
+  });
 
+  // 4. Site title
+  const siteTitle = await input({
+    message: "Site title (shown in header and hero):",
+    default: "Dev\nPulse",
+  });
+
+  // 5. Language
   const language = (await select({
     message: "Report language:",
-    choices: [
-      { name: "English", value: "en" },
-      { name: "Japanese", value: "ja" },
-      { name: "Chinese (Simplified)", value: "zh-CN" },
-      { name: "Korean", value: "ko" },
-      { name: "Spanish", value: "es" },
-      { name: "French", value: "fr" },
-      { name: "German", value: "de" },
-    ],
+    choices: LANGUAGE_CHOICES,
     default: "en",
   })) as Language;
 
-  const timezone = await input({
-    message: "IANA timezone:",
+  // 6. Timezone
+  const timezone = (await select({
+    message: "Timezone (for scheduling and date calculations):",
+    choices: [
+      ...TIMEZONE_CHOICES,
+      { name: "Other (enter manually)", value: "__other__" },
+    ],
     default: "UTC",
-  });
+  })) as string;
+
+  const resolvedTimezone =
+    timezone === "__other__"
+      ? await input({
+          message: "IANA timezone (e.g. Asia/Tokyo, Europe/London):",
+          validate: (v) => {
+            try {
+              Intl.DateTimeFormat(undefined, { timeZone: v });
+              return true;
+            } catch {
+              return "Invalid timezone. See: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones";
+            }
+          },
+        })
+      : timezone;
+
+  // 7. LLM
+  console.log("\n  AI-generated narratives make reports much more readable.");
+  console.log("  Groq and OpenRouter offer generous free tiers (no credit card required).\n");
 
   const setupLlm = await confirm({
-    message: "Configure LLM for AI-generated narratives?",
+    message: "Configure an LLM provider for AI narratives?",
     default: true,
   });
 
@@ -213,89 +411,141 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
     llmProvider = (await select({
       message: "LLM provider:",
       choices: [
-        { name: "Groq (free, fast)", value: "groq" },
-        { name: "OpenRouter (free tier, many models)", value: "openrouter" },
-        { name: "OpenAI", value: "openai" },
-        { name: "Anthropic", value: "anthropic" },
-        { name: "Google Gemini", value: "gemini" },
-        { name: "Grok (xAI)", value: "grok" },
+        { name: "Groq        - Free tier, fast inference (recommended)", value: "groq" },
+        { name: "OpenRouter   - Free tier, 25+ free models",            value: "openrouter" },
+        { name: "Google Gemini - Free tier available",                   value: "gemini" },
+        { name: "OpenAI       - Paid, GPT-4.1 series",                  value: "openai" },
+        { name: "Anthropic    - Paid, Claude 4 series",                 value: "anthropic" },
+        { name: "Grok (xAI)   - Paid, Grok 3 series",                  value: "grok" },
       ],
     })) as LLMProvider;
 
-    llmApiKey = await password({ message: `${llmProvider} API key:` });
-
-    const defaultModels: Record<string, string> = {
-      groq: "meta-llama/llama-4-scout-17b-16e-instruct",
-      openrouter: "stepfun/step-3.5-flash:free",
-      openai: "gpt-4o",
-      anthropic: "claude-sonnet-4-20250514",
-      gemini: "gemini-2.0-flash",
-      grok: "grok-3-mini",
+    const models = MODEL_CHOICES[llmProvider] ?? [];
+    const keyUrls: Record<string, string> = {
+      groq: "https://console.groq.com/keys",
+      openrouter: "https://openrouter.ai/settings/keys",
+      openai: "https://platform.openai.com/api-keys",
+      anthropic: "https://console.anthropic.com/settings/keys",
+      gemini: "https://aistudio.google.com/apikey",
+      grok: "https://console.x.ai",
     };
 
-    llmModel = await input({
-      message: "Model name:",
-      default: defaultModels[llmProvider] ?? "",
+    console.log(`\n  Get your API key at: ${keyUrls[llmProvider]}\n`);
+
+    llmApiKey = await password({
+      message: `${llmProvider} API key:`,
+      validate: (v) => (v.length > 0 ? true : "API key is required"),
     });
+
+    llmModel = (await select({
+      message: "Model:",
+      choices: models,
+    })) as string;
   }
 
-  return { token, username, repo, language, timezone, llmProvider, llmApiKey, llmModel };
+  return {
+    token,
+    username,
+    repo,
+    siteTitle,
+    language,
+    timezone: resolvedTimezone,
+    llmProvider,
+    llmApiKey,
+    llmModel,
+  };
 };
 
-// Setup actions
+// ── Setup actions ────────────────────────────────────────────
 
-const ensureRepo = async (token: string, fullRepo: string): Promise<boolean> => {
+const step = (msg: string) => console.log(`\n  [*] ${msg}`);
+const ok = (msg: string) => console.log(`      ${msg}`);
+
+const ensureRepo = async (
+  token: string,
+  fullRepo: string,
+): Promise<boolean> => {
   const res = await ghGet(token, `/repos/${fullRepo}`);
-  if (res.ok) return false; // already exists
+  if (res.ok) return false;
 
   const [owner, name] = fullRepo.split("/");
-  const userRes = await ghGet(token, "/user");
-  const user = (await userRes.json()) as { login: string };
+  const { login } = (await (await ghGet(token, "/user")).json()) as {
+    login: string;
+  };
 
   const createRes =
-    owner === user.login
-      ? await ghPost(token, "/user/repos", { name, auto_init: true, private: false })
-      : await ghPost(token, `/orgs/${owner}/repos`, { name, auto_init: true, private: false });
+    owner === login
+      ? await ghPost(token, "/user/repos", {
+          name,
+          auto_init: true,
+          private: false,
+          description: "Weekly GitHub activity reports",
+        })
+      : await ghPost(token, `/orgs/${owner}/repos`, {
+          name,
+          auto_init: true,
+          private: false,
+          description: "Weekly GitHub activity reports",
+        });
 
   if (!createRes.ok) {
-    const err = await createRes.text();
-    throw new Error(`Failed to create repository ${fullRepo}: ${err}`);
+    const body = await createRes.text();
+    throw new Error(
+      `Failed to create ${fullRepo}: ${createRes.status}\n  ${body}`,
+    );
   }
+
+  // Wait for repo to be ready
+  await new Promise((r) => setTimeout(r, 2000));
   return true;
 };
 
-const addWorkflowFile = async (
+const addFileToRepo = async (
   token: string,
   repo: string,
+  path: string,
   content: string,
+  message: string,
 ): Promise<void> => {
-  const path = ".github/workflows/weekly-report.yml";
   const existing = await ghGet(token, `/repos/${repo}/contents/${path}`);
-  const sha = existing.ok ? ((await existing.json()) as { sha: string }).sha : undefined;
+  const sha = existing.ok
+    ? ((await existing.json()) as { sha: string }).sha
+    : undefined;
 
   const res = await ghPut(token, `/repos/${repo}/contents/${path}`, {
-    message: "chore: add weekly report workflow",
+    message,
     content: btoa(unescape(encodeURIComponent(content))),
     ...(sha ? { sha } : {}),
   });
-  if (!res.ok) throw new Error(`Failed to add workflow: ${res.status}`);
+  if (!res.ok) {
+    throw new Error(`Failed to add ${path}: ${res.status}`);
+  }
 };
 
-const enablePages = async (token: string, repo: string): Promise<string> => {
+const enablePages = async (
+  token: string,
+  repo: string,
+): Promise<string> => {
   // Ensure gh-pages branch exists
-  const refRes = await ghGet(token, `/repos/${repo}/git/ref/heads/main`);
-  if (!refRes.ok) throw new Error("Cannot find main branch");
-  const { object } = (await refRes.json()) as { object: { sha: string } };
+  const mainRef = await ghGet(token, `/repos/${repo}/git/ref/heads/main`);
+  if (!mainRef.ok) throw new Error("Cannot find main branch");
+  const { object } = (await mainRef.json()) as { object: { sha: string } };
 
-  const ghPagesRes = await ghGet(token, `/repos/${repo}/git/ref/heads/gh-pages`);
-  if (!ghPagesRes.ok) {
-    await ghPost(token, `/repos/${repo}/git/refs`, {
+  const ghPagesRef = await ghGet(
+    token,
+    `/repos/${repo}/git/ref/heads/gh-pages`,
+  );
+  if (!ghPagesRef.ok) {
+    const createRef = await ghPost(token, `/repos/${repo}/git/refs`, {
       ref: "refs/heads/gh-pages",
       sha: object.sha,
     });
+    if (!createRef.ok) {
+      throw new Error("Failed to create gh-pages branch");
+    }
   }
 
-  // Enable Pages
+  // Enable Pages (may already be enabled)
   await ghPost(token, `/repos/${repo}/pages`, {
     source: { branch: "gh-pages", path: "/" },
   });
@@ -309,78 +559,128 @@ const run = async (cliRepo?: string): Promise<void> => {
   const fullRepo = config.repo.includes("/")
     ? config.repo
     : `${config.username}/${config.repo}`;
+  const pagesUrl = `https://${fullRepo.split("/")[0]}.github.io/${fullRepo.split("/")[1]}`;
 
-  // 1. Create or verify repo
-  console.log(`\n  Setting up ${fullRepo}...`);
+  // 1. Repository
+  step("Setting up repository...");
   const created = await ensureRepo(config.token, fullRepo);
-  console.log(created ? `  Created repository ${fullRepo}` : `  Repository ${fullRepo} exists`);
+  ok(created ? `Created ${fullRepo}` : `Using existing ${fullRepo}`);
 
-  // 2. Set LLM secret
+  // 2. LLM secret
   if (config.llmProvider && config.llmApiKey) {
-    const secretName = LLM_SECRET_NAMES[config.llmProvider] ?? "LLM_API_KEY";
-    console.log(`  Setting secret ${secretName}...`);
+    const secretName = LLM_SECRET_NAMES[config.llmProvider];
+    step(`Setting secret ${secretName}...`);
     await setRepoSecret(config.token, fullRepo, secretName, config.llmApiKey);
-    console.log(`  Secret ${secretName} set.`);
+    ok("Secret configured.");
   }
 
-  // 3. Add workflow file
-  console.log("  Adding workflow...");
+  // 3. Workflow
+  step("Adding workflow...");
   const workflow = buildWorkflow({
     username: config.username,
     language: config.language,
     timezone: config.timezone,
+    siteTitle: config.siteTitle,
     llmProvider: config.llmProvider,
     llmModel: config.llmModel,
-    llmSecretName: config.llmProvider ? LLM_SECRET_NAMES[config.llmProvider] : undefined,
+    llmSecretName: config.llmProvider
+      ? LLM_SECRET_NAMES[config.llmProvider]
+      : undefined,
   });
-  await addWorkflowFile(config.token, fullRepo, workflow);
-  console.log("  Workflow added.");
+  await addFileToRepo(
+    config.token,
+    fullRepo,
+    ".github/workflows/weekly-report.yml",
+    workflow,
+    "chore: add weekly report workflow",
+  );
+  ok("Workflow added.");
 
-  // 4. Enable GitHub Pages
-  console.log("  Enabling GitHub Pages...");
+  // 4. README
+  step("Adding README...");
+  const readme = buildReadme({
+    siteTitle: config.siteTitle,
+    username: config.username,
+    repo: fullRepo,
+    pagesUrl,
+    language: config.language,
+    timezone: config.timezone,
+    llmProvider: config.llmProvider,
+    llmModel: config.llmModel,
+  });
+  await addFileToRepo(
+    config.token,
+    fullRepo,
+    "README.md",
+    readme,
+    "docs: add README with configuration guide",
+  );
+  ok("README added.");
+
+  // 5. GitHub Pages
+  step("Enabling GitHub Pages...");
   try {
     const url = await enablePages(config.token, fullRepo);
-    console.log(`  Pages enabled: ${url}`);
+    ok(`Pages enabled: ${url}`);
   } catch {
-    console.log("  Pages may already be enabled (or needs manual setup).");
+    ok("Pages may already be enabled or require manual setup.");
+    ok(`Enable at: https://github.com/${fullRepo}/settings/pages`);
   }
 
-  // 5. Trigger first run
-  console.log("  Triggering first daily fetch...");
+  // 6. Trigger first run
+  step("Triggering first daily fetch...");
   const dispatchRes = await ghPost(
     config.token,
     `/repos/${fullRepo}/actions/workflows/weekly-report.yml/dispatches`,
     { ref: "main" },
   );
   if (dispatchRes.ok) {
-    console.log("  Workflow triggered.");
+    ok("Workflow triggered successfully.");
   } else {
-    console.log("  Could not trigger workflow (you can run it manually from Actions tab).");
+    ok("Could not auto-trigger. Run manually from the Actions tab.");
   }
 
+  // Done
+  const cron = midnightCronUTC(config.timezone);
   console.log(`
+  ──────────────────────────────────────────────
   Setup complete!
+  ──────────────────────────────────────────────
 
-  Daily fetches run automatically at midnight UTC.
-  To generate a weekly report, go to:
-    https://github.com/${fullRepo}/actions
-  and manually trigger the workflow.
+  Repository:  https://github.com/${fullRepo}
+  Reports:     ${pagesUrl}
+  Actions:     https://github.com/${fullRepo}/actions
 
-  Your reports will appear at:
-    https://${fullRepo.split("/")[0]}.github.io/${fullRepo.split("/")[1]}
+  Schedule:    Daily at midnight ${config.timezone} (cron: ${cron})
+
+  To generate a weekly report:
+    1. Go to Actions > Weekly Report > Run workflow
+    2. Select mode: "weekly"
+    3. Click "Run workflow"
+
+  To change settings, edit:
+    .github/workflows/weekly-report.yml
 `);
 };
+
+// ── Command registration ─────────────────────────────────────
 
 export const registerSetup = (program: Command): void => {
   program
     .command("setup")
-    .description("Interactive setup: create repo, add workflow, configure secrets, enable Pages")
-    .option("--repo <owner/repo>", "Use existing repository (skip repo creation prompt)")
+    .description(
+      "Interactive setup: create repo, add workflow, configure secrets, enable Pages",
+    )
+    .option(
+      "--repo <owner/repo>",
+      "Use existing repository (skip repo creation prompt)",
+    )
     .action(async (opts: { repo?: string }) => {
       try {
         await run(opts.repo);
       } catch (error) {
-        console.error("\n  Error:", error instanceof Error ? error.message : error);
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error(`\n  Error: ${msg}\n`);
         process.exit(1);
       }
     });
