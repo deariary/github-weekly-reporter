@@ -1,8 +1,16 @@
 # GitHub Weekly Reporter
 
-Generate beautiful weekly GitHub activity reports with AI-powered narratives.
+**Your GitHub activity, turned into a beautiful weekly report. Automatically.**
 
-Collect your commits, pull requests, issues, and code reviews from the past week, render them as a polished static HTML page, and deploy to GitHub Pages automatically.
+Every week, this tool looks at everything you did on GitHub (commits, pull requests, code reviews) and generates a polished, shareable report page with AI-written summaries. It runs as a GitHub Action, deploys to GitHub Pages, and costs nothing.
+
+One command to set up. Zero maintenance after that.
+
+```bash
+npx github-weekly-reporter setup
+```
+
+[See a live example](https://unhappychoice.github.io/weekly-report/)
 
 ## Prerequisites
 
