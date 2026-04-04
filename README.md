@@ -13,14 +13,14 @@ Before running setup, have these ready:
    ([Create one](https://github.com/settings/personal-access-tokens/new))
 
 2. **LLM API key** from one of the supported providers.
-   Groq and OpenRouter offer free tiers (no credit card required):
-   - Groq: https://console.groq.com/keys
+   OpenRouter and Groq offer free tiers (no credit card required):
    - OpenRouter: https://openrouter.ai/settings/keys
+   - Groq: https://console.groq.com/keys
 
 3. **LLM model name** for your chosen provider.
    Check available models at the provider's docs:
-   - Groq: https://console.groq.com/docs/models
    - OpenRouter: https://openrouter.ai/models
+   - Groq: https://console.groq.com/docs/models
 
 ## Quick Start
 
