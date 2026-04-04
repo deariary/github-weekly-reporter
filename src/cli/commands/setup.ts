@@ -712,26 +712,33 @@ const run = async (cliRepo?: string): Promise<void> => {
 
   // 2. PAT secret (needed to read activity across all repos)
   step("Setting secret GH_PAT...");
-  const manualSecrets: string[] = [];
   const patOk = await setRepoSecret(config.token, fullRepo, "GH_PAT", config.token);
-  if (patOk) {
-    ok("GH_PAT configured.");
-  } else {
-    ok("Could not set GH_PAT automatically (token may lack Secrets permission).");
-    manualSecrets.push("GH_PAT");
+  if (!patOk) {
+    throw new Error(
+      "Failed to set GH_PAT secret.\n\n" +
+        "  This is required for the workflow to read activity across all your repos.\n" +
+        "  Possible causes:\n" +
+        "    - Fine-grained PAT: make sure 'Secrets: Read and write' permission is granted\n" +
+        "      and 'Repository access' is set to 'All repositories'\n" +
+        "    - Classic PAT: make sure 'repo' scope is granted\n\n" +
+        `  You can also set it manually at:\n    https://github.com/${fullRepo}/settings/secrets/actions`,
+    );
   }
+  ok("GH_PAT configured.");
 
   // 3. LLM secret
   if (config.llmProvider && config.llmApiKey) {
     const secretName = LLM_SECRET_NAMES[config.llmProvider];
     step(`Setting secret ${secretName}...`);
     const llmOk = await setRepoSecret(config.token, fullRepo, secretName, config.llmApiKey);
-    if (llmOk) {
-      ok("Secret configured.");
-    } else {
-      ok(`Could not set ${secretName} automatically.`);
-      manualSecrets.push(secretName);
+    if (!llmOk) {
+      throw new Error(
+        `Failed to set ${secretName} secret.\n\n` +
+          "  This is required for AI narrative generation.\n" +
+          `  You can set it manually at:\n    https://github.com/${fullRepo}/settings/secrets/actions`,
+      );
     }
+    ok("Secret configured.");
   }
 
   // 3. Workflow
@@ -821,14 +828,7 @@ const run = async (cliRepo?: string): Promise<void> => {
     .github/workflows/weekly-report.yml
 `);
 
-  if (manualSecrets.length > 0) {
-    console.log(`  !! Some secrets could not be set automatically.
-  Please add them manually:
-    1. Go to https://github.com/${fullRepo}/settings/secrets/actions
-    2. Click "New repository secret" for each:
-${manualSecrets.map((s) => `       - ${s}`).join("\n")}
-`);
-  }
+
 };
 
 // ── Command registration ─────────────────────────────────────
