@@ -35,15 +35,9 @@ const resolveOptions = (
     groq: "GROQ_API_KEY",
     grok: "GROK_API_KEY",
   };
-  const llmApiKey = cli.llmApiKey
-    ?? env(providerKeyMap[llmProvider] ?? "")
-    ?? env("OPENAI_API_KEY")
-    ?? env("ANTHROPIC_API_KEY")
-    ?? env("GEMINI_API_KEY")
-    ?? env("OPENROUTER_API_KEY")
-    ?? env("GROQ_API_KEY")
-    ?? env("GROK_API_KEY");
-  if (!llmApiKey) throw new Error("LLM API key required. Pass --llm-api-key or set OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY / OPENROUTER_API_KEY / GROQ_API_KEY / GROK_API_KEY.");
+  const envVarName = providerKeyMap[llmProvider];
+  const llmApiKey = cli.llmApiKey ?? (envVarName ? env(envVarName) : undefined);
+  if (!llmApiKey) throw new Error(`LLM API key required. Pass --llm-api-key or set ${envVarName ?? "the provider's API key env var"}.`);
 
   const llmModel = cli.llmModel ?? env("LLM_MODEL");
   if (!llmModel) throw new Error("LLM model required. Pass --llm-model or set LLM_MODEL.");
@@ -99,9 +93,9 @@ export const registerGenerate = (program: Command): void => {
     .description("Generate AI content from fetched GitHub data")
     .option("--data-dir <dir>", "Data directory (env: DATA_DIR, default: ./data)")
     .option("--llm-provider <provider>", "LLM provider (env: LLM_PROVIDER)")
-    .option("--llm-api-key <key>", "LLM API key (env: OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY)")
+    .option("--llm-api-key <key>", "LLM API key (env: OPENROUTER_API_KEY / GROQ_API_KEY / GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY / GROK_API_KEY)")
     .option("--llm-model <model>", "LLM model name (env: LLM_MODEL)")
-    .option("--language <lang>", "Report language: en, ja (env: LANGUAGE, default: en)")
+    .option("--language <lang>", "Report language: en, ja, zh-CN, zh-TW, ko, es, fr, de, pt, ru (env: LANGUAGE, default: en)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {

@@ -7,6 +7,7 @@ import { registerFetch } from "./commands/fetch.js";
 import { registerGenerate } from "./commands/generate.js";
 import { registerRender } from "./commands/render.js";
 import { registerDeploy } from "./commands/deploy.js";
+import { registerSetup } from "./commands/setup.js";
 
 const program = new Command()
   .name("github-weekly-reporter")
@@ -17,5 +18,6 @@ registerFetch(program);
 registerGenerate(program);
 registerRender(program);
 registerDeploy(program);
+registerSetup(program);
 
 program.parse();

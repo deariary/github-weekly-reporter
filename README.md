@@ -1,20 +1,52 @@
 # GitHub Weekly Reporter
 
-Generate beautiful weekly GitHub activity reports with optional AI-powered narratives.
+Generate beautiful weekly GitHub activity reports with AI-powered narratives.
 
-Collect your commits, pull requests, issues, and code reviews from the past week, render them as a polished static HTML page, and deploy to GitHub Pages.
+Collect your commits, pull requests, issues, and code reviews from the past week, render them as a polished static HTML page, and deploy to GitHub Pages automatically.
+
+## Prerequisites
+
+Before running setup, have these ready:
+
+1. **GitHub fine-grained PAT** with `All repositories` access and these permissions (all Read & Write):
+   `Administration`, `Contents`, `Actions`, `Secrets`, `Pages`, `Workflows`
+   ([Create one](https://github.com/settings/personal-access-tokens/new))
+
+2. **LLM API key** from one of the supported providers.
+   | Provider | Free Tier | Get API Key |
+   |---|---|---|
+   | OpenRouter | Yes | https://openrouter.ai/settings/keys |
+   | Groq | Yes | https://console.groq.com/keys |
+   | Google Gemini | Yes | https://aistudio.google.com/apikey |
+   | OpenAI | No | https://platform.openai.com/api-keys |
+   | Anthropic | No | https://console.anthropic.com/settings/keys |
+   | Grok (xAI) | No | https://console.x.ai |
+
+3. **LLM model name** for your chosen provider:
+
+   | Provider | Models |
+   |---|---|
+   | OpenRouter | https://openrouter.ai/models |
+   | Groq | https://console.groq.com/docs/models |
+   | Google Gemini | https://ai.google.dev/gemini-api/docs/models |
+   | OpenAI | https://platform.openai.com/docs/models |
+   | Anthropic | https://docs.anthropic.com/en/docs/about-claude/models |
+   | Grok (xAI) | https://docs.x.ai/docs/models |
 
 ## Quick Start
 
 ```bash
-npx github-weekly-reporter generate \
-  -t $GITHUB_TOKEN \
-  -u your-username
-
-npx github-weekly-reporter deploy \
-  -d ./report \
-  -r https://github.com/your-username/weekly-report.git
+npx github-weekly-reporter setup
 ```
+
+The setup command will walk you through everything:
+- Creates a repository
+- Adds workflow files (daily fetch + weekly report)
+- Configures secrets (PAT and LLM API key)
+- Enables GitHub Pages
+- Triggers your first weekly report
+
+See [Manual Setup](docs/manual-setup.md) if you prefer to configure everything yourself.
 
 ## Features
 
@@ -22,121 +54,66 @@ npx github-weekly-reporter deploy \
 - Top repositories by activity
 - Language breakdown (CSS-only chart)
 - 7-day contribution heatmap
-- AI-generated narrative summary (optional, supports OpenAI / Anthropic / Gemini)
-- Light and dark themes
+- AI-generated narrative summary (6 providers, free tiers available)
+- Dark theme with responsive design
 - Self-contained HTML (no external requests, no JavaScript required)
+- SEO optimized (OG images, JSON-LD, sitemap)
 - Deploys to GitHub Pages with weekly archive
+- Internationalization (10 languages)
 
-## Installation
+## LLM Providers
 
-```bash
-npm install -g github-weekly-reporter
-```
+AI narratives are required for report generation. Six providers are supported, including free tiers:
 
-Or run directly with npx:
+| Provider | Free Tier | Env Variable |
+|---|---|---|
+| **OpenRouter** | Yes (25+ free models) | `OPENROUTER_API_KEY` |
+| **Groq** | Yes (generous) | `GROQ_API_KEY` |
+| **Google Gemini** | Yes | `GEMINI_API_KEY` |
+| OpenAI | No | `OPENAI_API_KEY` |
+| Anthropic | No | `ANTHROPIC_API_KEY` |
+| Grok (xAI) | No | `GROK_API_KEY` |
 
-```bash
-npx github-weekly-reporter <command>
-```
+OpenRouter and Groq are recommended for free usage. Both offer high-quality models at no cost. For model selection, see each provider's documentation:
 
-## Commands
+- OpenRouter: https://openrouter.ai/models
+- Groq: https://console.groq.com/docs/models
+- Gemini: https://ai.google.dev/gemini-api/docs/models
+- OpenAI: https://platform.openai.com/docs/models
+- Anthropic: https://docs.anthropic.com/en/docs/about-claude/models
+- Grok: https://docs.x.ai/docs/models
 
-### `generate`
+If the LLM call fails, the workflow will stop with an error. Make sure your API key and model name are correct.
 
-Collect GitHub activity data and generate an HTML report.
+## Generating a Report Manually
 
-```bash
-github-weekly-reporter generate [options]
-```
+After setup, daily fetches run automatically. To generate a weekly report anytime:
 
-| Option | Env Variable | Config Key | Description |
-|---|---|---|---|
-| `-t, --token` | `GITHUB_TOKEN` | - | GitHub personal access token (required) |
-| `-u, --username` | `GITHUB_USERNAME` | `username` | GitHub username (required) |
-| `-o, --output` | - | `output` | Output directory (default: `./report`) |
-| `--theme` | - | `theme` | `default` or `dark` |
-| `--llm-provider` | `LLM_PROVIDER` | `llm.provider` | `openai`, `anthropic`, or `gemini` |
-| `--llm-api-key` | `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` / `GEMINI_API_KEY` | - | LLM API key |
-| `--llm-model` | `LLM_MODEL` | `llm.model` | Model name (e.g. `gpt-4o-mini`) |
+1. Go to your repository's **Actions** tab
+2. Click **Weekly Report**
+3. Click **Run workflow**
 
-Priority: CLI flag > environment variable > config file.
+The report will be built and deployed to GitHub Pages within a few minutes.
 
-### `deploy`
+## Supported Languages
 
-Push generated report files to the `gh-pages` branch.
-
-```bash
-github-weekly-reporter deploy [options]
-```
-
-| Option | Description |
+| Code | Language |
 |---|---|
-| `-d, --directory` | Directory containing generated files (default: `./report`) |
-| `-r, --repo` | Repository URL to push to |
+| `en` | English |
+| `ja` | Japanese |
+| `zh-CN` | Chinese (Simplified) |
+| `zh-TW` | Chinese (Traditional) |
+| `ko` | Korean |
+| `es` | Spanish |
+| `fr` | French |
+| `de` | German |
+| `pt` | Portuguese |
+| `ru` | Russian |
 
-## Config File
+## Documentation
 
-Create `.github-weekly-reporter.toml` in your project root:
-
-```toml
-username = "your-username"
-theme = "dark"
-output = "./report"
-
-[llm]
-provider = "openai"
-model = "gpt-4o-mini"
-```
-
-Secrets (tokens, API keys) should be set via environment variables or CLI flags, not in the config file.
-
-## Report Contents
-
-| Section | Requires AI | Description |
-|---|---|---|
-| Weekly stats | No | Commits, PRs opened/merged, issues, reviews |
-| Highlight repos | No | Most active repositories with counts |
-| Language breakdown | No | CSS-only bar chart of languages used |
-| Contribution graph | No | 7-day heatmap |
-| AI narrative | Yes | Natural language summary of the week |
-| Footer | - | "Powered by deariary" link |
-
-## Themes
-
-Two built-in themes:
-
-- `default`: clean light theme
-- `dark`: dark background, GitHub-inspired
-
-## AI Narrative
-
-When an LLM provider and API key are configured, the report includes an AI-generated summary. All three major providers are supported:
-
-| Provider | Env Variable | Example Model |
-|---|---|---|
-| OpenAI | `OPENAI_API_KEY` | `gpt-4o-mini` |
-| Anthropic | `ANTHROPIC_API_KEY` | `claude-sonnet-4-20250514` |
-| Google Gemini | `GEMINI_API_KEY` | `gemini-2.0-flash` |
-
-If the LLM call fails, the report is generated without the AI section. The action never fails due to LLM errors.
-
-## GitHub Action Usage
-
-```yaml
-name: Weekly Report
-on:
-  schedule:
-    - cron: '0 9 * * 1'  # Every Monday 9:00 UTC
-  workflow_dispatch:
-
-jobs:
-  report:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: deariary/github-weekly-reporter@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-```
+- [Manual Setup](docs/manual-setup.md) - step-by-step guide without the setup command
+- [CLI Reference](docs/cli-reference.md) - all commands and environment variables
 
 ## URL Structure
 
