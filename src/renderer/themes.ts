@@ -97,9 +97,9 @@ export const buildCSS = (language: Language = "en"): string => {
       border-bottom: 1px solid ${c.border};
     }
     .nav-inner {
-      max-width: 960px;
+      max-width: 720px;
       margin: 0 auto;
-      padding: 0.75rem 3rem;
+      padding: 0.75rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -128,18 +128,6 @@ export const buildCSS = (language: Language = "en"): string => {
       max-width: 720px;
       margin: 0 auto;
       padding: 7rem 2rem 4rem;
-      position: relative;
-    }
-
-    /* GEOMETRIC DECORATION */
-    .page::before {
-      content: '';
-      position: absolute;
-      top: 100px; right: -200px;
-      width: 500px; height: 500px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.03);
-      pointer-events: none;
     }
 
     /* HEADER */
@@ -218,9 +206,9 @@ export const buildCSS = (language: Language = "en"): string => {
       margin-bottom: 2.5rem;
     }
     .section-group-title {
-      font-size: 1.75rem;
+      font-size: 2rem;
       font-weight: 800;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
     }
     .section-group-line {
       flex: 1;
@@ -251,7 +239,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .highlight-card:nth-child(4) { animation-delay: 0.15s; }
     .highlight-card:nth-child(5) { animation-delay: 0.2s; }
     .section-summary {
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
       padding: 2rem 2rem;
       border-radius: 12px;
       border: 1px solid ${c.chipBorder};
@@ -260,6 +248,13 @@ export const buildCSS = (language: Language = "en"): string => {
       animation: card-enter 0.4s ease both;
       position: relative;
       overflow: hidden;
+    }
+    .section-summary:nth-child(odd) { margin-left: 0; margin-right: 2rem; }
+    .section-summary:nth-child(even) { margin-left: 2rem; margin-right: 0; }
+    .section-summary:first-child {
+      margin-left: 0; margin-right: 0;
+      padding: 2.5rem;
+      border-color: ${c.accent}20;
     }
     .section-summary::before {
       content: '';
@@ -322,6 +317,16 @@ export const buildCSS = (language: Language = "en"): string => {
     .chip-red { color: ${c.red}; font-weight: 600; }
     .chip-default { font-weight: 600; }
 
+    /* HIGHLIGHT GRID */
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .highlight-grid .highlight-card:first-child {
+      grid-column: 1 / -1;
+    }
+
     /* HIGHLIGHT CARD */
     .highlight-card {
       background: ${c.cardBg};
@@ -329,7 +334,6 @@ export const buildCSS = (language: Language = "en"): string => {
       border-radius: 12px;
       padding: 2rem;
       animation: card-enter 0.4s ease both;
-      margin-bottom: 1rem;
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
@@ -539,6 +543,10 @@ export const buildCSS = (language: Language = "en"): string => {
       .nav-inner { padding: 0.75rem 1.5rem; }
       .page { padding: 5rem 1.5rem 3rem; }
       .header-title { font-size: clamp(1.75rem, 8vw, 2.5rem); }
+      .section-summary:nth-child(odd),
+      .section-summary:nth-child(even),
+      .section-summary:first-child { margin-left: 0; margin-right: 0; }
+      .highlight-grid { grid-template-columns: 1fr; }
     }
   `;
 };

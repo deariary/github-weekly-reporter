@@ -6,6 +6,7 @@
     <span class="section-group-count">{{itemsCount aiContent.highlights.length}}</span>
   </div>
 
+  <div class="highlight-grid">
   {{#each aiContent.highlights}}
   <div class="highlight-card">
     <span class="highlight-badge highlight-{{this.type}}">{{this.type}}</span>
@@ -18,5 +19,6 @@
     <div class="highlight-body">{{{mdInline this.body}}}</div>
   </div>
   {{/each}}
+  </div>
 </div>
 {{/if}}
