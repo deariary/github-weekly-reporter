@@ -162,8 +162,8 @@ export const buildCSS = (language: Language = "en"): string => {
 
     /* ===== CONTENT ===== */
     .page {
-      max-width: 720px; margin: 0 auto;
-      padding: 0 2rem 4rem;
+      max-width: 960px; margin: 0 auto;
+      padding: 0 3rem 4rem;
     }
 
     /* OVERVIEW */
@@ -174,6 +174,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .overview {
       padding: 0 0 2rem;
       margin-bottom: 4rem;
+      max-width: 680px;
       animation: fade-up 0.5s ease both;
     }
     .overview p {
@@ -219,16 +220,18 @@ export const buildCSS = (language: Language = "en"): string => {
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       animation: card-enter 0.4s ease both;
     }
-    /* first card: break out wide */
+    /* first card: featured */
     .section-summary:first-child {
-      margin-left: -3rem; margin-right: -3rem;
       padding: 2.5rem 3rem;
-      border-color: ${c.accent}15;
-      background: rgba(57,211,83,0.02);
+      border-color: ${c.accent}20;
+      background: linear-gradient(135deg, rgba(57,211,83,0.03) 0%, transparent 60%);
     }
-    /* alternating indent */
+    /* alternating offset for visual rhythm */
     .section-summary:nth-child(even):not(:first-child) {
-      margin-left: 4rem;
+      margin-left: 6rem;
+    }
+    .section-summary:nth-child(odd):not(:first-child) {
+      margin-right: 6rem;
     }
     .section-summary:hover {
       border-color: ${c.accent}30;
@@ -246,6 +249,7 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     .section-summary .section-body {
       font-size: 1rem; color: ${c.textSecondary}; line-height: 1.85;
+      max-width: 640px;
     }
 
     /* DATA CHIPS */
@@ -345,7 +349,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .repo-bar-value { font-family: ${f.monoFamily}; color: ${c.textTertiary}; font-size: 0.6875rem; }
 
     /* SHARE BAR */
-    .share-bar { max-width: 720px; margin: 0 auto; padding: 2rem 2rem 0; display: flex; align-items: center; gap: 0.75rem; }
+    .share-bar { max-width: 960px; margin: 0 auto; padding: 2rem 2rem 0; display: flex; align-items: center; gap: 0.75rem; }
     .share-label { font-family: ${f.monoFamily}; font-size: 0.5rem; color: ${c.textTertiary}; text-transform: uppercase; letter-spacing: 0.2em; }
     .share-btn {
       display: inline-flex; align-items: center; justify-content: center;
@@ -357,7 +361,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .share-btn:hover { border-color: ${c.accent}; color: ${c.text}; }
 
     /* WEEK NAV */
-    .week-nav { max-width: 720px; margin: 0 auto; padding: 2rem 2rem 0; display: flex; justify-content: space-between; }
+    .week-nav { max-width: 960px; margin: 0 auto; padding: 2rem 2rem 0; display: flex; justify-content: space-between; }
     .week-nav-link {
       font-family: ${f.monoFamily}; font-size: 0.6875rem; color: ${c.textTertiary};
       text-decoration: none; padding: 0.375rem 0.75rem; border-radius: 6px;
@@ -367,7 +371,7 @@ export const buildCSS = (language: Language = "en"): string => {
 
     /* FOOTER */
     .footer {
-      max-width: 720px; margin: 0 auto; text-align: center;
+      max-width: 960px; margin: 0 auto; text-align: center;
       padding: 3rem 2rem; font-size: 0.5625rem;
       color: rgba(255,255,255,0.12);
       border-top: 1px solid ${c.borderSubtle};
@@ -382,8 +386,9 @@ export const buildCSS = (language: Language = "en"): string => {
       .report-hero { padding: 6rem 1.5rem 3rem; }
       .report-hero .header-title { font-size: clamp(2rem, 10vw, 3rem); max-width: 100%; }
       .page { padding: 0 1.5rem 3rem; }
-      .section-summary:first-child { margin-left: 0; margin-right: 0; padding: 2rem; }
+      .section-summary:first-child { padding: 2rem; }
       .section-summary:nth-child(even):not(:first-child) { margin-left: 0; }
+      .section-summary:nth-child(odd):not(:first-child) { margin-right: 0; }
       .highlight-grid { grid-template-columns: 1fr; }
     }
   `;
