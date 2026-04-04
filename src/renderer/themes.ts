@@ -1,9 +1,9 @@
-// CSS definitions for report rendering (dark theme)
+// CSS definitions for report rendering (dark artistic theme)
 
 import type { Language } from "../types.js";
 import { getFontConfig } from "../i18n/index.js";
 
-const COLORS = {
+const c = {
   bg: "#050505",
   text: "#e0e0e0",
   textSecondary: "rgba(255,255,255,0.65)",
@@ -29,13 +29,22 @@ const COLORS = {
 };
 
 export const buildCSS = (language: Language = "en"): string => {
-  const c = COLORS;
   const f = getFontConfig(language);
 
   return `
     @import url('${f.importUrl}');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* GRAIN TEXTURE */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
 
     /* ACCESSIBILITY */
     .skip-link {
@@ -65,6 +74,7 @@ export const buildCSS = (language: Language = "en"): string => {
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
       font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+      overflow-x: hidden;
     }
 
     /* INLINE CODE */
@@ -82,49 +92,72 @@ export const buildCSS = (language: Language = "en"): string => {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: ${c.bg}dd;
-      backdrop-filter: blur(12px);
+      background: rgba(5,5,5,0.8);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid ${c.border};
     }
     .nav-inner {
-      max-width: 720px;
+      max-width: 960px;
       margin: 0 auto;
-      padding: 0.75rem 2rem;
+      padding: 0.75rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       min-height: 56px;
     }
     nav a { color: ${c.text}; text-decoration: none; }
-    .nav-site-title { font-size: 0.875rem; font-weight: 600; }
+    .nav-site-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
     .nav-back {
       font-family: ${f.monoFamily};
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
       color: ${c.textTertiary};
       padding: 0.375rem 0.75rem;
       border-radius: 6px;
       border: 1px solid ${c.chipBorder};
       transition: all 0.2s;
     }
-    .nav-back:hover { color: ${c.text}; border-color: ${c.border}; }
+    .nav-back:hover { color: ${c.text}; border-color: ${c.accent}; }
 
-    .page { max-width: 720px; margin: 0 auto; padding: 6rem 2rem 4rem; }
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 7rem 2rem 4rem;
+      position: relative;
+    }
+
+    /* GEOMETRIC DECORATION */
+    .page::before {
+      content: '';
+      position: absolute;
+      top: 100px; right: -200px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.03);
+      pointer-events: none;
+    }
 
     /* HEADER */
-    .header { margin-bottom: 3rem; }
+    .header { margin-bottom: 4rem; }
     .header-meta {
       display: flex;
       align-items: center;
       gap: 0.625rem;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
       font-size: 0.8125rem;
       color: ${c.textTertiary};
     }
-    .header-sep { color: ${c.textTertiary}; }
+    .header-sep { color: rgba(255,255,255,0.15); }
     .header-date {
       font-family: ${f.monoFamily};
-      font-size: 0.75rem;
-      letter-spacing: 0.05em;
+      font-size: 0.6875rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
     .header-author {
       display: inline-flex;
@@ -133,24 +166,27 @@ export const buildCSS = (language: Language = "en"): string => {
       text-decoration: none;
       color: ${c.textSecondary};
       font-weight: 500;
-      transition: color 0.2s;
+      transition: color 0.3s;
     }
     .header-author:hover { color: ${c.accent}; }
     .header-author img {
-      width: 24px; height: 24px;
+      width: 28px; height: 28px;
       border-radius: 50%;
+      border: 1px solid ${c.accent}40;
     }
     .header-title {
-      font-size: clamp(1.75rem, 4vw, 2.25rem);
-      font-weight: 600;
-      line-height: 1.35;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.75rem;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      margin-bottom: 1rem;
+      color: #ffffff;
     }
     .header-sub {
-      font-size: 1.0625rem;
+      font-size: 1.125rem;
       color: ${c.textSecondary};
       font-weight: 300;
+      line-height: 1.6;
     }
 
     /* OVERVIEW */
@@ -161,7 +197,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .overview {
       padding: 2.5rem 0 2rem;
       border-top: 1px solid ${c.border};
-      margin-bottom: 3rem;
+      margin-bottom: 4rem;
       animation: fade-up 0.5s ease both;
     }
     .overview p {
@@ -182,9 +218,9 @@ export const buildCSS = (language: Language = "en"): string => {
       margin-bottom: 2.5rem;
     }
     .section-group-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
     }
     .section-group-line {
       flex: 1;
@@ -193,9 +229,10 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     .section-group-count {
       font-family: ${f.monoFamily};
-      font-size: 0.6875rem;
+      font-size: 0.625rem;
       color: ${c.textTertiary};
-      letter-spacing: 0.1em;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
     }
 
     /* SUMMARY SECTION */
@@ -215,31 +252,42 @@ export const buildCSS = (language: Language = "en"): string => {
     .highlight-card:nth-child(5) { animation-delay: 0.2s; }
     .section-summary {
       margin-bottom: 1rem;
-      padding: 1.5rem 1.75rem;
+      padding: 2rem 2rem;
       border-radius: 12px;
       border: 1px solid ${c.chipBorder};
       background: ${c.cardBg};
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       animation: card-enter 0.4s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+    .section-summary::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px; height: 100%;
+      background: ${c.accent};
+      opacity: 0;
+      transition: opacity 0.3s;
     }
     .section-summary:hover {
-      border-color: ${c.accent};
-      box-shadow: 0 0 20px ${c.accent}22, inset 0 0 20px ${c.accent}08;
+      border-color: ${c.accent}40;
       transform: translateY(-2px);
     }
+    .section-summary:hover::before { opacity: 1; }
     .section-summary .section-type {
       font-family: ${f.monoFamily};
-      font-size: 0.6875rem;
+      font-size: 0.625rem;
       text-transform: uppercase;
       letter-spacing: 0.2em;
       color: ${c.accent};
-      margin-bottom: 0.625rem;
+      margin-bottom: 0.75rem;
     }
     .section-summary .section-heading {
       font-size: 1.25rem;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 0.75rem;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
     }
     .section-summary .section-body {
       font-size: 1rem;
@@ -252,11 +300,11 @@ export const buildCSS = (language: Language = "en"): string => {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
-      margin-top: 1rem;
+      margin-top: 1.25rem;
     }
     .chip {
       font-family: ${f.monoFamily};
-      font-size: 0.6875rem;
+      font-size: 0.625rem;
       padding: 0.3rem 0.65rem;
       border-radius: 6px;
       background: ${c.chipBg};
@@ -268,33 +316,43 @@ export const buildCSS = (language: Language = "en"): string => {
       transition: all 0.2s ease;
     }
     .chip:hover {
-      border-color: ${c.accent};
-      box-shadow: 0 0 8px ${c.accent}33;
+      border-color: ${c.accent}60;
     }
-    .chip-green { color: ${c.green}; font-weight: 500; }
-    .chip-red { color: ${c.red}; font-weight: 500; }
-    .chip-default { font-weight: 500; }
+    .chip-green { color: ${c.green}; font-weight: 600; }
+    .chip-red { color: ${c.red}; font-weight: 600; }
+    .chip-default { font-weight: 600; }
 
     /* HIGHLIGHT CARD */
     .highlight-card {
       background: ${c.cardBg};
       border: 1px solid ${c.chipBorder};
       border-radius: 12px;
-      padding: 1.5rem 1.75rem;
+      padding: 2rem;
       animation: card-enter 0.4s ease both;
       margin-bottom: 1rem;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .highlight-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px; height: 100%;
+      background: ${c.badgePr};
+      opacity: 0;
+      transition: opacity 0.3s;
     }
     .highlight-card:hover {
-      border-color: ${c.accent};
-      box-shadow: 0 0 20px ${c.accent}22, inset 0 0 20px ${c.accent}08;
+      border-color: rgba(255,255,255,0.12);
       transform: translateY(-2px);
     }
+    .highlight-card:hover::before { opacity: 1; }
     .highlight-badge {
       font-family: ${f.monoFamily};
-      font-size: 0.5625rem;
+      font-size: 0.5rem;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.15em;
       display: inline-block;
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
@@ -306,18 +364,20 @@ export const buildCSS = (language: Language = "en"): string => {
     .highlight-issue { background: ${c.badgeIssue}; color: #000; }
     .highlight-discussion { background: ${c.badgeDiscussion}; color: #000; }
     .highlight-title {
-      font-size: 1.0625rem;
+      font-size: 1.125rem;
       font-weight: 600;
       margin-bottom: 0.375rem;
+      letter-spacing: -0.01em;
     }
     .highlight-meta {
       font-family: ${f.monoFamily};
-      font-size: 0.6875rem;
+      font-size: 0.625rem;
       color: ${c.textTertiary};
       margin-bottom: 0.75rem;
+      letter-spacing: 0.02em;
     }
-    .highlight-title a { color: ${c.text}; text-decoration: none; }
-    .highlight-title a:hover { color: ${c.accent}; text-decoration: underline; }
+    .highlight-title a { color: ${c.text}; text-decoration: none; transition: color 0.2s; }
+    .highlight-title a:hover { color: ${c.accent}; }
     .highlight-body {
       font-size: 0.9375rem;
       color: ${c.textSecondary};
@@ -325,33 +385,33 @@ export const buildCSS = (language: Language = "en"): string => {
     }
 
     /* MINI HEATMAP */
-    .mini-heatmap { display: flex; gap: 4px; margin-top: 1rem; }
+    .mini-heatmap { display: flex; gap: 4px; margin-top: 1.25rem; }
     .mh-day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .mh-block {
       width: 44px; height: 44px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
       font-family: ${f.monoFamily};
       font-size: 0.8125rem; font-weight: 600;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .mh-block:hover {
       transform: scale(1.15);
-      box-shadow: 0 0 12px ${c.accent}44;
+      box-shadow: 0 0 16px ${c.accent}44;
     }
-    .mh-label { font-size: 0.5625rem; text-transform: uppercase; letter-spacing: 0.1em; color: ${c.textTertiary}; }
+    .mh-label { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.15em; color: ${c.textTertiary}; }
     .mh-level-0 { background: ${c.heatmap0}; color: ${c.textTertiary}; }
     .mh-level-1 { background: ${c.heatmap1}; }
     .mh-level-2 { background: ${c.heatmap2}; }
     .mh-level-3 { background: ${c.heatmap3}; }
     .mh-level-4 { background: ${c.heatmap4}; color: ${c.heatmap4Text}; }
 
-    /* DIFF BAR (commit-summary) */
+    /* DIFF BAR */
     .diff-bar {
       display: flex;
-      height: 8px;
-      border-radius: 4px;
+      height: 6px;
+      border-radius: 3px;
       overflow: hidden;
-      margin-top: 1rem;
+      margin-top: 1.25rem;
       margin-bottom: 0.5rem;
     }
     .diff-add { background: ${c.green}; height: 100%; }
@@ -360,14 +420,14 @@ export const buildCSS = (language: Language = "en"): string => {
       display: flex;
       justify-content: space-between;
       font-family: ${f.monoFamily};
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
     }
     .diff-label-add { color: ${c.green}; }
     .diff-label-del { color: ${c.red}; }
 
-    /* REPO BARS (repo-summary) */
+    /* REPO BARS */
     .repo-bars {
-      margin-top: 1rem;
+      margin-top: 1.25rem;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
@@ -381,28 +441,63 @@ export const buildCSS = (language: Language = "en"): string => {
     .repo-bar-label {
       font-family: ${f.monoFamily};
       color: ${c.textSecondary};
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
     }
     .repo-bar-track {
       width: 100%;
-      height: 6px;
-      border-radius: 3px;
+      height: 4px;
+      border-radius: 2px;
       background: ${c.chipBg};
       overflow: hidden;
     }
     .repo-bar-fill {
       height: 100%;
-      border-radius: 3px;
+      border-radius: 2px;
       background: ${c.accent};
       transition: width 0.5s ease;
     }
     .repo-bar-value {
       font-family: ${f.monoFamily};
       color: ${c.textTertiary};
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
     }
 
-    /* WEEK NAV (prev/next) */
+    /* SHARE BAR */
+    .share-bar {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 2rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .share-label {
+      font-family: ${f.monoFamily};
+      font-size: 0.5625rem;
+      color: ${c.textTertiary};
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      border: 1px solid ${c.chipBorder};
+      background: ${c.chipBg};
+      color: ${c.textSecondary};
+      text-decoration: none;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .share-btn:hover {
+      border-color: ${c.accent};
+      color: ${c.text};
+    }
+
+    /* WEEK NAV */
     .week-nav {
       max-width: 720px;
       margin: 0 auto;
@@ -412,7 +507,7 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     .week-nav-link {
       font-family: ${f.monoFamily};
-      font-size: 0.75rem;
+      font-size: 0.6875rem;
       color: ${c.textTertiary};
       text-decoration: none;
       padding: 0.375rem 0.75rem;
@@ -420,7 +515,7 @@ export const buildCSS = (language: Language = "en"): string => {
       border: 1px solid ${c.chipBorder};
       transition: all 0.2s;
     }
-    .week-nav-link:hover { color: ${c.text}; border-color: ${c.border}; }
+    .week-nav-link:hover { color: ${c.text}; border-color: ${c.accent}; }
 
     /* FOOTER */
     .footer {
@@ -428,12 +523,12 @@ export const buildCSS = (language: Language = "en"): string => {
       margin: 0 auto;
       text-align: center;
       padding: 3rem 2rem;
-      font-size: 0.6875rem;
-      color: ${c.textTertiary};
+      font-size: 0.625rem;
+      color: rgba(255,255,255,0.15);
       border-top: 1px solid ${c.borderSubtle};
     }
-    .footer a { color: ${c.accent}; text-decoration: none; }
-    .footer a:hover { text-decoration: underline; }
+    .footer a { color: rgba(255,255,255,0.3); text-decoration: none; }
+    .footer a:hover { color: ${c.accent}; }
 
     /* VIEW TRANSITIONS */
     @view-transition {
@@ -441,8 +536,9 @@ export const buildCSS = (language: Language = "en"): string => {
     }
 
     @media (max-width: 600px) {
-      nav { padding: 1rem 1.25rem; }
-      .page { padding: 5rem 1.25rem 3rem; }
+      .nav-inner { padding: 0.75rem 1.5rem; }
+      .page { padding: 5rem 1.5rem 3rem; }
+      .header-title { font-size: clamp(1.75rem, 8vw, 2.5rem); }
     }
   `;
 };
