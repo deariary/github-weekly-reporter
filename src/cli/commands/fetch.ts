@@ -5,7 +5,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { graphql } from "@octokit/graphql";
-import { buildWeeklyRange, toISODate, parseLocalDate } from "../../collector/date-range.js";
+import { buildWeeklyRange, toISODate, parseLocalDate, type DateRange } from "../../collector/date-range.js";
 import { fetchEvents, dedupeEvents } from "../../collector/fetch-events.js";
 import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
@@ -78,7 +78,50 @@ const runDailyFetch = async (options: BaseOptions): Promise<void> => {
   console.log(`Events accumulated: ${merged.length} total (${eventsPath})`);
 };
 
-// weekly-fetch: use accumulated events to find PRs, fetch each individually
+// Search PRs updated during the week via GitHub Search API (fallback for missing daily events)
+const searchWeeklyPRs = async (
+  token: string,
+  username: string,
+  range: DateRange,
+): Promise<PRRef[]> => {
+  const from = range.from.toISOString().split("T")[0];
+  const to = range.to.toISOString().split("T")[0];
+  const refs: PRRef[] = [];
+
+  // Search PRs authored by or involving the user, updated during the week
+  for (const qualifier of [`author:${username}`, `reviewed-by:${username}`]) {
+    let page = 1;
+    let hasMore = true;
+    while (hasMore) {
+      const q = encodeURIComponent(`is:pr ${qualifier} updated:${from}..${to}`);
+      const url = `https://api.github.com/search/issues?q=${q}&per_page=100&page=${page}`;
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json",
+          "User-Agent": "github-weekly-reporter",
+        },
+      });
+      if (!res.ok) break;
+      const data = (await res.json()) as {
+        items: { number: number; pull_request?: { url: string }; repository_url: string }[];
+        total_count: number;
+      };
+      data.items
+        .filter((item) => item.pull_request)
+        .forEach((item) => {
+          // repository_url is like "https://api.github.com/repos/owner/repo"
+          const repo = item.repository_url.replace("https://api.github.com/repos/", "");
+          refs.push({ repo, number: item.number });
+        });
+      hasMore = data.items.length === 100;
+      page++;
+    }
+  }
+  return refs;
+};
+
+// weekly-fetch: use accumulated events + search API to find PRs, fetch each individually
 const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   const weekId = getWeekId(options.date, options.timezone);
   const range = buildWeeklyRange(options.date, options.timezone);
@@ -91,12 +134,23 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   console.log(`Loaded ${events.length} accumulated events.`);
 
   // Extract PR refs from events
-  const prRefs = extractPRRefs(events);
-  console.log(`Found ${prRefs.length} PR references (${new Set(prRefs.map((r) => `${r.repo}#${r.number}`)).size} unique).`);
+  const eventRefs = extractPRRefs(events);
+  console.log(`Found ${eventRefs.length} PR references from events.`);
+
+  // Search for PRs via GitHub Search API (catches PRs missed by daily fetch)
+  console.log("Searching for PRs updated this week...");
+  const searchRefs = await searchWeeklyPRs(options.token, options.username, range);
+  console.log(`Found ${searchRefs.length} PR references from search.`);
+
+  // Merge and dedupe
+  const allRefs = [...eventRefs, ...searchRefs];
+  const uniqueRefs = new Map<string, PRRef>();
+  allRefs.forEach((ref) => uniqueRefs.set(`${ref.repo}#${ref.number}`, ref));
+  console.log(`Total unique PRs: ${uniqueRefs.size}`);
 
   // Fetch individual PRs
   console.log("Fetching PRs...");
-  const pullRequests = await fetchPRsByRefs(options.token, prRefs);
+  const pullRequests = await fetchPRsByRefs(options.token, [...uniqueRefs.values()]);
   console.log(`Fetched ${pullRequests.length} PRs.`);
 
   // Fetch contributions (GraphQL)
