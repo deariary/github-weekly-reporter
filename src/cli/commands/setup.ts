@@ -35,33 +35,46 @@ const ghPut = (token: string, path: string, body: unknown) => ghFetch(token, "PU
 
 const validateToken = async (
   token: string,
-): Promise<{ login: string; scopes: string[] }> => {
+): Promise<{ login: string; tokenType: "classic" | "fine-grained" }> => {
   const res = await ghGet(token, "/user");
   if (res.status === 401) {
     throw new Error(
-      "Invalid token. Create one at:\n" +
-        "  https://github.com/settings/tokens/new\n" +
-        "  Required scopes: repo, workflow",
+      "Invalid or expired token.\n\n" +
+        "  Create a token at: https://github.com/settings/tokens\n\n" +
+        "  Classic PAT scopes needed: repo, workflow\n" +
+        "  Fine-grained PAT permissions needed:\n" +
+        "    Administration: Read and write\n" +
+        "    Contents: Read and write\n" +
+        "    Actions: Read and write\n" +
+        "    Secrets: Read and write\n" +
+        "    Pages: Read and write\n" +
+        "    Workflows: Read and write",
     );
   }
   if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
 
-  const scopes =
-    res.headers
-      .get("x-oauth-scopes")
-      ?.split(",")
-      .map((s) => s.trim()) ?? [];
+  const { login } = (await res.json()) as { login: string };
+  const scopeHeader = res.headers.get("x-oauth-scopes");
+
+  // Fine-grained tokens do not return x-oauth-scopes header.
+  // We cannot validate permissions upfront, so we validate lazily
+  // when each API call is made and provide clear error messages.
+  if (scopeHeader === null) {
+    return { login, tokenType: "fine-grained" };
+  }
+
+  // Classic PAT: validate scopes
+  const scopes = scopeHeader.split(",").map((s) => s.trim());
   const missing = ["repo", "workflow"].filter((s) => !scopes.includes(s));
   if (missing.length > 0) {
     throw new Error(
-      `Token is missing required scopes: ${missing.join(", ")}\n` +
-        "  Create a new token at: https://github.com/settings/tokens/new\n" +
+      `Token is missing required scopes: ${missing.join(", ")}\n\n` +
+        "  Create a new token at: https://github.com/settings/tokens/new?scopes=repo,workflow\n" +
         "  Required scopes: repo, workflow",
     );
   }
 
-  const { login } = (await res.json()) as { login: string };
-  return { login, scopes };
+  return { login, tokenType: "classic" };
 };
 
 // ── Secret encryption (sealed box via tweetsodium) ───────────
@@ -75,8 +88,10 @@ const setRepoSecret = async (
   const keyRes = await ghGet(token, `/repos/${repo}/actions/secrets/public-key`);
   if (!keyRes.ok) {
     throw new Error(
-      `Cannot access secrets for ${repo}.\n` +
-        "  Make sure Actions is enabled and the token has 'repo' scope.",
+      `Cannot access secrets for ${repo} (${keyRes.status}).\n` +
+        "  Make sure Actions is enabled and the token has the required permissions.\n" +
+        "  Classic PAT: 'repo' scope\n" +
+        "  Fine-grained PAT: 'Secrets: Read and write' permission",
     );
   }
   const { key, key_id } = (await keyRes.json()) as {
@@ -406,6 +421,13 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
   console.log("  everything you need for automatic weekly reports.\n");
 
   // 1. Token
+  console.log("  A personal access token (PAT) is required.\n");
+  console.log("  Classic PAT (https://github.com/settings/tokens/new?scopes=repo,workflow):");
+  console.log("    Scopes: repo, workflow\n");
+  console.log("  Fine-grained PAT (https://github.com/settings/personal-access-tokens/new):");
+  console.log("    Permissions: Administration, Contents, Actions,");
+  console.log("                 Secrets, Pages, Workflows (all Read & Write)\n");
+
   const token = await password({
     message: "GitHub personal access token:",
     validate: (v) => (v.length > 0 ? true : "Token is required"),
