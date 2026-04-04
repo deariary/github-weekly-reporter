@@ -67,17 +67,17 @@ AI narratives are required for report generation. Six providers are supported, i
 
 | Provider | Free Tier | Env Variable |
 |---|---|---|
-| **Groq** | Yes (generous) | `GROQ_API_KEY` |
 | **OpenRouter** | Yes (25+ free models) | `OPENROUTER_API_KEY` |
+| **Groq** | Yes (generous) | `GROQ_API_KEY` |
 | **Google Gemini** | Yes | `GEMINI_API_KEY` |
 | OpenAI | No | `OPENAI_API_KEY` |
 | Anthropic | No | `ANTHROPIC_API_KEY` |
 | Grok (xAI) | No | `GROK_API_KEY` |
 
-Groq and OpenRouter are recommended for free usage. Both offer high-quality models at no cost. For model selection, see each provider's documentation:
+OpenRouter and Groq are recommended for free usage. Both offer high-quality models at no cost. For model selection, see each provider's documentation:
 
-- Groq: https://console.groq.com/docs/models
 - OpenRouter: https://openrouter.ai/models
+- Groq: https://console.groq.com/docs/models
 - Gemini: https://ai.google.dev/gemini-api/docs/models
 - OpenAI: https://platform.openai.com/docs/models
 - Anthropic: https://docs.anthropic.com/en/docs/about-claude/models
