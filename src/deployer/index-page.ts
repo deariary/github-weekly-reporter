@@ -347,7 +347,7 @@ const TEMPLATE = `<!DOCTYPE html>
 
 <nav class="index-nav">
   <div class="index-nav-inner">
-    <span class="nav-site-title">{{siteTitle}}</span>
+    <span class="nav-site-title">{{siteTitleInline}}</span>
   </div>
 </nav>
 
@@ -452,7 +452,8 @@ export const renderIndexPage = (
 ): string => {
   const locale = getLocale(language);
   const fontConfig = getFontConfig(language);
-  const resolvedSiteTitle = siteTitle ?? "Dev\nPulse";
+  const resolvedSiteTitle = (siteTitle ?? "Dev\nPulse").replace(/\\n/g, "\n");
+  const siteTitleInline = resolvedSiteTitle.replace(/\n/g, " ");
   const template = Handlebars.compile(TEMPLATE);
   return template({
     yearGroups: groupByYear(reports),
@@ -462,6 +463,7 @@ export const renderIndexPage = (
     profile: pageData?.profile,
     displayName: pageData?.profile?.name ?? pageData?.username,
     siteTitle: resolvedSiteTitle,
+    siteTitleInline,
     lang: language,
     weeklyReports: locale.weeklyReports,
     poweredBy: locale.poweredBy,

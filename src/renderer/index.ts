@@ -77,7 +77,8 @@ export const renderReport = (
   const canonicalUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/` : undefined;
   const ogImageUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/og.png` : "og.png";
 
-  const siteTitle = options.siteTitle ?? "Dev\nPulse";
+  const siteTitle = (options.siteTitle ?? "Dev\nPulse").replace(/\\n/g, "\n");
+  const siteTitleInline = siteTitle.replace(/\n/g, " ");
 
   return template({
     ...data,
@@ -89,6 +90,7 @@ export const renderReport = (
     canonicalUrl,
     ogImageUrl,
     siteTitle,
+    siteTitleInline,
     prevWeek: options.prevWeek,
     nextWeek: options.nextWeek,
   });
