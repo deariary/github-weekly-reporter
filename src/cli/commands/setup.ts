@@ -327,7 +327,7 @@ jobs:
 
       - uses: deariary/github-weekly-reporter@main
         with:
-          github-token: \${{ secrets.GITHUB_TOKEN }}
+          github-token: \${{ secrets.GH_PAT }}
           username: '${opts.username}'
           mode: \${{ github.event.inputs.mode || 'daily' }}
           language: '${opts.language}'
@@ -704,7 +704,12 @@ const run = async (cliRepo?: string): Promise<void> => {
   const created = await ensureRepo(config.token, fullRepo);
   ok(created ? `Created ${fullRepo}` : `Using existing ${fullRepo}`);
 
-  // 2. LLM secret
+  // 2. PAT secret (needed to read activity across all repos)
+  step("Setting secret GH_PAT...");
+  await setRepoSecret(config.token, fullRepo, "GH_PAT", config.token);
+  ok("GH_PAT configured.");
+
+  // 3. LLM secret
   if (config.llmProvider && config.llmApiKey) {
     const secretName = LLM_SECRET_NAMES[config.llmProvider];
     step(`Setting secret ${secretName}...`);

@@ -54,9 +54,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # github-token requires a PAT with 'repo' scope to read activity
+      # across all your repositories. The default GITHUB_TOKEN only has
+      # access to the current repository.
+      # Add your PAT as a repository secret named GH_PAT (see Step 3).
       - uses: deariary/github-weekly-reporter@main
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT }}
           username: 'YOUR_USERNAME'
           mode: ${{ github.event.inputs.mode || 'daily' }}
           language: 'en'
@@ -99,14 +103,25 @@ Update the `llm-provider`, `llm-model`, and the corresponding API key input in y
 
 ## Step 3: Set Repository Secrets
 
-If you configured an LLM provider, add the API key as a repository secret:
+### GitHub PAT (required)
+
+The action needs a PAT to read activity across all your repositories. The default `GITHUB_TOKEN` only has access to the current repository and cannot collect events from other repos.
 
 1. Go to your repository on GitHub
 2. Navigate to **Settings > Secrets and variables > Actions**
 3. Click **New repository secret**
-4. Name: the secret name from the table above (e.g. `GROQ_API_KEY`)
-5. Value: your API key
+4. Name: `GH_PAT`
+5. Value: your personal access token (the same one from the Prerequisites)
 6. Click **Add secret**
+
+### LLM API Key (optional)
+
+If you configured an LLM provider, add the API key as another secret:
+
+1. Click **New repository secret**
+2. Name: the secret name from the table above (e.g. `GROQ_API_KEY`)
+3. Value: your API key
+4. Click **Add secret**
 
 ## Step 4: Enable GitHub Pages
 

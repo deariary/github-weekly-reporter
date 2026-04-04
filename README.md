@@ -91,9 +91,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # github-token requires a PAT with 'repo' scope to read activity
+      # across all your repositories. The default GITHUB_TOKEN only has
+      # access to the current repository.
+      # Set your PAT as a repository secret named GH_PAT.
       - uses: deariary/github-weekly-reporter@main
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT }}
           username: 'your-username'
           mode: ${{ github.event.inputs.mode || 'daily' }}
           language: 'en'
@@ -107,7 +111,7 @@ jobs:
 
 | Input | Required | Default | Description |
 |---|---|---|---|
-| `github-token` | Yes | - | GitHub token (use `${{ secrets.GITHUB_TOKEN }}`) |
+| `github-token` | Yes | - | GitHub PAT with `repo` scope (use `${{ secrets.GH_PAT }}`, **not** `GITHUB_TOKEN`) |
 | `username` | No | `${{ github.actor }}` | GitHub username to report on |
 | `mode` | No | `daily` | `daily` (collect events) or `weekly` (full report) |
 | `language` | No | `en` | Report language |
