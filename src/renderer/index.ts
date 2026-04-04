@@ -61,6 +61,7 @@ const createInstance = (language: Language, timezone: string): typeof Handlebars
   return hbs;
 };
 
+/** Render a weekly report as a self-contained HTML string. */
 export const renderReport = (
   data: WeeklyReportData,
   options: RenderOptions = {},

@@ -16,7 +16,7 @@ type RawEvent = {
 const EVENTS_PER_PAGE = 100;
 const MAX_PAGES = 3; // GitHub Events API hard limit is 300 events (3 pages)
 
-const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayload => {
+export const summarizePayload = (type: string, raw: Record<string, unknown>): EventPayload => {
   switch (type) {
     case "PushEvent": {
       const commits = Array.isArray(raw.commits)
@@ -82,7 +82,10 @@ const fetchPage = async (
     },
   });
 
-  if (!response.ok) return [];
+  if (!response.ok) {
+    console.warn(`Failed to fetch events page ${page}: ${response.status} ${response.statusText}`);
+    return [];
+  }
   return (await response.json()) as RawEvent[];
 };
 

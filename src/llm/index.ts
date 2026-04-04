@@ -115,21 +115,21 @@ const parseAIContent = (raw: string): AIContent => {
   };
 };
 
+/** Generate AI-powered narrative content from weekly GitHub activity data. Throws on failure. */
 export const generateContent = async (
   input: NarrativeInput,
   config: LLMConfig,
-): Promise<AIContent | null> => {
+): Promise<AIContent> => {
   try {
     const factory = PROVIDER_FACTORIES[config.provider];
     const provider = factory(config);
     const prompt = buildPrompt(input);
     const raw = await provider.generate(prompt);
-    if (!raw) return null;
+    if (!raw) throw new Error("LLM returned empty content");
     const content = parseAIContent(raw);
     return resolveHighlightUrls(content, input.pullRequests, input.issues, input.events);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.warn(`LLM content generation failed (${config.provider}): ${message}`);
-    return null;
+    throw new Error(`LLM content generation failed (${config.provider}): ${message}`);
   }
 };

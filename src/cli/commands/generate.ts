@@ -11,7 +11,7 @@ import type { WeeklyReportData, LLMProvider, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
 
-type GenerateOptions = {
+export type GenerateOptions = {
   dataDir: string;
   llmProvider: LLMProvider;
   llmApiKey: string;
@@ -21,7 +21,7 @@ type GenerateOptions = {
   date?: Date;
 };
 
-const resolveOptions = (
+export const resolveOptions = (
   cli: Record<string, string | undefined>,
 ): GenerateOptions => {
   const llmProvider = (cli.llmProvider ?? env("LLM_PROVIDER")) as LLMProvider | undefined;
@@ -76,11 +76,6 @@ const run = async (options: GenerateOptions): Promise<void> => {
       language: options.language,
     },
   );
-
-  if (!aiContent) {
-    console.error("LLM returned no content.");
-    process.exit(1);
-  }
 
   const llmDataPath = join(dataDir, "llm-data.yaml");
   await writeFile(llmDataPath, toYaml(aiContent, { lineWidth: 120 }), "utf-8");

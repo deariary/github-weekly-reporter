@@ -1,7 +1,7 @@
 // OpenAI provider implementation
 
 import OpenAI from "openai";
-import type { LLMProvider, LLMConfig } from "../types.js";
+import { DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE, type LLMProvider, type LLMConfig } from "../types.js";
 
 export const createOpenAIProvider = (config: LLMConfig): LLMProvider => {
   const client = new OpenAI({ apiKey: config.apiKey });
@@ -11,8 +11,8 @@ export const createOpenAIProvider = (config: LLMConfig): LLMProvider => {
       const response = await client.chat.completions.create({
         model: config.model,
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 16384,
-        temperature: 0.7,
+        max_tokens: DEFAULT_MAX_TOKENS,
+        temperature: DEFAULT_TEMPERATURE,
       });
       return response.choices[0]?.message?.content?.trim() ?? "";
     },

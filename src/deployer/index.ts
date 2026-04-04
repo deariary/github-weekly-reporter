@@ -17,6 +17,7 @@ export type DeployOptions = {
   message?: string;
 };
 
+/** Deploy the output directory to the gh-pages branch via force push. */
 export const deploy = async (options: DeployOptions): Promise<void> => {
   const { repoUrl, directory, message = "deploy" } = options;
   const tmp = await mkdtemp(join(tmpdir(), "gwr-deploy-"));
@@ -46,10 +47,7 @@ export const deploy = async (options: DeployOptions): Promise<void> => {
     await git(["add", "."], tmp);
 
     const { stdout } = await git(["status", "--porcelain"], tmp);
-    if (!stdout.trim()) {
-      console.log("No changes to deploy.");
-      return;
-    }
+    if (!stdout.trim()) return;
 
     await git(["commit", "-m", message], tmp);
     await git(["push", repoUrl, "gh-pages", "--force"], tmp);
