@@ -75,11 +75,12 @@ runs:
       with:
         node-version: '24'
 
-    - name: Configure git
+    - name: Configure git and sync
       shell: bash
       run: |
         git config user.name "github-weekly-reporter[bot]"
         git config user.email "github-weekly-reporter[bot]@users.noreply.github.com"
+        git pull --rebase || true
 
     # --- Daily mode: fetch events and persist ---
 
