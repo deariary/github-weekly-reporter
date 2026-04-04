@@ -48,7 +48,6 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
 
       - run: npm ci
       - run: npm run build
@@ -61,7 +60,7 @@ jobs:
           NEW_VERSION=$(npm version "$BUMP" --no-git-tag-version)
           echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
 
-      - name: Publish to npm
+      - name: Publish to npm (OIDC Trusted Publishing)
         run: npm publish --provenance --access public
 
       - name: Create tag and release
