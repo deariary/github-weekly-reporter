@@ -367,7 +367,7 @@ const TEMPLATE = `<!DOCTYPE html>
   {{/if}}
 
   <div class="hero-inner">
-    <h1 class="hero-title">{{weeklyReports}}</h1>
+    <h1 class="hero-title">{{siteTitle}}</h1>
 
     {{#if username}}
     <a href="https://github.com/{{username}}" class="hero-profile" target="_blank" rel="noopener nofollow">
@@ -450,7 +450,7 @@ export const renderIndexPage = (
 ): string => {
   const locale = getLocale(language);
   const fontConfig = getFontConfig(language);
-  const resolvedSiteTitle = siteTitle ?? (pageData?.username ? `${pageData.username}'s ${locale.weeklyReports}` : locale.weeklyReports);
+  const resolvedSiteTitle = siteTitle ?? "Dev Pulse";
   const template = Handlebars.compile(TEMPLATE);
   return template({
     yearGroups: groupByYear(reports),
