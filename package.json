@@ -11,7 +11,8 @@
   "files": [
     "dist/",
     "!dist/**/*.test.*",
-    "src/renderer/templates/"
+    "src/renderer/templates/",
+    "assets/"
   ],
   "scripts": {
     "build": "tsc",
