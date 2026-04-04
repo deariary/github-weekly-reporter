@@ -21,59 +21,88 @@ cd weekly-report
 
 Or create it via the GitHub web UI at https://github.com/new.
 
-## Step 2: Add the Workflow File
+## Step 2: Add Workflow Files
 
-Create `.github/workflows/weekly-report.yml` in your repository:
+Create two workflow files in your repository.
+
+### `.github/workflows/daily-fetch.yml`
+
+Runs every day at midnight (your timezone) to collect GitHub events.
 
 ```yaml
-name: Weekly Report
+name: Daily Fetch
 
 on:
   schedule:
     # Run daily at midnight in your timezone (this example is midnight JST = 15:00 UTC)
     - cron: '0 15 * * *'
   workflow_dispatch:
-    inputs:
-      mode:
-        description: 'Run mode'
-        type: choice
-        options: [daily, weekly]
-        default: daily
+
+permissions:
+  contents: write
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # github-token requires a PAT to read activity across all your
+      # repositories. The default GITHUB_TOKEN only has access to the
+      # current repository.
+      # Add your PAT as a repository secret named GH_PAT (see Step 3).
+      - uses: deariary/github-weekly-reporter@main
+        with:
+          github-token: ${{ secrets.GH_PAT }}
+          username: 'YOUR_USERNAME'
+          mode: 'daily'
+          language: 'en'
+          timezone: 'UTC'
+```
+
+### `.github/workflows/weekly-report.yml`
+
+Runs every Monday (1 hour after daily fetch) to generate the full report. Can also be triggered manually.
+
+```yaml
+name: Weekly Report
+
+on:
+  schedule:
+    # Run Monday, 1 hour after daily fetch (this example is 01:00 JST = 16:00 UTC)
+    - cron: '0 16 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: write
   pages: write
 
 env:
-  # Customize your site title (shown in the header)
   SITE_TITLE: 'Dev\nPulse'
 
 jobs:
-  report:
+  weekly:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # github-token requires a PAT with 'repo' scope to read activity
-      # across all your repositories. The default GITHUB_TOKEN only has
-      # access to the current repository.
-      # Add your PAT as a repository secret named GH_PAT (see Step 3).
       - uses: deariary/github-weekly-reporter@main
         with:
           github-token: ${{ secrets.GH_PAT }}
           username: 'YOUR_USERNAME'
-          mode: ${{ github.event.inputs.mode || 'daily' }}
+          mode: 'weekly'
           language: 'en'
           timezone: 'UTC'
-          # LLM configuration (remove if not using AI narratives)
-          llm-provider: 'groq'
+          llm-provider: 'openrouter'
           llm-model: 'YOUR_MODEL_NAME'
-          groq-api-key: ${{ secrets.GROQ_API_KEY }}
+          openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
 ```
 
 ### Scheduling
 
-GitHub Actions cron uses UTC. Calculate your local midnight:
+The daily fetch runs every day at midnight (your timezone). The weekly report runs every Monday, 1 hour later. Both use UTC cron.
+
+Calculate your local midnight for the daily fetch (then add 1 hour for weekly):
 
 | Your Timezone | Cron for Midnight |
 |---|---|
@@ -88,12 +117,12 @@ GitHub Actions cron uses UTC. Calculate your local midnight:
 
 ### Choosing an LLM Provider
 
-For free usage, we recommend **Groq** or **OpenRouter**:
+For free usage, we recommend **OpenRouter** or **Groq**:
 
 | Provider | Input Name | Secret Name | Models Page |
 |---|---|---|---|
-| Groq | `groq-api-key` | `GROQ_API_KEY` | https://console.groq.com/docs/models |
 | OpenRouter | `openrouter-api-key` | `OPENROUTER_API_KEY` | https://openrouter.ai/models |
+| Groq | `groq-api-key` | `GROQ_API_KEY` | https://console.groq.com/docs/models |
 | Google Gemini | `gemini-api-key` | `GEMINI_API_KEY` | https://ai.google.dev/gemini-api/docs/models |
 | OpenAI | `openai-api-key` | `OPENAI_API_KEY` | https://platform.openai.com/docs/models |
 | Anthropic | `anthropic-api-key` | `ANTHROPIC_API_KEY` | https://docs.anthropic.com/en/docs/about-claude/models |
@@ -149,8 +178,6 @@ The workflow runs automatically on the cron schedule. You can also trigger it ma
 1. Go to **Actions** tab
 2. Click **Weekly Report** workflow
 3. Click **Run workflow**
-4. Change mode to `weekly`
-5. Click **Run workflow**
 
 The report will be generated and deployed to GitHub Pages.
 
