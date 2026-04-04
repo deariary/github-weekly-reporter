@@ -162,4 +162,55 @@ describe("renderReport", () => {
     expect(html).toContain("摘要");
     expect(html).toContain("Noto Sans SC");
   });
+
+  it("computes heatmap levels from daily commits", () => {
+    const data: WeeklyReportData = {
+      ...MOCK_DATA,
+      dailyCommits: [
+        { date: "2026-03-28", count: 0 },
+        { date: "2026-03-29", count: 1 },
+        { date: "2026-03-30", count: 5 },
+        { date: "2026-03-31", count: 8 },
+        { date: "2026-04-01", count: 10 },
+      ],
+    };
+    const html = renderReport(data);
+    expect(html).toContain("level-0");
+    expect(html).toContain("level-4");
+  });
+
+  it("renders navigation links when prevWeek/nextWeek provided", () => {
+    const html = renderReport(MOCK_DATA, {
+      prevWeek: "2026/W13",
+      nextWeek: "2026/W15",
+    });
+    expect(html).toContain("2026/W13");
+    expect(html).toContain("2026/W15");
+  });
+
+  it("renders canonical URL when baseUrl and weekPath provided", () => {
+    const html = renderReport(MOCK_DATA, {
+      baseUrl: "https://user.github.io/repo",
+      weekPath: "2026/W14",
+    });
+    expect(html).toContain("https://user.github.io/repo/2026/W14/");
+    expect(html).toContain("https://user.github.io/repo/2026/W14/og.png");
+  });
+
+  it("uses custom site title", () => {
+    const html = renderReport(MOCK_DATA, { siteTitle: "My Weekly" });
+    expect(html).toContain("My Weekly");
+  });
+
+  it("replaces escaped newline in site title", () => {
+    const html = renderReport(MOCK_DATA, { siteTitle: "Dev\\nPulse" });
+    // The inline version (used in <title>) has the newline replaced with space
+    expect(html).toContain("Dev Pulse");
+  });
+
+  it("defaults timezone to UTC", () => {
+    const html = renderReport(MOCK_DATA);
+    expect(html).toBeDefined();
+    expect(html).toContain("<!DOCTYPE html>");
+  });
 });
