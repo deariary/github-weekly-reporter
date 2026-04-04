@@ -40,7 +40,7 @@ const buildRepoUrl = (repo: string | undefined): string => {
 const run = async (options: DeployCommandOptions): Promise<void> => {
   const weekId = getWeekId(options.date, options.timezone);
 
-  console.log(`Deploying ${options.directory} to gh-pages...`);
+  console.log(`Deploying ${options.directory}...`);
   await deploy({
     repoUrl: options.repoUrl,
     directory: options.directory,
@@ -52,7 +52,7 @@ const run = async (options: DeployCommandOptions): Promise<void> => {
 export const registerDeploy = (program: Command): void => {
   program
     .command("deploy")
-    .description("Deploy generated report to GitHub Pages (gh-pages branch)")
+    .description("Deploy generated report to GitHub Pages")
     .option("-d, --directory <dir>", "Directory containing generated HTML files (env: OUTPUT_DIR, default: ./output)")
     .option("-r, --repo <slug>", "Repository (owner/repo or full URL, env: GITHUB_REPOSITORY)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
