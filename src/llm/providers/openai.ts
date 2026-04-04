@@ -11,7 +11,7 @@ export const createOpenAIProvider = (config: LLMConfig): LLMProvider => {
       const response = await client.chat.completions.create({
         model: config.model,
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 4096,
+        max_tokens: 16384,
         temperature: 0.7,
       });
       return response.choices[0]?.message?.content?.trim() ?? "";

@@ -10,7 +10,7 @@ export const createAnthropicProvider = (config: LLMConfig): LLMProvider => {
     generate: async (prompt: string): Promise<string> => {
       const response = await client.messages.create({
         model: config.model,
-        max_tokens: 4096,
+        max_tokens: 16384,
         messages: [{ role: "user", content: prompt }],
       });
       const block = response.content[0];
