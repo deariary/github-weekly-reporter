@@ -357,6 +357,25 @@ Edit \`.github/workflows/weekly-report.yml\` to change:
 | \`timezone\` | \`${opts.timezone}\` | IANA timezone for date calculations |
 | \`SITE_TITLE\` | \`${opts.siteTitle}\` | Site title in the header and hero |
 ${opts.llmProvider ? `| \`llm-provider\` | \`${opts.llmProvider}\` | LLM provider for AI narrative |\n| \`llm-model\` | \`${opts.llmModel}\` | Model name |\n` : ""}
+## Base URL
+
+The report's canonical URL, OG images, and sitemap are generated using \`BASE_URL\`.
+By default this is derived automatically from the repository name:
+
+\`\`\`
+https://${opts.repo.split("/")[0]}.github.io/${opts.repo.split("/")[1]}
+\`\`\`
+
+If you use a **custom domain**, add \`BASE_URL\` to the workflow env:
+
+\`\`\`yaml
+env:
+  SITE_TITLE: '${opts.siteTitle}'
+  BASE_URL: 'https://your-custom-domain.com'
+\`\`\`
+
+Then configure the custom domain in **Settings > Pages > Custom domain**.
+
 ## Changing the LLM API Key
 
 1. Go to **Settings > Secrets and variables > Actions**
