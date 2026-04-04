@@ -36,7 +36,8 @@ describe("renderIndexPage", () => {
   it("handles empty report list", () => {
     const html = renderIndexPage([]);
     expect(html).toContain("<!DOCTYPE html>");
-    expect(html).toContain("Weekly Reports");
+    expect(html).toContain("Dev");
+    expect(html).toContain("Pulse");
   });
 
   it("shows AI title when provided", () => {
@@ -63,12 +64,19 @@ describe("renderIndexPage", () => {
   it("renders Japanese locale", () => {
     const html = renderIndexPage(entries(["2026/W14"]), undefined, "ja");
     expect(html).toContain('lang="ja"');
-    expect(html).toContain("ウィークリーレポート");
+    expect(html).toContain("Dev");
+    expect(html).toContain("Pulse");
   });
 
   it("defaults to English locale", () => {
     const html = renderIndexPage(entries(["2026/W14"]));
     expect(html).toContain('lang="en"');
+    expect(html).toContain("Dev");
+    expect(html).toContain("Pulse");
+  });
+
+  it("uses custom site title", () => {
+    const html = renderIndexPage(entries(["2026/W14"]), undefined, "en", "Weekly Reports");
     expect(html).toContain("Weekly Reports");
   });
 });

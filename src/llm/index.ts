@@ -14,11 +14,15 @@ import { buildPrompt } from "./prompt.js";
 import { createOpenAIProvider } from "./providers/openai.js";
 import { createAnthropicProvider } from "./providers/anthropic.js";
 import { createGeminiProvider } from "./providers/gemini.js";
+import { createOpenRouterProvider } from "./providers/openrouter.js";
+import { createGroqProvider } from "./providers/groq.js";
 
 const PROVIDER_FACTORIES = {
   openai: createOpenAIProvider,
   anthropic: createAnthropicProvider,
   gemini: createGeminiProvider,
+  openrouter: createOpenRouterProvider,
+  groq: createGroqProvider,
 } as const;
 
 export type { LLMConfig } from "./types.js";
