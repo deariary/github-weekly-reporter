@@ -343,7 +343,7 @@ ${opts.pagesUrl}
 ## How It Works
 
 1. **Daily** (automatic): A scheduled workflow collects your GitHub events at midnight (${opts.timezone}).
-2. **Weekly** (manual): Trigger the workflow with \`mode: weekly\` from the [Actions tab](https://github.com/${opts.repo}/actions) to generate a full report${opts.llmProvider ? ` with AI narrative (${opts.llmProvider}/${opts.llmModel})` : ""}.
+2. **Weekly** (manual): Trigger the workflow with \`mode: weekly\` from the [Actions tab](https://github.com/${opts.repo}/actions) to generate a full report${opts.llmProvider ? " with AI narrative" : ""}.
 3. The report is deployed to GitHub Pages automatically.
 
 ## Configuration
@@ -487,9 +487,9 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
         { name: "Groq        - Free tier, fast inference (recommended)", value: "groq" },
         { name: "OpenRouter   - Free tier, 25+ free models",            value: "openrouter" },
         { name: "Google Gemini - Free tier available",                   value: "gemini" },
-        { name: "OpenAI       - Paid, GPT-4.1 series",                  value: "openai" },
-        { name: "Anthropic    - Paid, Claude 4 series",                 value: "anthropic" },
-        { name: "Grok (xAI)   - Paid, Grok 3 series",                  value: "grok" },
+        { name: "OpenAI       - Paid",                                   value: "openai" },
+        { name: "Anthropic    - Paid",                                   value: "anthropic" },
+        { name: "Grok (xAI)   - Paid",                                  value: "grok" },
       ],
     })) as LLMProvider;
 
