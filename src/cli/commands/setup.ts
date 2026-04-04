@@ -112,6 +112,9 @@ const setRepoSecret = async (
     });
     if (res.ok) return true;
 
+    const body = await res.text().catch(() => "");
+    console.log(`      Attempt ${attempt + 1}/3 failed: ${res.status} ${body.slice(0, 200)}`);
+
     if (attempt < 2) {
       await sleep(3000 * (attempt + 1));
       continue;
@@ -817,9 +820,9 @@ const run = async (cliRepo?: string): Promise<void> => {
   Reports:     ${pagesUrl}
   Actions:     https://github.com/${fullRepo}/actions
 
-  Schedule:    Daily at midnight ${config.timezone} (cron: ${cron})
+  Daily fetches will run automatically at midnight ${config.timezone}.
 
-  To generate a weekly report:
+  After a few days of data collection, generate your first report:
     1. Go to Actions > Weekly Report > Run workflow
     2. Select mode: "weekly"
     3. Click "Run workflow"
