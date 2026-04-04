@@ -82,7 +82,10 @@ const fetchPage = async (
     },
   });
 
-  if (!response.ok) return [];
+  if (!response.ok) {
+    console.warn(`Failed to fetch events page ${page}: ${response.status} ${response.statusText}`);
+    return [];
+  }
   return (await response.json()) as RawEvent[];
 };
 

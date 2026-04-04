@@ -15,7 +15,7 @@ import type { GitHubEvent } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
 
-type BaseOptions = {
+export type BaseOptions = {
   token: string;
   username: string;
   dataDir: string;
@@ -23,7 +23,7 @@ type BaseOptions = {
   date?: Date;
 };
 
-const resolveBaseOptions = (
+export const resolveBaseOptions = (
   cli: Record<string, string | undefined>,
 ): BaseOptions => {
   const token = cli.token ?? env("GITHUB_TOKEN");
@@ -45,7 +45,7 @@ const tryReadYaml = async <T>(path: string): Promise<T | null> => {
 };
 
 // Extract PR references from events
-const extractPRRefs = (events: GitHubEvent[]): PRRef[] => {
+export const extractPRRefs = (events: GitHubEvent[]): PRRef[] => {
   const refs: PRRef[] = [];
   events.forEach((e) => {
     const p = e.payload;

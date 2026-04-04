@@ -14,7 +14,7 @@ type DeployCommandOptions = {
 
 const env = (key: string): string | undefined => process.env[key];
 
-const buildRepoUrl = (repo: string | undefined): string => {
+export const buildRepoUrl = (repo: string | undefined): string => {
   const repoSlug = repo ?? env("GITHUB_REPOSITORY");
   if (!repoSlug) {
     throw new Error("Repository required. Pass --repo or set GITHUB_REPOSITORY.");

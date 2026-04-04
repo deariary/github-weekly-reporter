@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { generateContent } from "./index.js";
 import type { LLMConfig } from "./types.js";
 import type { NarrativeInput } from "./types.js";
@@ -17,17 +17,11 @@ const MOCK_INPUT: NarrativeInput = {
 };
 
 describe("generateContent", () => {
-  it("returns null and logs warning when LLM call fails", async () => {
-    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
-
+  it("throws when LLM call fails", async () => {
     const config: LLMConfig = { provider: "openai", apiKey: "invalid-key", model: "gpt-4o-mini" };
-    const result = await generateContent(MOCK_INPUT, config);
 
-    expect(result).toBeNull();
-    expect(spy).toHaveBeenCalledWith(
-      expect.stringContaining("LLM content generation failed"),
+    await expect(generateContent(MOCK_INPUT, config)).rejects.toThrow(
+      "LLM content generation failed",
     );
-
-    spy.mockRestore();
   });
 });

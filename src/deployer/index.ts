@@ -46,10 +46,7 @@ export const deploy = async (options: DeployOptions): Promise<void> => {
     await git(["add", "."], tmp);
 
     const { stdout } = await git(["status", "--porcelain"], tmp);
-    if (!stdout.trim()) {
-      console.log("No changes to deploy.");
-      return;
-    }
+    if (!stdout.trim()) return;
 
     await git(["commit", "-m", message], tmp);
     await git(["push", repoUrl, "gh-pages", "--force"], tmp);

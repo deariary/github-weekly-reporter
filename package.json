@@ -8,6 +8,13 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist/",
     "!dist/**/*.test.*",
@@ -35,7 +42,7 @@
     "url": "https://github.com/deariary/github-weekly-reporter.git"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=20"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
@@ -45,15 +52,16 @@
     "commander": "^14.0.3",
     "handlebars": "^4.7.9",
     "isomorphic-dompurify": "^3.7.1",
+    "libsodium-wrappers": "^0.7.16",
     "marked": "^17.0.5",
     "openai": "^6.33.0",
     "satori": "^0.26.0",
     "sharp": "^0.34.5",
-    "tweetsodium": "^0.0.4",
     "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
+    "@types/libsodium-wrappers": "^0.7.14",
     "@types/node": "^22.14.1",
     "eslint": "^9.24.0",
     "typescript": "^5.8.3",

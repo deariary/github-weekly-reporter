@@ -42,7 +42,10 @@ const fetchSinglePR = async (
 ): Promise<PullRequest | null> => {
   const url = `https://api.github.com/repos/${ref.repo}/pulls/${ref.number}`;
   const response = await fetch(url, { headers: GITHUB_HEADERS(token) });
-  if (!response.ok) return null;
+  if (!response.ok) {
+    console.warn(`Failed to fetch PR ${ref.repo}#${ref.number}: ${response.status} ${response.statusText}`);
+    return null;
+  }
 
   const pr = (await response.json()) as RawPR;
   return {
