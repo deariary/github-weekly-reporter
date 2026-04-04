@@ -372,7 +372,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .share-btn:hover { border-color: ${c.accent}; color: ${c.text}; }
 
     /* WEEK NAV */
-    .week-nav { max-width: 960px; margin: 0 auto; padding: 2rem 2rem 0; display: flex; justify-content: space-between; }
+    .week-nav { max-width: 960px; margin: 0 auto; padding: 2rem; display: flex; justify-content: space-between; }
     .week-nav-link {
       font-family: ${f.monoFamily}; font-size: 0.6875rem; color: ${c.textTertiary};
       text-decoration: none; padding: 0.375rem 0.75rem; border-radius: 6px;
