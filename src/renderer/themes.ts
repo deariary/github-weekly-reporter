@@ -198,8 +198,8 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     .section-group-line { flex: 1; height: 1px; background: ${c.border}; }
     .section-group-count {
-      font-family: ${f.monoFamily}; font-size: 0.5625rem;
-      color: ${c.textTertiary}; letter-spacing: 0.2em;
+      font-family: ${f.monoFamily}; font-size: 0.75rem;
+      color: ${c.textTertiary}; letter-spacing: 0.15em;
       text-transform: uppercase;
     }
 
@@ -214,22 +214,25 @@ export const buildCSS = (language: Language = "en"): string => {
     .section-summary:nth-child(5) { animation-delay: 0.2s; }
     .section-summary:nth-child(6) { animation-delay: 0.25s; }
     .section-summary {
-      margin-bottom: 2rem;
-      padding: 2rem 2rem 2rem 2.5rem;
-      border-radius: 12px;
-      border: 1px solid ${c.chipBorder};
-      background: ${c.cardBg};
+      margin-bottom: 2.5rem;
+      padding: 2rem 0 2rem 2.5rem;
+      border: none;
+      border-left: 2px solid ${c.chipBorder};
+      background: none;
       max-width: 600px;
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       animation: card-enter 0.4s ease both;
       position: relative;
     }
+    .section-summary:hover {
+      border-left-color: ${c.accent};
+    }
     /* first card: featured, wider */
     .section-summary:first-child {
       max-width: 700px;
-      padding: 2.5rem 3rem;
-      border-color: ${c.accent}20;
-      background: linear-gradient(135deg, rgba(57,211,83,0.03) 0%, transparent 60%);
+      padding: 2.5rem 0 2.5rem 3rem;
+      border-left-width: 3px;
+      border-left-color: ${c.accent}40;
     }
     /* alternating offset */
     .section-summary:nth-child(even):not(:first-child) {
@@ -239,9 +242,7 @@ export const buildCSS = (language: Language = "en"): string => {
       margin-right: auto;
     }
     .section-summary:hover {
-      border-color: ${c.accent}60;
-      transform: translateY(-4px);
-      box-shadow: 0 12px 48px ${c.accent}15, 0 4px 16px rgba(0,0,0,0.5);
+      transform: translateX(4px);
     }
     /* heading breaks out left of card */
     .section-summary .section-heading {
@@ -256,8 +257,8 @@ export const buildCSS = (language: Language = "en"): string => {
       font-size: 2.75rem;
     }
     .section-summary .section-type {
-      font-family: ${f.monoFamily}; font-size: 0.5rem;
-      text-transform: uppercase; letter-spacing: 0.3em;
+      font-family: ${f.monoFamily}; font-size: 0.6875rem;
+      text-transform: uppercase; letter-spacing: 0.2em;
       color: ${c.accent}; margin-bottom: 0.75rem;
     }
     .section-summary .section-body {
@@ -267,7 +268,7 @@ export const buildCSS = (language: Language = "en"): string => {
     /* DATA CHIPS */
     .data-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
     .chip {
-      font-family: ${f.monoFamily}; font-size: 0.5625rem;
+      font-family: ${f.monoFamily}; font-size: 0.75rem;
       padding: 0.3rem 0.65rem; border-radius: 6px;
       background: ${c.chipBg}; border: 1px solid ${c.chipBorder};
       color: ${c.textSecondary};
@@ -305,7 +306,7 @@ export const buildCSS = (language: Language = "en"): string => {
       box-shadow: 0 12px 48px ${c.badgePr}15, 0 4px 16px rgba(0,0,0,0.5);
     }
     .highlight-badge {
-      font-family: ${f.monoFamily}; font-size: 0.5rem;
+      font-family: ${f.monoFamily}; font-size: 0.6875rem;
       text-transform: uppercase; letter-spacing: 0.15em;
       display: inline-block; padding: 0.2rem 0.5rem;
       border-radius: 4px; margin-bottom: 0.75rem; color: #fff;
@@ -316,7 +317,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .highlight-discussion { background: ${c.badgeDiscussion}; color: #000; }
     .highlight-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.375rem; letter-spacing: -0.01em; }
     .highlight-meta {
-      font-family: ${f.monoFamily}; font-size: 0.5625rem;
+      font-family: ${f.monoFamily}; font-size: 0.75rem;
       color: ${c.textTertiary}; margin-bottom: 0.75rem; letter-spacing: 0.02em;
     }
     .highlight-title a { color: ${c.text}; text-decoration: none; transition: color 0.2s; }
@@ -333,7 +334,7 @@ export const buildCSS = (language: Language = "en"): string => {
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .mh-block:hover { transform: scale(1.15); box-shadow: 0 0 16px ${c.accent}44; }
-    .mh-label { font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.15em; color: ${c.textTertiary}; }
+    .mh-label { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.15em; color: ${c.textTertiary}; }
     .mh-level-0 { background: ${c.heatmap0}; color: ${c.textTertiary}; }
     .mh-level-1 { background: ${c.heatmap1}; }
     .mh-level-2 { background: ${c.heatmap2}; }
@@ -359,7 +360,7 @@ export const buildCSS = (language: Language = "en"): string => {
 
     /* SHARE BAR */
     .share-bar { max-width: 960px; margin: 3rem auto 0; padding: 2rem 3rem; display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
-    .share-label { font-family: ${f.monoFamily}; font-size: 0.5rem; color: ${c.textTertiary}; text-transform: uppercase; letter-spacing: 0.2em; }
+    .share-label { font-family: ${f.monoFamily}; font-size: 0.75rem; color: ${c.textTertiary}; text-transform: uppercase; letter-spacing: 0.2em; }
     .share-btn {
       display: inline-flex; align-items: center; justify-content: center;
       width: 32px; height: 32px; border-radius: 6px;

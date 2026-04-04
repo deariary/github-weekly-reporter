@@ -282,16 +282,9 @@ const TEMPLATE = `<!DOCTYPE html>
     }
     .week-item-date {
       font-family: {{monoFamily}};
-      font-size: 0.625rem;
-      color: rgba(255,255,255,0.2);
+      font-size: 0.75rem;
       margin-top: 0.5rem;
-    }
-
-    .week-item-stats {
-      display: flex;
-      gap: 1.5rem;
-      font-family: {{monoFamily}};
-      font-size: 0.625rem;
+      font-size: 0.75rem;
       color: rgba(255,255,255,0.2);
       padding-top: 0.25rem;
     }
@@ -305,12 +298,12 @@ const TEMPLATE = `<!DOCTYPE html>
       max-width: 960px;
       margin: 0 auto;
       text-align: center;
-      padding: 3rem;
-      font-size: 0.625rem;
-      color: rgba(255,255,255,0.15);
-      border-top: 1px solid rgba(255,255,255,0.04);
+      padding: 4rem 3rem;
+      font-size: 0.8125rem;
+      color: rgba(255,255,255,0.3);
+      border-top: 1px solid rgba(255,255,255,0.08);
     }
-    .footer a { color: rgba(255,255,255,0.3); text-decoration: none; }
+    .footer a { color: rgba(255,255,255,0.5); text-decoration: none; transition: color 0.2s; }
     .footer a:hover { color: rgba(255,255,255,0.6); }
 
     @media (max-width: 768px) {
