@@ -335,6 +335,12 @@ jobs:
 };
 
 const buildWeeklyWorkflow = (opts: WorkflowOpts): string => {
+  // Run 1 hour after daily fetch, Monday only
+  const dailyCron = midnightCronUTC(opts.timezone);
+  const [minute, hour] = dailyCron.split(" ").map(Number);
+  const weeklyHour = (hour + 1) % 24;
+  const weeklyCron = `${minute} ${weeklyHour} * * 1`;
+
   const llmInputs =
     opts.llmProvider && opts.llmModel && opts.llmSecretName
       ? `          llm-provider: '${opts.llmProvider}'
@@ -348,6 +354,8 @@ const buildWeeklyWorkflow = (opts: WorkflowOpts): string => {
 name: Weekly Report
 
 on:
+  schedule:
+    - cron: '${weeklyCron}'  # Monday midnight ${opts.timezone}
   workflow_dispatch:
 
 permissions:
