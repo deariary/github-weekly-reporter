@@ -16,6 +16,7 @@ import { createAnthropicProvider } from "./providers/anthropic.js";
 import { createGeminiProvider } from "./providers/gemini.js";
 import { createOpenRouterProvider } from "./providers/openrouter.js";
 import { createGroqProvider } from "./providers/groq.js";
+import { createGrokProvider } from "./providers/grok.js";
 
 const PROVIDER_FACTORIES = {
   openai: createOpenAIProvider,
@@ -23,6 +24,7 @@ const PROVIDER_FACTORIES = {
   gemini: createGeminiProvider,
   openrouter: createOpenRouterProvider,
   groq: createGroqProvider,
+  grok: createGrokProvider,
 } as const;
 
 export type { LLMConfig } from "./types.js";

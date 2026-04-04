@@ -46,8 +46,12 @@ inputs:
     description: 'Groq API key for AI narrative (fast inference)'
     required: false
     default: ''
+  grok-api-key:
+    description: 'Grok (xAI) API key for AI narrative'
+    required: false
+    default: ''
   llm-provider:
-    description: 'LLM provider (openai, anthropic, gemini, openrouter, groq). Required for weekly mode.'
+    description: 'LLM provider (openai, anthropic, gemini, openrouter, groq, grok). Required for weekly mode.'
     required: false
     default: ''
   llm-model:
@@ -123,6 +127,7 @@ runs:
         GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
         OPENROUTER_API_KEY: ${{ inputs.openrouter-api-key }}
         GROQ_API_KEY: ${{ inputs.groq-api-key }}
+        GROK_API_KEY: ${{ inputs.grok-api-key }}
         LLM_PROVIDER: ${{ inputs.llm-provider }}
         LLM_MODEL: ${{ inputs.llm-model }}
         LANGUAGE: ${{ inputs.language }}

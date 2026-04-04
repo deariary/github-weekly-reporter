@@ -32,8 +32,9 @@ const resolveOptions = (
     ?? env("ANTHROPIC_API_KEY")
     ?? env("GEMINI_API_KEY")
     ?? env("OPENROUTER_API_KEY")
-    ?? env("GROQ_API_KEY");
-  if (!llmApiKey) throw new Error("LLM API key required. Pass --llm-api-key or set OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY / OPENROUTER_API_KEY / GROQ_API_KEY.");
+    ?? env("GROQ_API_KEY")
+    ?? env("GROK_API_KEY");
+  if (!llmApiKey) throw new Error("LLM API key required. Pass --llm-api-key or set OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY / OPENROUTER_API_KEY / GROQ_API_KEY / GROK_API_KEY.");
 
   const llmModel = cli.llmModel ?? env("LLM_MODEL");
   if (!llmModel) throw new Error("LLM model required. Pass --llm-model or set LLM_MODEL.");

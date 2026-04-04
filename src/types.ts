@@ -179,7 +179,7 @@ export type AIContent = {
 
 // Configuration types
 
-export type LLMProvider = "openai" | "anthropic" | "gemini" | "openrouter" | "groq";
+export type LLMProvider = "openai" | "anthropic" | "gemini" | "openrouter" | "groq" | "grok";
 
 export type Language =
   | "en"
