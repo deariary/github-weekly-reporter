@@ -487,20 +487,15 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
         })
       : timezone;
 
-  // 7. LLM
-  console.log("\n  AI-generated narratives make reports much more readable.");
+  // 7. LLM (required for report generation)
+  console.log("\n  An LLM provider is required for report generation.");
   console.log("  Groq and OpenRouter offer generous free tiers (no credit card required).\n");
-
-  const setupLlm = await confirm({
-    message: "Configure an LLM provider for AI narratives?",
-    default: true,
-  });
 
   let llmProvider: LLMProvider | undefined;
   let llmApiKey: string | undefined;
   let llmModel: string | undefined;
 
-  if (setupLlm) {
+  {
     llmProvider = (await select({
       message: "LLM provider:",
       choices: [

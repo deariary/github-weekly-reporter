@@ -1,6 +1,6 @@
 # GitHub Weekly Reporter
 
-Generate beautiful weekly GitHub activity reports with optional AI-powered narratives.
+Generate beautiful weekly GitHub activity reports with AI-powered narratives.
 
 Collect your commits, pull requests, issues, and code reviews from the past week, render them as a polished static HTML page, and deploy to GitHub Pages automatically.
 
@@ -25,7 +25,7 @@ See [Manual Setup](docs/manual-setup.md) if you prefer to configure everything y
 - Top repositories by activity
 - Language breakdown (CSS-only chart)
 - 7-day contribution heatmap
-- AI-generated narrative summary (optional, 6 providers supported)
+- AI-generated narrative summary (6 providers, free tiers available)
 - Dark theme with responsive design
 - Self-contained HTML (no external requests, no JavaScript required)
 - SEO optimized (OG images, JSON-LD, sitemap)
@@ -34,7 +34,7 @@ See [Manual Setup](docs/manual-setup.md) if you prefer to configure everything y
 
 ## LLM Providers
 
-AI narratives are optional but recommended. Six providers are supported:
+AI narratives are required for report generation. Six providers are supported, including free tiers:
 
 | Provider | Free Tier | Env Variable |
 |---|---|---|
