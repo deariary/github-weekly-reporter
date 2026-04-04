@@ -44,8 +44,8 @@ const validateToken = async (
         "  Classic PAT scopes needed: repo, workflow\n" +
         "  Fine-grained PAT:\n" +
         "    Repository access: All repositories\n" +
-        "    Permissions: Administration, Contents, Actions,\n" +
-        "                 Secrets, Pages, Workflows (all Read & Write)",
+        "    Permissions: Actions, Administration, Contents,\n" +
+        "                 Pages, Secrets, Workflows (all Read & Write)",
     );
   }
   if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
@@ -482,8 +482,8 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
   console.log("    Scopes: repo, workflow\n");
   console.log("  Fine-grained PAT (https://github.com/settings/personal-access-tokens/new):");
   console.log("    Repository access: All repositories");
-  console.log("    Permissions: Administration, Contents, Actions,");
-  console.log("                 Secrets, Pages, Workflows (all Read & Write)\n");
+  console.log("    Permissions: Actions, Administration, Contents,");
+  console.log("                 Pages, Secrets, Workflows (all Read & Write)\n");
 
   const token = await password({
     message: "GitHub personal access token:",
