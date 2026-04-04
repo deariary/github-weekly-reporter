@@ -18,10 +18,6 @@ inputs:
     description: 'Run mode: "daily" (accumulate events) or "weekly" (full report generation)'
     required: false
     default: 'daily'
-  theme:
-    description: 'Report theme (default, dark)'
-    required: false
-    default: 'default'
   language:
     description: 'Report language (en, ja)'
     required: false
@@ -146,7 +142,7 @@ runs:
         DATA_DIR: ./data
         OUTPUT_DIR: ./output
         BASE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
-      run: npx github-weekly-reporter@${{ inputs.version }} render --theme ${{ inputs.theme }} ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+      run: npx github-weekly-reporter@${{ inputs.version }} render ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
 
     - name: Deploy to GitHub Pages
       if: inputs.mode == 'weekly'

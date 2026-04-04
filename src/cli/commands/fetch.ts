@@ -111,6 +111,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   const githubData = {
     username: contributions.username,
     avatarUrl: contributions.avatarUrl,
+    profile: contributions.profile,
     dateRange: {
       from: toISODate(range.from, options.timezone),
       to: toISODate(range.to, options.timezone),

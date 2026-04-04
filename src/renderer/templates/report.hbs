@@ -20,7 +20,7 @@
   <meta name="twitter:description" content="{{aiContent.subtitle}}" />
   <meta name="twitter:image" content="{{{ogImageUrl}}}" />
   <meta name="author" content="{{username}}" />
-  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="theme-color" content="#050505" />
   <meta property="article:published_time" content="{{dateRange.to}}" />
   <meta property="article:author" content="https://github.com/{{username}}" />
   <link rel="icon" href="{{avatarUrl}}" />
@@ -60,21 +60,34 @@
 <a href="#main-content" class="skip-link">Skip to content</a>
 
 <nav aria-label="Site navigation">
-  <a href="../../" class="nav-left">
-    <img src="{{avatarUrl}}" alt="{{username}}" width="28" height="28" />
-    <span>{{username}}</span>
-  </a>
-  <a href="../../" class="nav-back">&larr; {{i18n.allWeeks}}</a>
+  <div class="nav-inner">
+    <a href="../../" class="nav-site-title">{{siteTitle}}</a>
+    <a href="../../" class="nav-back">&larr; {{i18n.allWeeks}}</a>
+  </div>
 </nav>
+
+<div class="report-hero">
+  <div class="report-hero-inner">
+    {{> header}}
+  </div>
+</div>
 
 <main id="main-content">
 <article class="page">
-  {{> header}}
   {{> overview}}
   {{> summaries}}
   {{> highlights}}
 </article>
 </main>
+
+{{#if canonicalUrl}}
+<div class="share-bar">
+  <span class="share-label">{{i18n.share}}</span>
+  <a href="https://x.com/intent/tweet?url={{{canonicalUrl}}}&text={{aiContent.title}}" target="_blank" rel="noopener nofollow" class="share-btn share-x" aria-label="Share on X">𝕏</a>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn share-linkedin" aria-label="Share on LinkedIn">in</a>
+  <a href="https://bsky.app/intent/compose?text={{aiContent.title}}%20{{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn share-bsky" aria-label="Share on Bluesky">🦋</a>
+</div>
+{{/if}}
 
 {{#if prevWeek}}{{#if nextWeek}}
 <nav class="week-nav" aria-label="Week navigation">

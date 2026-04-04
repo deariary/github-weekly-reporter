@@ -115,9 +115,20 @@ export type ExternalContribution = {
   pullRequests: PullRequest[];
 };
 
+export type UserProfile = {
+  name: string | null;
+  bio: string | null;
+  company: string | null;
+  location: string | null;
+  followers: number;
+  following: number;
+  publicRepos: number;
+};
+
 export type WeeklyReportData = {
   username: string;
   avatarUrl: string;
+  profile?: UserProfile;
   dateRange: { from: string; to: string };
   stats: WeeklyStats;
   dailyCommits: DailyCommitCount[];
@@ -170,8 +181,6 @@ export type AIContent = {
 
 export type LLMProvider = "openai" | "anthropic" | "gemini";
 
-export type Theme = "default" | "dark";
-
 export type Language =
   | "en"
   | "ja"
@@ -189,7 +198,6 @@ export type ReportConfig = {
   llmProvider: LLMProvider | null;
   llmApiKey: string | null;
   llmModel: string | null;
-  theme: Theme;
   language: Language;
   timezone: string; // IANA timezone (e.g. "Asia/Tokyo", "UTC")
 };

@@ -102,14 +102,14 @@ describe("renderReport", () => {
     expect(html).toContain("Auth refactor completed");
   });
 
-  it("renders dark theme (string argument for backward compatibility)", () => {
-    const html = renderReport(MOCK_DATA, "dark");
+  it("uses dark theme colors", () => {
+    const html = renderReport(MOCK_DATA);
     expect(html).toContain("#050505");
     expect(html).toContain("<!DOCTYPE html>");
   });
 
   it("renders with RenderOptions object", () => {
-    const html = renderReport(MOCK_DATA, { theme: "dark", language: "en" });
+    const html = renderReport(MOCK_DATA, { language: "en" });
     expect(html).toContain("#050505");
     expect(html).toContain('lang="en"');
   });
