@@ -2,6 +2,8 @@
 
 **Your GitHub activity, turned into a beautiful weekly report. Automatically.**
 
+<video src="https://github.com/user-attachments/assets/96828826-d694-4338-89b9-974094b0950d" autoplay loop muted playsinline></video>
+
 Every week, this tool looks at everything you did on GitHub (commits, pull requests, code reviews) and generates a polished, shareable report page with AI-written summaries. It runs as a GitHub Action, deploys to GitHub Pages, and costs nothing.
 
 One command to set up. Zero maintenance after that.
