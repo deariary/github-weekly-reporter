@@ -865,8 +865,8 @@ const run = async (cliRepo?: string): Promise<void> => {
   Setup complete!
   ──────────────────────────────────────────────
 
-  Repository:  https://github.com/${fullRepo}
-  Workflow:    ${runUrl}
+  Repository:         https://github.com/${fullRepo}
+  Triggered workflow: ${runUrl}
 
   Your first weekly report is being generated now.
   Once complete, it will be available at:
