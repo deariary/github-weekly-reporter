@@ -193,8 +193,8 @@ export const buildCSS = (language: Language = "en"): string => {
       margin-bottom: 2.5rem;
     }
     .section-group-title {
-      font-size: 2.5rem; font-weight: 900;
-      letter-spacing: -0.05em;
+      font-size: clamp(3rem, 8vw, 5rem); font-weight: 900;
+      letter-spacing: -0.06em;
     }
     .section-group-line { flex: 1; height: 1px; background: ${c.border}; }
     .section-group-count {
@@ -245,15 +245,15 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     /* heading breaks out left of card */
     .section-summary .section-heading {
-      font-size: 1.75rem; font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-left: -4rem;
+      font-size: 2rem; font-weight: 900;
+      letter-spacing: -0.04em;
+      margin-left: -5rem;
       margin-bottom: 1rem;
       color: #ffffff;
     }
     .section-summary:first-child .section-heading {
-      margin-left: -5rem;
-      font-size: 2.25rem;
+      margin-left: -6rem;
+      font-size: 2.75rem;
     }
     .section-summary .section-type {
       font-family: ${f.monoFamily}; font-size: 0.5rem;
