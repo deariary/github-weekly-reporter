@@ -652,6 +652,30 @@ const run = async (cliRepo?: string): Promise<void> => {
     ? config.repo
     : `${config.username}/${config.repo}`;
   const pagesUrl = `https://${fullRepo.split("/")[0]}.github.io/${fullRepo.split("/")[1]}`;
+  const cron = midnightCronUTC(config.timezone);
+
+  // Confirmation
+  console.log("\n  ── Setup Summary ─────────────────────────────");
+  console.log(`  Repository:    ${fullRepo}`);
+  console.log(`  Username:      ${config.username}`);
+  console.log(`  Site title:    ${config.siteTitle}`);
+  console.log(`  Language:      ${config.language}`);
+  console.log(`  Timezone:      ${config.timezone}`);
+  console.log(`  Schedule:      Daily at midnight (cron: ${cron})`);
+  if (config.llmProvider && config.llmModel) {
+    console.log(`  LLM provider:  ${config.llmProvider}`);
+    console.log(`  LLM model:     ${config.llmModel}`);
+  } else {
+    console.log("  LLM:           Not configured");
+  }
+  console.log(`  Pages URL:     ${pagesUrl}`);
+  console.log("  ──────────────────────────────────────────────\n");
+
+  const proceed = await confirm({ message: "Proceed with setup?", default: true });
+  if (!proceed) {
+    console.log("\n  Setup cancelled.\n");
+    return;
+  }
 
   // 1. Repository
   step("Setting up repository...");
@@ -733,7 +757,6 @@ const run = async (cliRepo?: string): Promise<void> => {
   }
 
   // Done
-  const cron = midnightCronUTC(config.timezone);
   console.log(`
   ──────────────────────────────────────────────
   Setup complete!
