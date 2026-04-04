@@ -77,7 +77,7 @@ export const renderReport = (
   const canonicalUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/` : undefined;
   const ogImageUrl = baseUrl && weekPath ? `${baseUrl}/${weekPath}/og.png` : "og.png";
 
-  const siteTitle = options.siteTitle ?? "Dev Pulse";
+  const siteTitle = options.siteTitle ?? "Dev\nPulse";
 
   return template({
     ...data,

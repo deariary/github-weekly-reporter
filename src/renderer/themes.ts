@@ -91,6 +91,7 @@ export const buildCSS = (language: Language = "en"): string => {
       font-size: 0.75rem; font-weight: 600;
       letter-spacing: 0.2em; text-transform: uppercase;
       color: rgba(255,255,255,0.4);
+      white-space: nowrap;
     }
     .nav-back {
       font-family: ${f.monoFamily}; font-size: 0.6875rem;

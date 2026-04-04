@@ -77,6 +77,7 @@ const TEMPLATE = `<!DOCTYPE html>
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: rgba(255,255,255,0.4);
+      white-space: nowrap;
     }
 
     /* HERO */
@@ -148,10 +149,11 @@ const TEMPLATE = `<!DOCTYPE html>
       font-size: clamp(4rem, 12vw, 9rem);
       font-weight: 900;
       letter-spacing: -0.06em;
-      line-height: 0.9;
+      line-height: 0.85;
       color: #ffffff;
       margin-bottom: 3rem;
       max-width: 70%;
+      white-space: pre-line;
     }
 
     /* PROFILE - asymmetric, stacked */
@@ -450,7 +452,7 @@ export const renderIndexPage = (
 ): string => {
   const locale = getLocale(language);
   const fontConfig = getFontConfig(language);
-  const resolvedSiteTitle = siteTitle ?? "Dev Pulse";
+  const resolvedSiteTitle = siteTitle ?? "Dev\nPulse";
   const template = Handlebars.compile(TEMPLATE);
   return template({
     yearGroups: groupByYear(reports),
