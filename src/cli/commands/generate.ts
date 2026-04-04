@@ -27,7 +27,16 @@ const resolveOptions = (
   const llmProvider = (cli.llmProvider ?? env("LLM_PROVIDER")) as LLMProvider | undefined;
   if (!llmProvider) throw new Error("LLM provider required. Pass --llm-provider or set LLM_PROVIDER.");
 
+  const providerKeyMap: Record<string, string> = {
+    openai: "OPENAI_API_KEY",
+    anthropic: "ANTHROPIC_API_KEY",
+    gemini: "GEMINI_API_KEY",
+    openrouter: "OPENROUTER_API_KEY",
+    groq: "GROQ_API_KEY",
+    grok: "GROK_API_KEY",
+  };
   const llmApiKey = cli.llmApiKey
+    ?? env(providerKeyMap[llmProvider] ?? "")
     ?? env("OPENAI_API_KEY")
     ?? env("ANTHROPIC_API_KEY")
     ?? env("GEMINI_API_KEY")
