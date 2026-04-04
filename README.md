@@ -13,14 +13,25 @@ Before running setup, have these ready:
    ([Create one](https://github.com/settings/personal-access-tokens/new))
 
 2. **LLM API key** from one of the supported providers.
-   OpenRouter and Groq offer free tiers (no credit card required):
-   - OpenRouter: https://openrouter.ai/settings/keys
-   - Groq: https://console.groq.com/keys
+   | Provider | Free Tier | Get API Key |
+   |---|---|---|
+   | OpenRouter | Yes | https://openrouter.ai/settings/keys |
+   | Groq | Yes | https://console.groq.com/keys |
+   | Google Gemini | Yes | https://aistudio.google.com/apikey |
+   | OpenAI | No | https://platform.openai.com/api-keys |
+   | Anthropic | No | https://console.anthropic.com/settings/keys |
+   | Grok (xAI) | No | https://console.x.ai |
 
-3. **LLM model name** for your chosen provider.
-   Check available models at the provider's docs:
-   - OpenRouter: https://openrouter.ai/models
-   - Groq: https://console.groq.com/docs/models
+3. **LLM model name** for your chosen provider:
+
+   | Provider | Models |
+   |---|---|
+   | OpenRouter | https://openrouter.ai/models |
+   | Groq | https://console.groq.com/docs/models |
+   | Google Gemini | https://ai.google.dev/gemini-api/docs/models |
+   | OpenAI | https://platform.openai.com/docs/models |
+   | Anthropic | https://docs.anthropic.com/en/docs/about-claude/models |
+   | Grok (xAI) | https://docs.x.ai/docs/models |
 
 ## Quick Start
 
