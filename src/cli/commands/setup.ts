@@ -454,7 +454,7 @@ Go to [Actions](https://github.com/${opts.repo}/actions), click **Weekly Report*
 
 ---
 
-Built with [deariary](https://deariary.com)
+Supported by [deariary](https://deariary.com)
 `;
 
 // ── Interactive prompts ──────────────────────────────────────
