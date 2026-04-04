@@ -96,7 +96,8 @@ const setRepoSecret = async (
     key_id: string;
   };
 
-  const { seal } = await import("tweetsodium");
+  const tweetsodium = await import("tweetsodium");
+  const seal = tweetsodium.default.seal;
   const keyBytes = Uint8Array.from(atob(key), (c) => c.charCodeAt(0));
   const encrypted = seal(new TextEncoder().encode(value), keyBytes);
   const encryptedB64 = btoa(String.fromCharCode(...encrypted));
