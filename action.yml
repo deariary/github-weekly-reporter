@@ -104,7 +104,6 @@ runs:
           echo "No new data to commit"
         else
           git commit -m "data: daily events $(date -u +%Y-%m-%d)"
-          git pull --rebase
           git push
         fi
 
@@ -150,7 +149,6 @@ runs:
           echo "No new data to commit"
         else
           git commit -m "data: weekly report $(date -u +%Y-%m-%d)"
-          git pull --rebase
           git push
         fi
 
