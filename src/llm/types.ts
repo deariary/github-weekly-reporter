@@ -2,6 +2,9 @@
 
 import type { WeeklyReportData, LLMProvider as LLMProviderName, Language } from "../types.js";
 
+export const DEFAULT_MAX_TOKENS = 16384;
+export const DEFAULT_TEMPERATURE = 0.7;
+
 export type LLMConfig = {
   provider: LLMProviderName;
   apiKey: string;

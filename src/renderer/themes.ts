@@ -402,7 +402,6 @@ export const buildCSS = (language: Language = "en"): string => {
       .section-summary .section-heading { margin-left: -0.5rem; font-size: 1.25rem; }
       .section-summary:first-child .section-heading { margin-left: -0.5rem; font-size: 1.5rem; }
       .highlight-grid { grid-template-columns: 1fr; }
-      .highlight-grid { grid-template-columns: 1fr; }
     }
   `;
 };

@@ -115,6 +115,7 @@ const parseAIContent = (raw: string): AIContent => {
   };
 };
 
+/** Generate AI-powered narrative content from weekly GitHub activity data. Throws on failure. */
 export const generateContent = async (
   input: NarrativeInput,
   config: LLMConfig,

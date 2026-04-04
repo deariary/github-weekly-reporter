@@ -6,7 +6,7 @@ export type DateRange = {
 };
 
 // Resolve the local date components (year, month, day) in the given timezone.
-const localDateParts = (
+export const localDateParts = (
   now: Date,
   tz: string,
 ): { year: number; month: number; day: number } => {

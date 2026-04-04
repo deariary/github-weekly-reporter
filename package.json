@@ -37,6 +37,10 @@
   ],
   "author": "deariary",
   "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://github.com/deariary/github-weekly-reporter#readme",
+  "bugs": {
+    "url": "https://github.com/deariary/github-weekly-reporter/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/deariary/github-weekly-reporter.git"

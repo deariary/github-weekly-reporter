@@ -1,7 +1,7 @@
 // Anthropic provider implementation
 
 import Anthropic from "@anthropic-ai/sdk";
-import type { LLMProvider, LLMConfig } from "../types.js";
+import { DEFAULT_MAX_TOKENS, type LLMProvider, type LLMConfig } from "../types.js";
 
 export const createAnthropicProvider = (config: LLMConfig): LLMProvider => {
   const client = new Anthropic({ apiKey: config.apiKey });
@@ -10,7 +10,7 @@ export const createAnthropicProvider = (config: LLMConfig): LLMProvider => {
     generate: async (prompt: string): Promise<string> => {
       const response = await client.messages.create({
         model: config.model,
-        max_tokens: 16384,
+        max_tokens: DEFAULT_MAX_TOKENS,
         messages: [{ role: "user", content: prompt }],
       });
       const block = response.content[0];

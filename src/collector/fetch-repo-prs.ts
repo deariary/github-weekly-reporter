@@ -26,7 +26,7 @@ const GITHUB_HEADERS = (token: string) => ({
   "User-Agent": "github-weekly-reporter",
 });
 
-const mapState = (state: string, mergedAt: string | null): PullRequest["state"] => {
+export const mapState = (state: string, mergedAt: string | null): PullRequest["state"] => {
   if (mergedAt) return "merged";
   return state === "closed" ? "closed" : "open";
 };

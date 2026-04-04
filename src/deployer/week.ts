@@ -1,23 +1,11 @@
 // ISO week number calculation (timezone-aware)
 
+import { localDateParts } from "../collector/date-range.js";
+
 export type WeekId = {
   year: number;
   week: number;
   path: string; // e.g. "2026/W14"
-};
-
-const localDateParts = (
-  date: Date,
-  tz: string,
-): { year: number; month: number; day: number } => {
-  const fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone: tz,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  const [year, month, day] = fmt.format(date).split("-").map(Number);
-  return { year, month: month - 1, day };
 };
 
 const getISOWeekNumber = (date: Date, timezone: string): number => {
