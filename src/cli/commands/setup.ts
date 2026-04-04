@@ -797,17 +797,21 @@ const run = async (cliRepo?: string): Promise<void> => {
     ok(`Enable at: https://github.com/${fullRepo}/settings/pages`);
   }
 
-  // 6. Trigger first run
-  step("Triggering first daily fetch...");
+  // 6. Trigger first weekly report
+  step("Generating first weekly report...");
   const dispatchRes = await ghPost(
     config.token,
     `/repos/${fullRepo}/actions/workflows/weekly-report.yml/dispatches`,
-    { ref: "main" },
+    { ref: "main", inputs: { mode: "weekly" } },
   );
   if (dispatchRes.ok) {
-    ok("Workflow triggered successfully.");
+    ok("Weekly report workflow triggered.");
+    ok("This will take a few minutes. Check progress at:");
+    ok(`https://github.com/${fullRepo}/actions`);
   } else {
-    ok("Could not auto-trigger. Run manually from the Actions tab.");
+    ok("Could not auto-trigger. Run manually from the Actions tab:");
+    ok(`https://github.com/${fullRepo}/actions`);
+    ok('Select mode: "weekly" and click "Run workflow".');
   }
 
   // Done
@@ -820,12 +824,8 @@ const run = async (cliRepo?: string): Promise<void> => {
   Reports:     ${pagesUrl}
   Actions:     https://github.com/${fullRepo}/actions
 
+  Your first weekly report is being generated now.
   Daily fetches will run automatically at midnight ${config.timezone}.
-
-  After a few days of data collection, generate your first report:
-    1. Go to Actions > Weekly Report > Run workflow
-    2. Select mode: "weekly"
-    3. Click "Run workflow"
 
   To change settings, edit:
     .github/workflows/weekly-report.yml
