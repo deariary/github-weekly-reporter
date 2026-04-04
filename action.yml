@@ -99,11 +99,11 @@ runs:
       if: inputs.mode == 'daily'
       shell: bash
       run: |
+        git pull --rebase
         git add data/
         if git diff --cached --quiet; then
           echo "No new data to commit"
         else
-          git pull --rebase
           git commit -m "data: daily events $(date -u +%Y-%m-%d)"
           git push
         fi
@@ -145,11 +145,11 @@ runs:
       if: inputs.mode == 'weekly'
       shell: bash
       run: |
+        git pull --rebase
         git add data/
         if git diff --cached --quiet; then
           echo "No new data to commit"
         else
-          git pull --rebase
           git commit -m "data: weekly report $(date -u +%Y-%m-%d)"
           git push
         fi
