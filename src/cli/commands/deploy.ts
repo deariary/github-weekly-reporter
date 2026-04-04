@@ -52,7 +52,7 @@ const run = async (options: DeployCommandOptions): Promise<void> => {
 export const registerDeploy = (program: Command): void => {
   program
     .command("deploy")
-    .description("Deploy generated report to GitHub Pages")
+    .description("Deploy generated report to GitHub Pages (gh-pages branch)")
     .option("-d, --directory <dir>", "Directory containing generated HTML files (env: OUTPUT_DIR, default: ./output)")
     .option("-r, --repo <slug>", "Repository (owner/repo or full URL, env: GITHUB_REPOSITORY)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")

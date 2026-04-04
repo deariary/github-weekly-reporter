@@ -694,7 +694,7 @@ const enablePages = async (
 ): Promise<string> => {
   // Enable Pages from main branch, /output directory (may already be enabled)
   await ghPost(token, `/repos/${repo}/pages`, {
-    source: { branch: "main", path: "/output" },
+    source: { branch: "gh-pages", path: "/" },
   });
 
   const [owner, name] = repo.split("/");
