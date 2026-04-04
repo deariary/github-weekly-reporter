@@ -357,6 +357,11 @@ on:
   schedule:
     - cron: '${weeklyCron}'  # Monday, 1 hour after daily fetch (${opts.timezone})
   workflow_dispatch:
+    inputs:
+      date:
+        description: 'Target date (YYYY-MM-DD, default: today)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -378,6 +383,7 @@ jobs:
           mode: 'weekly'
           language: '${opts.language}'
           timezone: '${opts.timezone}'
+          date: \${{ inputs.date }}
 ${llmInputs}
 `;
 };
