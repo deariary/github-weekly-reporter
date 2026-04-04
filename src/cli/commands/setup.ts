@@ -540,8 +540,8 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
     llmProvider = (await select({
       message: "LLM provider:",
       choices: [
-        { name: "Groq        - Free tier, fast inference (recommended)", value: "groq" },
-        { name: "OpenRouter   - Free tier, 25+ free models",            value: "openrouter" },
+        { name: "OpenRouter   - Free tier, 25+ free models (recommended)", value: "openrouter" },
+        { name: "Groq        - Free tier, fast inference",              value: "groq" },
         { name: "Google Gemini - Free tier available",                   value: "gemini" },
         { name: "OpenAI       - Paid",                                   value: "openai" },
         { name: "Anthropic    - Paid",                                   value: "anthropic" },
