@@ -5,7 +5,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { graphql } from "@octokit/graphql";
-import { buildWeeklyRange, buildCurrentWeekRange, toISODate, parseLocalDate, type DateRange } from "../../collector/date-range.js";
+import { buildWeeklyRange, buildYesterdayRange, localDateParts, toISODate, parseLocalDate, type DateRange } from "../../collector/date-range.js";
 import { fetchEvents, dedupeEvents } from "../../collector/fetch-events.js";
 import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
@@ -59,18 +59,77 @@ export const extractPRRefs = (events: GitHubEvent[]): PRRef[] => {
   return refs;
 };
 
-// daily-fetch: accumulate events for the current week
-const runDailyFetch = async (options: BaseOptions): Promise<void> => {
-  const weekId = getCurrentWeekId(options.date, options.timezone);
-  const range = buildCurrentWeekRange(options.date, options.timezone);
-  const reportDir = join(options.dataDir, weekId.path);
-  await mkdir(reportDir, { recursive: true });
+// Resolved parameters for a fetch operation.
+// Computed once from (now, timezone, dataDir) so that every downstream
+// consumer (logging, file I/O, commit message) uses the same values.
+export type FetchPlan = {
+  targetDate: string;  // YYYY-MM-DD in local timezone
+  rangeFrom: string;   // YYYY-MM-DD in local timezone
+  rangeTo: string;     // YYYY-MM-DD in local timezone
+  weekPath: string;    // e.g. "2026/W14"
+  reportDir: string;   // e.g. "./data/2026/W14"
+  range: DateRange;    // Date objects for API filtering
+};
 
-  console.log(`Fetching events for ${options.username} (${weekId.path})...`);
-  const newEvents = await fetchEvents(options.token, options.username, range);
+// Compute yesterday's noon (safe for week-ID calculation) in the given timezone.
+const getYesterday = (now: Date, timezone: string): Date => {
+  const { year, month, day } = localDateParts(now, timezone);
+  const todayUTC = new Date(Date.UTC(year, month, day));
+  const yesterdayUTC = new Date(todayUTC.getTime() - 86_400_000);
+  const y = yesterdayUTC.getUTCFullYear();
+  const m = String(yesterdayUTC.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(yesterdayUTC.getUTCDate()).padStart(2, "0");
+  return parseLocalDate(`${y}-${m}-${d}`, timezone);
+};
+
+// Build a daily-fetch plan: yesterday's events stored in yesterday's week folder.
+export const buildDailyPlan = (now: Date, timezone: string, dataDir: string): FetchPlan => {
+  const yesterday = getYesterday(now, timezone);
+  const weekId = getCurrentWeekId(yesterday, timezone);
+  const range = buildYesterdayRange(now, timezone);
+  return {
+    targetDate: toISODate(yesterday, timezone),
+    rangeFrom: toISODate(range.from, timezone),
+    rangeTo: toISODate(range.to, timezone),
+    weekPath: weekId.path,
+    reportDir: join(dataDir, weekId.path),
+    range,
+  };
+};
+
+// Build a weekly-fetch plan: previous week's full Mon-Sun range.
+export const buildWeeklyPlan = (now: Date, timezone: string, dataDir: string): FetchPlan => {
+  const weekId = getWeekId(now, timezone);
+  const range = buildWeeklyRange(now, timezone);
+  return {
+    targetDate: toISODate(now, timezone),
+    rangeFrom: toISODate(range.from, timezone),
+    rangeTo: toISODate(range.to, timezone),
+    weekPath: weekId.path,
+    reportDir: join(dataDir, weekId.path),
+    range,
+  };
+};
+
+const logPlan = (command: string, username: string, timezone: string, plan: FetchPlan): void => {
+  console.log(`${command}: user=${username} timezone=${timezone}`);
+  console.log(`  target date : ${plan.targetDate}`);
+  console.log(`  date range  : ${plan.rangeFrom} .. ${plan.rangeTo}`);
+  console.log(`  week        : ${plan.weekPath}`);
+  console.log(`  data dir    : ${plan.reportDir}`);
+};
+
+// daily-fetch: collect yesterday's events and store in yesterday's week folder.
+const runDailyFetch = async (options: BaseOptions): Promise<void> => {
+  const now = options.date ?? new Date();
+  const plan = buildDailyPlan(now, options.timezone, options.dataDir);
+  await mkdir(plan.reportDir, { recursive: true });
+
+  logPlan("daily-fetch", options.username, options.timezone, plan);
+  const newEvents = await fetchEvents(options.token, options.username, plan.range);
   console.log(`Fetched ${newEvents.length} events.`);
 
-  const eventsPath = join(reportDir, "events.yaml");
+  const eventsPath = join(plan.reportDir, "events.yaml");
   const existing = await tryReadYaml<GitHubEvent[]>(eventsPath) ?? [];
   const merged = dedupeEvents([...existing, ...newEvents]);
 
@@ -123,13 +182,14 @@ const searchWeeklyPRs = async (
 
 // weekly-fetch: use accumulated events + search API to find PRs, fetch each individually
 const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
-  const weekId = getWeekId(options.date, options.timezone);
-  const range = buildWeeklyRange(options.date, options.timezone);
-  const reportDir = join(options.dataDir, weekId.path);
-  await mkdir(reportDir, { recursive: true });
+  const now = options.date ?? new Date();
+  const plan = buildWeeklyPlan(now, options.timezone, options.dataDir);
+  await mkdir(plan.reportDir, { recursive: true });
+
+  logPlan("weekly-fetch", options.username, options.timezone, plan);
 
   // Load accumulated events
-  const eventsPath = join(reportDir, "events.yaml");
+  const eventsPath = join(plan.reportDir, "events.yaml");
   const events = await tryReadYaml<GitHubEvent[]>(eventsPath) ?? [];
   console.log(`Loaded ${events.length} accumulated events.`);
 
@@ -139,7 +199,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
 
   // Search for PRs via GitHub Search API (catches PRs missed by daily fetch)
   console.log("Searching for PRs updated this week...");
-  const searchRefs = await searchWeeklyPRs(options.token, options.username, range);
+  const searchRefs = await searchWeeklyPRs(options.token, options.username, plan.range);
   console.log(`Found ${searchRefs.length} PR references from search.`);
 
   // Merge and dedupe
@@ -156,7 +216,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   // Fetch contributions (GraphQL)
   console.log("Fetching contribution stats...");
   const gql = graphql.defaults({ headers: { authorization: `token ${options.token}` } });
-  const contributions = await fetchContributions(gql, options.username, range, options.timezone);
+  const contributions = await fetchContributions(gql, options.username, plan.range, options.timezone);
 
   const repositories = aggregateRepositories(pullRequests, []);
   const totalAdditions = pullRequests.reduce((sum, pr) => sum + pr.additions, 0);
@@ -166,10 +226,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     username: contributions.username,
     avatarUrl: contributions.avatarUrl,
     profile: contributions.profile,
-    dateRange: {
-      from: toISODate(range.from, options.timezone),
-      to: toISODate(range.to, options.timezone),
-    },
+    dateRange: { from: plan.rangeFrom, to: plan.rangeTo },
     stats: {
       totalCommits: contributions.totalCommits,
       totalAdditions,
@@ -187,7 +244,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     events,
     externalContributions: [],
   };
-  const dataPath = join(reportDir, "github-data.yaml");
+  const dataPath = join(plan.reportDir, "github-data.yaml");
   await writeFile(dataPath, toYaml(githubData, { lineWidth: 120 }), "utf-8");
   console.log(`GitHub data written to ${dataPath}`);
   console.log(`Total: ${pullRequests.length} PRs`);
@@ -201,11 +258,20 @@ const baseOptions = (cmd: Command): Command =>
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)");
 
+// Format a commit message from a plan. Used by the commit-msg
+// subcommand so that action.yml produces consistent messages.
+// Includes the UTC range timestamps so the commit is unambiguous
+// regardless of the reader's timezone.
+export const formatCommitMsg = (mode: string, plan: FetchPlan): string =>
+  mode === "daily"
+    ? `data: daily ${plan.weekPath} ${plan.range.from.toISOString()}..${plan.range.to.toISOString()}`
+    : `data: weekly ${plan.weekPath} ${plan.range.from.toISOString()}..${plan.range.to.toISOString()}`;
+
 export const registerFetch = (program: Command): void => {
   baseOptions(
     program
       .command("daily-fetch")
-      .description("Fetch today's GitHub events and accumulate (run daily via cron)"),
+      .description("Fetch yesterday's GitHub events and accumulate (run daily via cron at midnight)"),
   ).action(async (opts) => {
     try {
       const options = resolveBaseOptions(opts);
@@ -229,4 +295,21 @@ export const registerFetch = (program: Command): void => {
       process.exit(1);
     }
   });
+
+  program
+    .command("commit-msg")
+    .description("Print a commit message for the given mode (used by action.yml)")
+    .argument("<mode>", "daily or weekly")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
+    .option("--date <date>", "Target date (YYYY-MM-DD, default: today)")
+    .option("--data-dir <dir>", "Data directory (default: ./data)")
+    .action((mode: string, opts: Record<string, string | undefined>) => {
+      const timezone = opts.timezone ?? env("TIMEZONE") ?? "UTC";
+      const dataDir = opts.dataDir ?? env("DATA_DIR") ?? "./data";
+      const now = opts.date ? parseLocalDate(opts.date, timezone) : new Date();
+      const plan = mode === "daily"
+        ? buildDailyPlan(now, timezone, dataDir)
+        : buildWeeklyPlan(now, timezone, dataDir);
+      process.stdout.write(formatCommitMsg(mode, plan));
+    });
 };

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
-import { resolveBaseOptions, extractPRRefs } from "./fetch.js";
+import { resolveBaseOptions, extractPRRefs, buildDailyPlan, buildWeeklyPlan, formatCommitMsg } from "./fetch.js";
 import type { GitHubEvent } from "../../types.js";
 
 // Mock fs/promises
@@ -41,10 +41,9 @@ vi.mock("../../collector/aggregate.js", () => ({
   aggregateRepositories: () => [],
 }));
 
-vi.mock("../../deployer/week.js", () => ({
-  getWeekId: () => ({ year: 2026, week: 14, path: "2026/W14" }),
-  getCurrentWeekId: () => ({ year: 2026, week: 14, path: "2026/W14" }),
-}));
+// Note: deployer/week.js is NOT mocked here. buildDailyPlan/buildWeeklyPlan
+// call the real getWeekId/getCurrentWeekId (pure functions, no I/O) so that
+// the plan tests verify actual week-ID calculations end-to-end.
 
 vi.mock("@octokit/graphql", () => ({
   graphql: { defaults: () => vi.fn() },
@@ -212,6 +211,222 @@ describe("extractPRRefs", () => {
       },
     ];
     expect(extractPRRefs(events)).toEqual([]);
+  });
+});
+
+// -------------------------------------------------------------------
+// buildDailyPlan
+//
+// Cron fires at midnight local time. The plan should collect
+// yesterday's events and store them in yesterday's ISO week folder.
+//
+// Reference table (Asia/Tokyo, W14 = Mon 3/30 .. Sun 4/5):
+//
+//   cron (JST)        | yesterday | week | range
+//   3/31 Mon 00:00    | 3/30 Mon  | W14  | 3/30 .. 3/30
+//   4/1  Tue 00:00    | 3/31 Tue  | W14  | 3/31 .. 3/31
+//   ...
+//   4/6  Sun 00:00    | 4/5  Sun  | W14  | 4/5  .. 4/5
+//   4/7  Mon 00:00    | 4/6  Mon  | W15  | 4/6  .. 4/6
+// -------------------------------------------------------------------
+
+describe("buildDailyPlan", () => {
+  // Full week cycle (Asia/Tokyo, W14)
+  const jstCases: [string, string, string, string, string][] = [
+    // [cron UTC instant,           targetDate, range,       weekPath,    description]
+    ["2026-03-30T15:00:00Z", "2026-03-30", "2026-03-30", "2026/W14", "Mon: yesterday=Mon(W14)"],
+    ["2026-03-31T15:00:00Z", "2026-03-31", "2026-03-31", "2026/W14", "Tue: yesterday=Tue(W14)"],
+    ["2026-04-01T15:00:00Z", "2026-04-01", "2026-04-01", "2026/W14", "Wed: yesterday=Wed(W14)"],
+    ["2026-04-02T15:00:00Z", "2026-04-02", "2026-04-02", "2026/W14", "Thu: yesterday=Thu(W14)"],
+    ["2026-04-03T15:00:00Z", "2026-04-03", "2026-04-03", "2026/W14", "Fri: yesterday=Fri(W14)"],
+    ["2026-04-04T15:00:00Z", "2026-04-04", "2026-04-04", "2026/W14", "Sat: yesterday=Sat(W14)"],
+    ["2026-04-05T15:00:00Z", "2026-04-05", "2026-04-05", "2026/W14", "Sun: yesterday=Sun(W14)"],
+    ["2026-04-06T15:00:00Z", "2026-04-06", "2026-04-06", "2026/W15", "Mon: yesterday=Mon(W15), week boundary"],
+  ];
+
+  it.each(jstCases)("JST cron at %s: %s", (utcInstant, targetDate, rangeDate, weekPath, _desc) => {
+    const plan = buildDailyPlan(new Date(utcInstant), "Asia/Tokyo", "./data");
+    expect(plan.targetDate).toBe(targetDate);
+    expect(plan.rangeFrom).toBe(rangeDate);
+    expect(plan.rangeTo).toBe(rangeDate);
+    expect(plan.weekPath).toBe(weekPath);
+    expect(plan.reportDir).toBe(`data/${weekPath}`);
+  });
+
+  // UTC cycle (W14)
+  const utcCases: [string, string, string][] = [
+    ["2026-03-31T00:00:00Z", "2026-03-30", "2026/W14"],
+    ["2026-04-06T00:00:00Z", "2026-04-05", "2026/W14"],
+    ["2026-04-07T00:00:00Z", "2026-04-06", "2026/W15"],
+  ];
+
+  it.each(utcCases)("UTC cron at %s: yesterday=%s week=%s", (utcInstant, targetDate, weekPath) => {
+    const plan = buildDailyPlan(new Date(utcInstant), "UTC", "./data");
+    expect(plan.targetDate).toBe(targetDate);
+    expect(plan.weekPath).toBe(weekPath);
+  });
+
+  it("year boundary: Jan 1 midnight -> yesterday is Dec 31", () => {
+    const plan = buildDailyPlan(new Date("2026-01-01T00:00:00Z"), "UTC", "./data");
+    expect(plan.targetDate).toBe("2025-12-31");
+    expect(plan.rangeFrom).toBe("2025-12-31");
+    expect(plan.rangeTo).toBe("2025-12-31");
+    // Dec 31 2025 is Wednesday, ISO W01 of 2026
+    expect(plan.weekPath).toBe("2026/W01");
+  });
+
+  it("range covers exactly one day (from and to are the same date)", () => {
+    const plan = buildDailyPlan(new Date("2026-04-04T15:00:00Z"), "Asia/Tokyo", "./data");
+    expect(plan.rangeFrom).toBe(plan.rangeTo);
+  });
+});
+
+// -------------------------------------------------------------------
+// buildWeeklyPlan
+//
+// Cron fires Monday 01:00 local time (1h after daily). The plan
+// should target the previous ISO week (Mon-Sun).
+//
+// Reference table (Asia/Tokyo):
+//
+//   cron (JST)        | range             | week
+//   4/7  Mon 01:00    | 3/30 .. 4/5       | W14
+//   4/14 Mon 01:00    | 4/6  .. 4/12      | W15
+// -------------------------------------------------------------------
+
+describe("buildWeeklyPlan", () => {
+  it("Monday JST: targets previous week W14 (3/30..4/5)", () => {
+    // Mon Apr 7 01:00 JST = 2026-04-06T16:00:00Z
+    const plan = buildWeeklyPlan(new Date("2026-04-06T16:00:00Z"), "Asia/Tokyo", "./data");
+    expect(plan.rangeFrom).toBe("2026-03-30");
+    expect(plan.rangeTo).toBe("2026-04-05");
+    expect(plan.weekPath).toBe("2026/W14");
+    expect(plan.reportDir).toBe("data/2026/W14");
+  });
+
+  it("Monday UTC: targets previous week W14 (3/30..4/5)", () => {
+    const plan = buildWeeklyPlan(new Date("2026-04-07T01:00:00Z"), "UTC", "./data");
+    expect(plan.rangeFrom).toBe("2026-03-30");
+    expect(plan.rangeTo).toBe("2026-04-05");
+    expect(plan.weekPath).toBe("2026/W14");
+  });
+
+  it("next Monday targets W15 (4/6..4/12)", () => {
+    // Mon Apr 14 01:00 JST = 2026-04-13T16:00:00Z
+    const plan = buildWeeklyPlan(new Date("2026-04-13T16:00:00Z"), "Asia/Tokyo", "./data");
+    expect(plan.rangeFrom).toBe("2026-04-06");
+    expect(plan.rangeTo).toBe("2026-04-12");
+    expect(plan.weekPath).toBe("2026/W15");
+  });
+
+  it("range covers exactly 7 days", () => {
+    const plan = buildWeeklyPlan(new Date("2026-04-07T01:00:00Z"), "UTC", "./data");
+    expect(plan.rangeFrom).toBe("2026-03-30");
+    expect(plan.rangeTo).toBe("2026-04-05");
+  });
+
+  it("year boundary: Mon Jan 5 (W02) targets previous W01 (Dec 29..Jan 4)", () => {
+    // Mon Jan 5 2026 01:00 UTC is W02. Previous week is W01 (Dec 29..Jan 4).
+    // ISO W01 of 2026 starts on Mon Dec 29 2025.
+    const plan = buildWeeklyPlan(new Date("2026-01-05T01:00:00Z"), "UTC", "./data");
+    expect(plan.rangeFrom).toBe("2025-12-29");
+    expect(plan.rangeTo).toBe("2026-01-04");
+    expect(plan.weekPath).toBe("2026/W01");
+  });
+});
+
+// -------------------------------------------------------------------
+// daily + weekly plan consistency
+// -------------------------------------------------------------------
+
+describe("daily/weekly plan consistency", () => {
+  it("7 daily plans cover the same range as the weekly plan (UTC)", () => {
+    // W14 daily crons: Tue 3/31 00:00 through Mon 4/7 00:00
+    const dailyDates = [
+      "2026-03-31T00:00:00Z", // yesterday = 3/30 Mon
+      "2026-04-01T00:00:00Z", // yesterday = 3/31 Tue
+      "2026-04-02T00:00:00Z", // yesterday = 4/1  Wed
+      "2026-04-03T00:00:00Z", // yesterday = 4/2  Thu
+      "2026-04-04T00:00:00Z", // yesterday = 4/3  Fri
+      "2026-04-05T00:00:00Z", // yesterday = 4/4  Sat
+      "2026-04-06T00:00:00Z", // yesterday = 4/5  Sun
+    ];
+    const dailyPlans = dailyDates.map((d) => buildDailyPlan(new Date(d), "UTC", "./data"));
+
+    // All should target W14
+    dailyPlans.forEach((p) => expect(p.weekPath).toBe("2026/W14"));
+
+    // Collected dates should be Mon 3/30 through Sun 4/5
+    const collectedDates = dailyPlans.map((p) => p.targetDate);
+    expect(collectedDates).toEqual([
+      "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02",
+      "2026-04-03", "2026-04-04", "2026-04-05",
+    ]);
+
+    // Weekly plan should cover the same range
+    const weeklyPlan = buildWeeklyPlan(new Date("2026-04-07T01:00:00Z"), "UTC", "./data");
+    expect(weeklyPlan.rangeFrom).toBe(collectedDates[0]);
+    expect(weeklyPlan.rangeTo).toBe(collectedDates[collectedDates.length - 1]);
+    expect(weeklyPlan.weekPath).toBe("2026/W14");
+  });
+
+  it("7 daily plans cover the same range as the weekly plan (Asia/Tokyo)", () => {
+    // JST midnight = 15:00 UTC previous day
+    const dailyDates = [
+      "2026-03-30T15:00:00Z", // JST 3/31 Mon, yesterday = 3/30
+      "2026-03-31T15:00:00Z", // JST 4/1  Tue, yesterday = 3/31
+      "2026-04-01T15:00:00Z", // JST 4/2  Wed, yesterday = 4/1
+      "2026-04-02T15:00:00Z", // JST 4/3  Thu, yesterday = 4/2
+      "2026-04-03T15:00:00Z", // JST 4/4  Fri, yesterday = 4/3
+      "2026-04-04T15:00:00Z", // JST 4/5  Sat, yesterday = 4/4
+      "2026-04-05T15:00:00Z", // JST 4/6  Sun, yesterday = 4/5
+    ];
+    const dailyPlans = dailyDates.map((d) => buildDailyPlan(new Date(d), "Asia/Tokyo", "./data"));
+
+    dailyPlans.forEach((p) => expect(p.weekPath).toBe("2026/W14"));
+
+    const collectedDates = dailyPlans.map((p) => p.targetDate);
+    expect(collectedDates).toEqual([
+      "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02",
+      "2026-04-03", "2026-04-04", "2026-04-05",
+    ]);
+
+    // Weekly cron: Mon 4/7 01:00 JST = 2026-04-06T16:00:00Z
+    const weeklyPlan = buildWeeklyPlan(new Date("2026-04-06T16:00:00Z"), "Asia/Tokyo", "./data");
+    expect(weeklyPlan.rangeFrom).toBe(collectedDates[0]);
+    expect(weeklyPlan.rangeTo).toBe(collectedDates[collectedDates.length - 1]);
+    expect(weeklyPlan.weekPath).toBe("2026/W14");
+  });
+});
+
+// -------------------------------------------------------------------
+// formatCommitMsg
+// -------------------------------------------------------------------
+
+describe("formatCommitMsg", () => {
+  it("daily: includes week path and UTC range", () => {
+    // Sun Apr 6 00:00 JST = 2026-04-05T15:00:00Z, yesterday = Sat Apr 5 (W14)
+    const plan = buildDailyPlan(new Date("2026-04-05T15:00:00Z"), "Asia/Tokyo", "./data");
+    const msg = formatCommitMsg("daily", plan);
+    // Apr 5 JST midnight = Apr 4 15:00 UTC, Apr 6 JST midnight - 1ms = Apr 5 14:59:59.999 UTC
+    expect(msg).toBe(`data: daily 2026/W14 ${plan.range.from.toISOString()}..${plan.range.to.toISOString()}`);
+    expect(msg).toMatch(/^data: daily 2026\/W14 2026-04-04T15:00:00\.000Z\.\.2026-04-05T14:59:59\.999Z$/);
+  });
+
+  it("weekly: includes week path and UTC range", () => {
+    // Mon Apr 7 01:00 JST = 2026-04-06T16:00:00Z
+    const plan = buildWeeklyPlan(new Date("2026-04-06T16:00:00Z"), "Asia/Tokyo", "./data");
+    const msg = formatCommitMsg("weekly", plan);
+    expect(msg).toBe(`data: weekly 2026/W14 ${plan.range.from.toISOString()}..${plan.range.to.toISOString()}`);
+    // W14 in JST: Mon Mar 30 00:00 JST .. Sun Apr 5 23:59:59.999 JST
+    expect(msg).toMatch(/^data: weekly 2026\/W14 2026-03-29T15:00:00\.000Z\.\.2026-04-05T14:59:59\.999Z$/);
+  });
+
+  it("daily at week boundary: Tue midnight, yesterday=Mon is new week", () => {
+    // Tue Apr 8 00:00 JST = 2026-04-07T15:00:00Z, yesterday = Mon Apr 7 (W15)
+    const plan = buildDailyPlan(new Date("2026-04-07T15:00:00Z"), "Asia/Tokyo", "./data");
+    const msg = formatCommitMsg("daily", plan);
+    expect(msg).toMatch(/^data: daily 2026\/W15 /);
   });
 });
 

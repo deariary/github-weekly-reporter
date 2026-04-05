@@ -152,34 +152,27 @@ export const buildWeeklyRange = (
   return { from, to };
 };
 
-// Current ISO week range (Monday to now). Used by daily-fetch to accumulate
-// events for the week that is still in progress.
-export const buildCurrentWeekRange = (
+// Yesterday's full day (00:00:00.000 to 23:59:59.999 local time).
+// Used by daily-fetch: the cron fires at midnight, so yesterday is fully
+// complete and its events can be collected reliably.
+export const buildYesterdayRange = (
   now: Date = new Date(),
   timezone: string = "UTC",
 ): DateRange => {
   const { year, month, day } = localDateParts(now, timezone);
 
-  // Find the Monday of the current ISO week
-  const d = new Date(Date.UTC(year, month, day));
-  const dow = d.getUTCDay() || 7; // 1=Mon..7=Sun
-  const thisMonday = new Date(Date.UTC(year, month, day - (dow - 1)));
-
-  const fromParts = {
-    year: thisMonday.getUTCFullYear(),
-    month: thisMonday.getUTCMonth(),
-    day: thisMonday.getUTCDate(),
+  // Yesterday in the local timezone
+  const todayUTC = new Date(Date.UTC(year, month, day));
+  const yesterdayUTC = new Date(todayUTC.getTime() - 86_400_000);
+  const yParts = {
+    year: yesterdayUTC.getUTCFullYear(),
+    month: yesterdayUTC.getUTCMonth(),
+    day: yesterdayUTC.getUTCDate(),
   };
-  const from = midnightInTz(fromParts.year, fromParts.month, fromParts.day, timezone);
 
-  // "to" is end of today (next day's midnight - 1ms)
-  const nextDay = new Date(Date.UTC(year, month, day + 1));
-  const toParts = {
-    year: nextDay.getUTCFullYear(),
-    month: nextDay.getUTCMonth(),
-    day: nextDay.getUTCDate(),
-  };
-  const to = new Date(midnightInTz(toParts.year, toParts.month, toParts.day, timezone).getTime() - 1);
+  const from = midnightInTz(yParts.year, yParts.month, yParts.day, timezone);
+  // "to" is end of yesterday (today's midnight - 1ms)
+  const to = new Date(midnightInTz(year, month, day, timezone).getTime() - 1);
 
   return { from, to };
 };

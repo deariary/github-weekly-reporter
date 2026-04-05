@@ -13,7 +13,13 @@ npx github-weekly-reporter setup --repo owner/existing-repo
 
 ### `daily-fetch` / `weekly-fetch`
 
-Collect GitHub activity data. Use `--date` to target a specific date.
+Collect GitHub activity data.
+
+`daily-fetch` collects **yesterday's** events and stores them in the corresponding ISO week folder. Designed to run at midnight via cron.
+
+`weekly-fetch` builds the complete dataset for the **previous** ISO week (Mon-Sun) from accumulated events, PR search, and contribution stats.
+
+Use `--date` to override the reference date (format: `YYYY-MM-DD`).
 
 ```bash
 github-weekly-reporter daily-fetch --token $GITHUB_TOKEN --username your-name
@@ -45,6 +51,18 @@ Deploy rendered report to GitHub Pages.
 ```bash
 github-weekly-reporter deploy --repo owner/repo
 github-weekly-reporter deploy --date 2026-03-31
+```
+
+### `commit-msg`
+
+Print a commit message for use by `action.yml`. Computes the same date range and week ID as `daily-fetch` or `weekly-fetch`, ensuring the commit message matches the data that was actually collected.
+
+```bash
+github-weekly-reporter commit-msg daily --timezone Asia/Tokyo
+# => data: daily 2026/W14 2026-04-04T15:00:00.000Z..2026-04-05T14:59:59.999Z
+
+github-weekly-reporter commit-msg weekly --timezone Asia/Tokyo
+# => data: weekly 2026/W14 2026-03-29T15:00:00.000Z..2026-04-05T14:59:59.999Z
 ```
 
 ## Environment Variables

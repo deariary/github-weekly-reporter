@@ -47,7 +47,7 @@ If you want private reports, you can run the CLI locally without the `deploy` st
 
 ### What is the daily fetch for?
 
-The daily fetch collects your GitHub activity events and saves them locally. GitHub's Events API only retains the most recent 300 events per user, so fetching daily ensures nothing is lost for active users.
+The daily fetch runs at midnight and collects **yesterday's** GitHub activity events. GitHub's Events API only retains the most recent 300 events per user, so fetching daily ensures nothing is lost for active users. Events are stored in the ISO week folder that the day belongs to (e.g., Sunday's events go into the previous week's folder).
 
 Running daily-fetch multiple times in a day is safe. Events are deduplicated by ID.
 

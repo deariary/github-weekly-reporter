@@ -99,12 +99,17 @@ runs:
     - name: Commit and push data (daily)
       if: inputs.mode == 'daily'
       shell: bash
+      env:
+        TIMEZONE: ${{ inputs.timezone }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_DATE: ${{ inputs.date }}
       run: |
         git add -f data/
         if git diff --cached --quiet; then
           echo "No new data to commit"
         else
-          git commit -m "data: daily events $(date -u +%Y-%m-%d)"
+          MSG=$(npx "github-weekly-reporter@${INPUT_VERSION}" commit-msg daily ${INPUT_DATE:+--date "$INPUT_DATE"})
+          git commit -m "${MSG}"
           git push
         fi
 
@@ -144,12 +149,17 @@ runs:
     - name: Commit and push data (weekly)
       if: inputs.mode == 'weekly'
       shell: bash
+      env:
+        TIMEZONE: ${{ inputs.timezone }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_DATE: ${{ inputs.date }}
       run: |
         git add -f data/
         if git diff --cached --quiet; then
           echo "No new data to commit"
         else
-          git commit -m "data: weekly report $(date -u +%Y-%m-%d)"
+          MSG=$(npx "github-weekly-reporter@${INPUT_VERSION}" commit-msg weekly ${INPUT_DATE:+--date "$INPUT_DATE"})
+          git commit -m "${MSG}"
           git push
         fi
 
