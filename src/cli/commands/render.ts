@@ -25,7 +25,7 @@ type RenderOptions = {
 
 const listReportDirs = async (dir: string): Promise<string[]> => {
   const paths: string[] = [];
-  let entries: string[] = [];
+  let entries: string[];
   try {
     entries = await readdir(dir);
   } catch {
