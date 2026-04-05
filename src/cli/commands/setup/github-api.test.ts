@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { validateToken, ensureRepo, addFileToRepo, enablePages, setRepoSecret, sleep, ghGet, ghPost, ghPut } from "./github-api.js";
+import { validateToken, ensureRepo, setRepoTopics, addFileToRepo, enablePages, setRepoSecret, sleep, ghGet, ghPost, ghPut } from "./github-api.js";
 
 describe("github-api", () => {
   beforeEach(() => {
@@ -105,13 +105,18 @@ describe("github-api", () => {
     });
 
     it("creates user repo when owner matches login", async () => {
-      vi.spyOn(globalThis, "fetch")
+      const fetchSpy = vi.spyOn(globalThis, "fetch")
         .mockResolvedValueOnce(new Response("", { status: 404 })) // repo doesn't exist
         .mockResolvedValueOnce(new Response(JSON.stringify({ login: "user" }), { status: 200 })) // /user
         .mockResolvedValueOnce(new Response("", { status: 201 })); // create repo
 
       const result = await ensureRepo("token", "user/repo");
       expect(result).toBe(true);
+
+      // Verify homepage is set in the create request
+      const createCall = fetchSpy.mock.calls[2];
+      const body = JSON.parse(createCall[1]!.body as string);
+      expect(body.homepage).toBe("https://user.github.io/repo");
     });
 
     it("creates org repo when owner differs from login", async () => {
@@ -134,6 +139,29 @@ describe("github-api", () => {
         .mockResolvedValueOnce(new Response("error details", { status: 422 }));
 
       await expect(ensureRepo("token", "user/repo")).rejects.toThrow("Failed to create user/repo");
+    });
+  });
+
+  describe("setRepoTopics", () => {
+    it("sends PUT request with topic names", async () => {
+      const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+        new Response("", { status: 200 }),
+      );
+      await setRepoTopics("token", "user/repo");
+      expect(fetchSpy).toHaveBeenCalledWith(
+        "https://api.github.com/repos/user/repo/topics",
+        expect.objectContaining({
+          method: "PUT",
+          body: expect.stringContaining("github-weekly-reporter"),
+        }),
+      );
+      const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+      expect(body.names).toEqual(expect.arrayContaining([
+        "github-weekly-reporter",
+        "weekly-report",
+        "github-activity",
+        "github-pages",
+      ]));
     });
   });
 

@@ -134,31 +134,44 @@ export const ensureRepo = async (
     login: string;
   };
 
+  const homepage = `https://${owner}.github.io/${name}`;
+  const body = {
+    name,
+    auto_init: true,
+    private: false,
+    description: "Weekly GitHub activity reports",
+    homepage,
+  };
+
   const createRes =
     owner === login
-      ? await ghPost(token, "/user/repos", {
-          name,
-          auto_init: true,
-          private: false,
-          description: "Weekly GitHub activity reports",
-        })
-      : await ghPost(token, `/orgs/${owner}/repos`, {
-          name,
-          auto_init: true,
-          private: false,
-          description: "Weekly GitHub activity reports",
-        });
+      ? await ghPost(token, "/user/repos", body)
+      : await ghPost(token, `/orgs/${owner}/repos`, body);
 
   if (!createRes.ok) {
-    const body = await createRes.text();
+    const errBody = await createRes.text();
     throw new Error(
-      `Failed to create ${fullRepo}: ${createRes.status}\n  ${body}`,
+      `Failed to create ${fullRepo}: ${createRes.status}\n  ${errBody}`,
     );
   }
 
   // Wait for repo to be ready
   await new Promise((r) => setTimeout(r, 2000));
   return true;
+};
+
+const REPO_TOPICS = [
+  "github-weekly-reporter",
+  "weekly-report",
+  "github-activity",
+  "github-pages",
+];
+
+export const setRepoTopics = async (
+  token: string,
+  repo: string,
+): Promise<void> => {
+  await ghPut(token, `/repos/${repo}/topics`, { names: REPO_TOPICS });
 };
 
 export const addFileToRepo = async (
