@@ -52,7 +52,7 @@
     "@anthropic-ai/sdk": "^0.82.0",
     "@google/generative-ai": "^0.24.1",
     "@inquirer/prompts": "^8.3.2",
-    "@octokit/graphql": "^8.2.1",
+    "@octokit/graphql": "^9.0.3",
     "commander": "^14.0.3",
     "handlebars": "^4.7.9",
     "isomorphic-dompurify": "^3.7.1",
