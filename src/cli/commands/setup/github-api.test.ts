@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { validateToken, ensureRepo, addFileToRepo, enablePages, sleep, ghGet, ghPost, ghPut } from "./github-api.js";
+import { validateToken, ensureRepo, addFileToRepo, enablePages, setRepoSecret, sleep, ghGet, ghPost, ghPut } from "./github-api.js";
 
 describe("github-api", () => {
   beforeEach(() => {
@@ -173,6 +173,30 @@ describe("github-api", () => {
       );
       const url = await enablePages("token", "user/repo");
       expect(url).toBe("https://user.github.io/repo");
+    });
+  });
+
+  describe("setRepoSecret", () => {
+    // Generate a valid 32-byte public key for libsodium sealed box
+    const makeValidKeyResponse = async () => {
+      const { default: _sodium } = await import("libsodium-wrappers");
+      await _sodium.ready;
+      const keyPair = _sodium.crypto_box_keypair();
+      const publicKeyB64 = _sodium.to_base64(keyPair.publicKey, _sodium.base64_variants.ORIGINAL);
+      return { key: publicKeyB64, key_id: "kid123" };
+    };
+
+    it("returns true on successful secret creation (no retry needed)", async () => {
+      const keyData = await makeValidKeyResponse();
+      vi.spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify(keyData), { status: 200 }),
+        )
+        .mockResolvedValueOnce(new Response("", { status: 200 }));
+
+      // No sleep is called when first attempt succeeds
+      const result = await setRepoSecret("token", "user/repo", "SECRET", "value");
+      expect(result).toBe(true);
     });
   });
 

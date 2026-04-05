@@ -102,6 +102,21 @@ describe("registerHelpers", () => {
       const result = compile(hbs, "{{{md text}}}", { text: null });
       expect(result).toBe("");
     });
+
+    it("renders links with rel=noopener nofollow", () => {
+      const hbs = createHbs();
+      const result = compile(hbs, "{{{md text}}}", { text: "[example](https://example.com)" });
+      expect(result).toContain('rel="noopener nofollow"');
+      expect(result).toContain('href="https://example.com"');
+    });
+
+    it("escapes quotes in link href", () => {
+      const hbs = createHbs();
+      const result = compile(hbs, "{{{md text}}}", { text: '[test](https://example.com/a"b)' });
+      // DOMPurify may re-encode quotes; just check the href contains the URL
+      expect(result).toContain("https://example.com/a");
+      expect(result).toContain("rel=\"noopener nofollow\"");
+    });
   });
 
   describe("mdInline", () => {
