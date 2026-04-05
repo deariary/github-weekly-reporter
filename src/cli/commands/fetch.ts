@@ -59,8 +59,20 @@ export const extractPRRefs = (events: GitHubEvent[]): PRRef[] => {
   return refs;
 };
 
+// Resolved parameters for a fetch operation.
+// Computed once from (now, timezone, dataDir) so that every downstream
+// consumer (logging, file I/O, commit message) uses the same values.
+export type FetchPlan = {
+  targetDate: string;  // YYYY-MM-DD in local timezone
+  rangeFrom: string;   // YYYY-MM-DD in local timezone
+  rangeTo: string;     // YYYY-MM-DD in local timezone
+  weekPath: string;    // e.g. "2026/W14"
+  reportDir: string;   // e.g. "./data/2026/W14"
+  range: DateRange;    // Date objects for API filtering
+};
+
 // Compute yesterday's noon (safe for week-ID calculation) in the given timezone.
-export const getYesterday = (now: Date, timezone: string): Date => {
+const getYesterday = (now: Date, timezone: string): Date => {
   const { year, month, day } = localDateParts(now, timezone);
   const todayUTC = new Date(Date.UTC(year, month, day));
   const yesterdayUTC = new Date(todayUTC.getTime() - 86_400_000);
@@ -70,25 +82,54 @@ export const getYesterday = (now: Date, timezone: string): Date => {
   return parseLocalDate(`${y}-${m}-${d}`, timezone);
 };
 
+// Build a daily-fetch plan: yesterday's events stored in yesterday's week folder.
+export const buildDailyPlan = (now: Date, timezone: string, dataDir: string): FetchPlan => {
+  const yesterday = getYesterday(now, timezone);
+  const weekId = getCurrentWeekId(yesterday, timezone);
+  const range = buildYesterdayRange(now, timezone);
+  return {
+    targetDate: toISODate(yesterday, timezone),
+    rangeFrom: toISODate(range.from, timezone),
+    rangeTo: toISODate(range.to, timezone),
+    weekPath: weekId.path,
+    reportDir: join(dataDir, weekId.path),
+    range,
+  };
+};
+
+// Build a weekly-fetch plan: previous week's full Mon-Sun range.
+export const buildWeeklyPlan = (now: Date, timezone: string, dataDir: string): FetchPlan => {
+  const weekId = getWeekId(now, timezone);
+  const range = buildWeeklyRange(now, timezone);
+  return {
+    targetDate: toISODate(now, timezone),
+    rangeFrom: toISODate(range.from, timezone),
+    rangeTo: toISODate(range.to, timezone),
+    weekPath: weekId.path,
+    reportDir: join(dataDir, weekId.path),
+    range,
+  };
+};
+
+const logPlan = (command: string, username: string, timezone: string, plan: FetchPlan): void => {
+  console.log(`${command}: user=${username} timezone=${timezone}`);
+  console.log(`  target date : ${plan.targetDate}`);
+  console.log(`  date range  : ${plan.rangeFrom} .. ${plan.rangeTo}`);
+  console.log(`  week        : ${plan.weekPath}`);
+  console.log(`  data dir    : ${plan.reportDir}`);
+};
+
 // daily-fetch: collect yesterday's events and store in yesterday's week folder.
-// The cron fires at midnight, so the previous day is fully complete.
 const runDailyFetch = async (options: BaseOptions): Promise<void> => {
   const now = options.date ?? new Date();
-  const yesterday = getYesterday(now, options.timezone);
-  const weekId = getCurrentWeekId(yesterday, options.timezone);
-  const range = buildYesterdayRange(now, options.timezone);
-  const reportDir = join(options.dataDir, weekId.path);
-  await mkdir(reportDir, { recursive: true });
+  const plan = buildDailyPlan(now, options.timezone, options.dataDir);
+  await mkdir(plan.reportDir, { recursive: true });
 
-  console.log(`daily-fetch: user=${options.username} timezone=${options.timezone}`);
-  console.log(`  target date : ${toISODate(yesterday, options.timezone)} (yesterday)`);
-  console.log(`  date range  : ${toISODate(range.from, options.timezone)} .. ${toISODate(range.to, options.timezone)}`);
-  console.log(`  week        : ${weekId.path}`);
-  console.log(`  output      : ${reportDir}/events.yaml`);
-  const newEvents = await fetchEvents(options.token, options.username, range);
+  logPlan("daily-fetch", options.username, options.timezone, plan);
+  const newEvents = await fetchEvents(options.token, options.username, plan.range);
   console.log(`Fetched ${newEvents.length} events.`);
 
-  const eventsPath = join(reportDir, "events.yaml");
+  const eventsPath = join(plan.reportDir, "events.yaml");
   const existing = await tryReadYaml<GitHubEvent[]>(eventsPath) ?? [];
   const merged = dedupeEvents([...existing, ...newEvents]);
 
@@ -141,18 +182,14 @@ const searchWeeklyPRs = async (
 
 // weekly-fetch: use accumulated events + search API to find PRs, fetch each individually
 const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
-  const weekId = getWeekId(options.date, options.timezone);
-  const range = buildWeeklyRange(options.date, options.timezone);
-  const reportDir = join(options.dataDir, weekId.path);
-  await mkdir(reportDir, { recursive: true });
+  const now = options.date ?? new Date();
+  const plan = buildWeeklyPlan(now, options.timezone, options.dataDir);
+  await mkdir(plan.reportDir, { recursive: true });
 
-  console.log(`weekly-fetch: user=${options.username} timezone=${options.timezone}`);
-  console.log(`  date range  : ${toISODate(range.from, options.timezone)} .. ${toISODate(range.to, options.timezone)}`);
-  console.log(`  week        : ${weekId.path}`);
-  console.log(`  data dir    : ${reportDir}`);
+  logPlan("weekly-fetch", options.username, options.timezone, plan);
 
   // Load accumulated events
-  const eventsPath = join(reportDir, "events.yaml");
+  const eventsPath = join(plan.reportDir, "events.yaml");
   const events = await tryReadYaml<GitHubEvent[]>(eventsPath) ?? [];
   console.log(`Loaded ${events.length} accumulated events.`);
 
@@ -162,7 +199,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
 
   // Search for PRs via GitHub Search API (catches PRs missed by daily fetch)
   console.log("Searching for PRs updated this week...");
-  const searchRefs = await searchWeeklyPRs(options.token, options.username, range);
+  const searchRefs = await searchWeeklyPRs(options.token, options.username, plan.range);
   console.log(`Found ${searchRefs.length} PR references from search.`);
 
   // Merge and dedupe
@@ -179,7 +216,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   // Fetch contributions (GraphQL)
   console.log("Fetching contribution stats...");
   const gql = graphql.defaults({ headers: { authorization: `token ${options.token}` } });
-  const contributions = await fetchContributions(gql, options.username, range, options.timezone);
+  const contributions = await fetchContributions(gql, options.username, plan.range, options.timezone);
 
   const repositories = aggregateRepositories(pullRequests, []);
   const totalAdditions = pullRequests.reduce((sum, pr) => sum + pr.additions, 0);
@@ -189,10 +226,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     username: contributions.username,
     avatarUrl: contributions.avatarUrl,
     profile: contributions.profile,
-    dateRange: {
-      from: toISODate(range.from, options.timezone),
-      to: toISODate(range.to, options.timezone),
-    },
+    dateRange: { from: plan.rangeFrom, to: plan.rangeTo },
     stats: {
       totalCommits: contributions.totalCommits,
       totalAdditions,
@@ -210,7 +244,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     events,
     externalContributions: [],
   };
-  const dataPath = join(reportDir, "github-data.yaml");
+  const dataPath = join(plan.reportDir, "github-data.yaml");
   await writeFile(dataPath, toYaml(githubData, { lineWidth: 120 }), "utf-8");
   console.log(`GitHub data written to ${dataPath}`);
   console.log(`Total: ${pullRequests.length} PRs`);
