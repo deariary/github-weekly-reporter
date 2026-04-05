@@ -152,6 +152,38 @@ export const buildWeeklyRange = (
   return { from, to };
 };
 
+// Current ISO week range (Monday to now). Used by daily-fetch to accumulate
+// events for the week that is still in progress.
+export const buildCurrentWeekRange = (
+  now: Date = new Date(),
+  timezone: string = "UTC",
+): DateRange => {
+  const { year, month, day } = localDateParts(now, timezone);
+
+  // Find the Monday of the current ISO week
+  const d = new Date(Date.UTC(year, month, day));
+  const dow = d.getUTCDay() || 7; // 1=Mon..7=Sun
+  const thisMonday = new Date(Date.UTC(year, month, day - (dow - 1)));
+
+  const fromParts = {
+    year: thisMonday.getUTCFullYear(),
+    month: thisMonday.getUTCMonth(),
+    day: thisMonday.getUTCDate(),
+  };
+  const from = midnightInTz(fromParts.year, fromParts.month, fromParts.day, timezone);
+
+  // "to" is end of today (next day's midnight - 1ms)
+  const nextDay = new Date(Date.UTC(year, month, day + 1));
+  const toParts = {
+    year: nextDay.getUTCFullYear(),
+    month: nextDay.getUTCMonth(),
+    day: nextDay.getUTCDate(),
+  };
+  const to = new Date(midnightInTz(toParts.year, toParts.month, toParts.day, timezone).getTime() - 1);
+
+  return { from, to };
+};
+
 export const toISODate = (date: Date, timezone: string = "UTC"): string => {
   const fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,

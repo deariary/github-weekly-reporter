@@ -43,6 +43,7 @@ vi.mock("../../collector/aggregate.js", () => ({
 
 vi.mock("../../deployer/week.js", () => ({
   getWeekId: () => ({ year: 2026, week: 14, path: "2026/W14" }),
+  getCurrentWeekId: () => ({ year: 2026, week: 14, path: "2026/W14" }),
 }));
 
 vi.mock("@octokit/graphql", () => ({
