@@ -131,6 +131,34 @@ describe("buildRSSFeed", () => {
     expect(feed).not.toContain("<pubDate>");
   });
 
+  it("includes overview and stats in description", () => {
+    const entry: ReportEntry = {
+      path: "2026/W14",
+      week: "W14",
+      year: "2026",
+      title: "Big Week",
+      subtitle: "Shipped auth refactor",
+      overview: "This week focused on the auth refactor. The new OAuth2 flow is live.",
+      dateLabel: "2026 W14",
+      dateTo: "2026-04-05",
+      stats: { commits: 42, prs: 5, reviews: 8 },
+    };
+
+    const feed = buildRSSFeed([entry], defaultChannel());
+
+    expect(feed).toContain("Shipped auth refactor");
+    expect(feed).toContain("This week focused on the auth refactor");
+    expect(feed).toContain("Commits: 42, PRs: 5, Reviews: 8");
+  });
+
+  it("includes only subtitle when overview and stats are absent", () => {
+    const entries = [makeEntry("2026/W14", "Title", "Just a subtitle", "2026-04-05")];
+    const feed = buildRSSFeed(entries, defaultChannel());
+
+    expect(feed).toContain("Just a subtitle");
+    expect(feed).not.toContain("Commits:");
+  });
+
   it("returns empty items for empty entries", () => {
     const feed = buildRSSFeed([], defaultChannel());
 

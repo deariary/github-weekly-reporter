@@ -73,7 +73,7 @@ const buildReportEntries = async (
         reviews: ghData.stats.prsReviewed,
       } : undefined;
       const dateTo = ghData?.dateRange?.to;
-      return buildReportEntry(path, llmData.title, llmData.subtitle, stats, dateTo);
+      return buildReportEntry(path, llmData.title, llmData.subtitle, stats, dateTo, llmData.overview);
     }),
   );
   return entries.filter((e): e is ReportEntry => e !== null);

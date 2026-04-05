@@ -56,10 +56,21 @@ const computePubDate = (dateTo: string, timezone: string): string => {
   return targetUtc.toUTCString();
 };
 
+const buildDescription = (entry: ReportEntry): string => {
+  const parts: string[] = [];
+  if (entry.subtitle) parts.push(entry.subtitle);
+  if (entry.overview) parts.push(entry.overview);
+  if (entry.stats) {
+    const { commits, prs, reviews } = entry.stats;
+    parts.push(`Commits: ${commits}, PRs: ${prs}, Reviews: ${reviews}`);
+  }
+  return escapeXml(parts.join("\n\n"));
+};
+
 const buildItem = (entry: ReportEntry, baseUrl: string, timezone: string): string => {
   const link = `${baseUrl}/${entry.path}/`;
   const title = escapeXml(entry.title ?? entry.dateLabel);
-  const description = escapeXml(entry.subtitle ?? "");
+  const description = buildDescription(entry);
   const ogImageUrl = `${baseUrl}/${entry.path}/og.png`;
   const pubDate = entry.dateTo
     ? computePubDate(entry.dateTo, timezone)
