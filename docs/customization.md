@@ -59,7 +59,7 @@ Two things must be updated:
    | Asia/Tokyo (UTC+9) | `0 15 * * *` |
    | Asia/Shanghai (UTC+8) | `0 16 * * *` |
 
-   The weekly cron should be 1 hour after the daily cron, on Mondays only. For example, if the daily cron is `0 15 * * *`, the weekly cron is `0 16 * * 1`.
+   The weekly cron should be 1 hour after the daily cron, on the UTC day-of-week that corresponds to Monday in your timezone. For example, if the daily cron is `0 15 * * *` (Asia/Tokyo), the weekly cron is `0 16 * * 0` (Sunday in UTC = Monday 01:00 in JST).
 
 ## LLM Provider and Model
 

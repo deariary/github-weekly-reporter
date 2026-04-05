@@ -91,12 +91,35 @@ jobs:
 `;
 };
 
-export const buildWeeklyWorkflow = (opts: WorkflowOpts): string => {
-  // Run 1 hour after daily fetch, Monday only
-  const dailyCron = midnightCronUTC(opts.timezone);
+export const weeklyCronUTC = (timezone: string): string => {
+  // Weekly report runs 1 hour after daily fetch, on the local Monday.
+  // Because cron is in UTC, the UTC day-of-week may differ from the
+  // local day-of-week for timezones with positive offsets (e.g.
+  // Asia/Tokyo local Monday 01:00 = UTC Sunday 16:00, day-of-week 0).
+  const dailyCron = midnightCronUTC(timezone);
   const [minute, hour] = dailyCron.split(" ").map(Number);
   const weeklyHour = (hour + 1) % 24;
-  const weeklyCron = `${minute} ${weeklyHour} * * 1`;
+  // Compute tz offset: positive = local is ahead of UTC (e.g. +540 for Asia/Tokyo).
+  const jan1 = new Date(new Date().getFullYear(), 0, 1, 0, 0, 0);
+  const utcMidnight = new Date(
+    jan1.toLocaleString("en-US", { timeZone: "UTC" }),
+  );
+  const localMidnight = new Date(
+    jan1.toLocaleString("en-US", { timeZone: timezone }),
+  );
+  const offsetMinutes = Math.round(
+    (localMidnight.getTime() - utcMidnight.getTime()) / 60000,
+  );
+  // Local Monday 01:00 is 60 minutes after Monday 00:00 local.
+  // In UTC that is (60 - offsetMinutes) minutes from Monday 00:00 UTC.
+  const utcMinutesFromMondayStart = 60 - offsetMinutes;
+  const dayShift = Math.floor(utcMinutesFromMondayStart / (24 * 60));
+  const utcDow = (((1 + dayShift) % 7) + 7) % 7;
+  return `${minute} ${weeklyHour} * * ${utcDow}`;
+};
+
+export const buildWeeklyWorkflow = (opts: WorkflowOpts): string => {
+  const weeklyCron = weeklyCronUTC(opts.timezone);
 
   const llmInputs =
     opts.llmProvider && opts.llmModel && opts.llmSecretName
