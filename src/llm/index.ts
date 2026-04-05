@@ -130,6 +130,10 @@ export const generateContent = async (
     return resolveHighlightUrls(content, input.pullRequests, input.issues, input.events);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`LLM content generation failed (${config.provider}): ${message}`, { cause: error });
+    const isParseError = message.includes("YAML") || message.includes("parse");
+    const hint = isParseError
+      ? " The LLM returned malformed output. Retry the command, or try a larger/different model."
+      : "";
+    throw new Error(`LLM content generation failed (${config.provider}): ${message}${hint}`, { cause: error });
   }
 };

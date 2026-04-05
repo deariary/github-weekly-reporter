@@ -109,4 +109,14 @@ describe("validateModel", () => {
     expect(result.valid).toBe(false);
     expect(result.error).toContain("API error: 500");
   });
+
+  it("does not false-positive on error body that mentions 'model' without 'not found'", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response('{"error": "The model is currently overloaded"}', { status: 503 }),
+    );
+    const result = await validateModel("openai", "key", "gpt-4");
+    expect(result.valid).toBe(false);
+    expect(result.error).toContain("API error: 503");
+    expect(result.error).not.toContain("not found");
+  });
 });

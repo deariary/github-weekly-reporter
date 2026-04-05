@@ -110,4 +110,8 @@ export const registerHelpers = (
   hbs.registerHelper("neq", function (this: unknown, a: unknown, b: unknown, opts: Handlebars.HelperOptions) {
     return a !== b ? opts.fn(this) : opts.inverse(this);
   });
+
+  hbs.registerHelper("urlEncode", (text: string): string =>
+    encodeURIComponent(String(text ?? "")),
+  );
 };

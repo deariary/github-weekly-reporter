@@ -192,7 +192,12 @@ export const addFileToRepo = async (
     ...(sha ? { sha } : {}),
   });
   if (!res.ok) {
-    throw new Error(`Failed to add ${path}: ${res.status}`);
+    const hint = res.status === 403
+      ? "\n\n  Possible causes:" +
+        "\n    - Fine-grained PAT: ensure 'Contents: Read and write' and 'Workflows: Read and write' permissions" +
+        "\n    - Classic PAT: ensure 'repo' and 'workflow' scopes are granted"
+      : "";
+    throw new Error(`Failed to add ${path}: ${res.status}${hint}`);
   }
 };
 

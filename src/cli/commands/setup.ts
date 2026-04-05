@@ -8,6 +8,7 @@ import { midnightCronUTC, buildDailyWorkflow, buildWeeklyWorkflow, buildReadme, 
 import type { WorkflowOpts } from "./setup/workflows.js";
 import { TIMEZONE_CHOICES, LANGUAGE_CHOICES, MODEL_LIST_URLS } from "./setup/constants.js";
 import { validateModel } from "./setup/validate-model.js";
+import { withSpinner } from "../spinner.js";
 
 // Re-export for tests and external consumers
 export { midnightCronUTC, buildDailyWorkflow, buildWeeklyWorkflow } from "./setup/workflows.js";
@@ -46,8 +47,7 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
     validate: (v) => (v.length > 0 ? true : "Token is required"),
   });
 
-  console.log("\n  Validating token...");
-  const { login } = await validateToken(token);
+  const { login } = await withSpinner("Validating token...", () => validateToken(token));
   console.log(`  Authenticated as ${login}\n`);
 
   // 2. Username
@@ -149,10 +149,9 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
         validate: (v) => (v.length > 0 ? true : "Model name is required"),
       });
 
-      console.log("  Validating model...");
-      const result = await validateModel(llmProvider, llmApiKey, llmModel);
+      const result = await withSpinner("Validating model...", () => validateModel(llmProvider, llmApiKey!, llmModel!));
       if (result.valid) {
-        console.log("  Model OK.\n");
+        console.log("");
         modelValidated = true;
       } else {
         console.log(`  ${result.error}`);
@@ -195,7 +194,7 @@ const run = async (cliRepo?: string): Promise<void> => {
   console.log("\n  ── Setup Summary ─────────────────────────────");
   console.log(`  Repository:    ${fullRepo}`);
   console.log(`  Username:      ${config.username}`);
-  console.log(`  Site title:    ${config.siteTitle}`);
+  console.log(`  Site title:    ${config.siteTitle.replace(/\\n/g, " ")}`);
   console.log(`  Language:      ${config.language}`);
   console.log(`  Timezone:      ${config.timezone}`);
   console.log(`  Schedule:      Daily at midnight (cron: ${cron})`);

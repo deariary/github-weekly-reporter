@@ -247,9 +247,29 @@ describe("fetchEvents", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("handles API error gracefully", async () => {
+  it("throws on 401 authentication error", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response("", { status: 401, statusText: "Unauthorized" }),
+    );
+
+    await expect(fetchEvents("token", "testuser", range)).rejects.toThrow(
+      /GitHub API returned 401/,
+    );
+  });
+
+  it("throws on 403 forbidden error", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response("", { status: 403, statusText: "Forbidden" }),
+    );
+
+    await expect(fetchEvents("token", "testuser", range)).rejects.toThrow(
+      /GitHub API returned 403/,
+    );
+  });
+
+  it("handles other API errors gracefully", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response("", { status: 500, statusText: "Internal Server Error" }),
     );
 
     const result = await fetchEvents("token", "testuser", range);
