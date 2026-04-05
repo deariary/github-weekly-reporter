@@ -189,6 +189,17 @@ After the weekly workflow completes, your report is available at:
 https://YOUR_USERNAME.github.io/weekly-report/
 ```
 
+## Generating a Report Manually
+
+After setup, daily fetches run automatically. To generate a weekly report anytime:
+
+1. Go to your repository's **Actions** tab
+2. Click **Weekly Report**
+3. Click **Run workflow**
+4. Optionally set the `date` input to target a specific week (format: `YYYY-MM-DD`)
+
+The report will be built and deployed to GitHub Pages within a few minutes.
+
 ## Configuration Reference
 
 ### Workflow Environment Variables
