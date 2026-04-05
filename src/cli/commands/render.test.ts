@@ -6,12 +6,14 @@ const mockReadFile = vi.fn();
 const mockWriteFile = vi.fn();
 const mockReaddir = vi.fn();
 const mockMkdir = vi.fn();
+const mockAccess = vi.fn();
 
 vi.mock("node:fs/promises", () => ({
   readFile: (...args: unknown[]) => mockReadFile(...args),
   writeFile: (...args: unknown[]) => mockWriteFile(...args),
   readdir: (...args: unknown[]) => mockReaddir(...args),
   mkdir: (...args: unknown[]) => mockMkdir(...args),
+  access: (...args: unknown[]) => mockAccess(...args),
 }));
 
 // Mock renderer
@@ -80,6 +82,8 @@ describe("registerRender", () => {
     vi.clearAllMocks();
     mockWriteFile.mockResolvedValue(undefined);
     mockMkdir.mockResolvedValue(undefined);
+    // Default: llm-data.yaml exists for all directories
+    mockAccess.mockResolvedValue(undefined);
     vi.spyOn(process, "exit").mockImplementation((() => { throw new Error("process.exit"); }) as never);
   });
 
@@ -310,6 +314,11 @@ describe("registerRender", () => {
       if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
       return Promise.reject(new Error("not found"));
     });
+
+    // W13 has no llm-data.yaml
+    mockAccess.mockImplementation((path: string) =>
+      path.includes("W13") ? Promise.reject(new Error("not found")) : Promise.resolve(undefined),
+    );
 
     mockReaddir.mockImplementation((dir: string) => {
       if (dir.endsWith("data")) return Promise.resolve(["2026"]);
