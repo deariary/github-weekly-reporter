@@ -258,6 +258,13 @@ const baseOptions = (cmd: Command): Command =>
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)");
 
+// Format a commit message from a plan. Used by the commit-msg
+// subcommand so that action.yml produces consistent messages.
+export const formatCommitMsg = (mode: string, plan: FetchPlan): string =>
+  mode === "daily"
+    ? `data: daily ${plan.targetDate} (${plan.weekPath})`
+    : `data: weekly ${plan.weekPath} (${plan.rangeFrom}..${plan.rangeTo})`;
+
 export const registerFetch = (program: Command): void => {
   baseOptions(
     program
@@ -286,4 +293,21 @@ export const registerFetch = (program: Command): void => {
       process.exit(1);
     }
   });
+
+  program
+    .command("commit-msg")
+    .description("Print a commit message for the given mode (used by action.yml)")
+    .argument("<mode>", "daily or weekly")
+    .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
+    .option("--date <date>", "Target date (YYYY-MM-DD, default: today)")
+    .option("--data-dir <dir>", "Data directory (default: ./data)")
+    .action((mode: string, opts: Record<string, string | undefined>) => {
+      const timezone = opts.timezone ?? env("TIMEZONE") ?? "UTC";
+      const dataDir = opts.dataDir ?? env("DATA_DIR") ?? "./data";
+      const now = opts.date ? parseLocalDate(opts.date, timezone) : new Date();
+      const plan = mode === "daily"
+        ? buildDailyPlan(now, timezone, dataDir)
+        : buildWeeklyPlan(now, timezone, dataDir);
+      process.stdout.write(formatCommitMsg(mode, plan));
+    });
 };

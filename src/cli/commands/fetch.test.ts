@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
-import { resolveBaseOptions, extractPRRefs, buildDailyPlan, buildWeeklyPlan } from "./fetch.js";
+import { resolveBaseOptions, extractPRRefs, buildDailyPlan, buildWeeklyPlan, formatCommitMsg } from "./fetch.js";
 import type { GitHubEvent } from "../../types.js";
 
 // Mock fs/promises
@@ -396,6 +396,28 @@ describe("daily/weekly plan consistency", () => {
     expect(weeklyPlan.rangeFrom).toBe(collectedDates[0]);
     expect(weeklyPlan.rangeTo).toBe(collectedDates[collectedDates.length - 1]);
     expect(weeklyPlan.weekPath).toBe("2026/W14");
+  });
+});
+
+// -------------------------------------------------------------------
+// formatCommitMsg
+// -------------------------------------------------------------------
+
+describe("formatCommitMsg", () => {
+  it("daily: includes target date and week path", () => {
+    const plan = buildDailyPlan(new Date("2026-04-05T15:00:00Z"), "Asia/Tokyo", "./data");
+    expect(formatCommitMsg("daily", plan)).toBe("data: daily 2026-04-05 (2026/W14)");
+  });
+
+  it("weekly: includes week path and full range", () => {
+    const plan = buildWeeklyPlan(new Date("2026-04-06T16:00:00Z"), "Asia/Tokyo", "./data");
+    expect(formatCommitMsg("weekly", plan)).toBe("data: weekly 2026/W14 (2026-03-30..2026-04-05)");
+  });
+
+  it("daily at week boundary: Tue midnight, yesterday=Mon is new week", () => {
+    // Tue Apr 8 00:00 JST = 2026-04-07T15:00:00Z, yesterday = Mon Apr 7 (W15)
+    const plan = buildDailyPlan(new Date("2026-04-07T15:00:00Z"), "Asia/Tokyo", "./data");
+    expect(formatCommitMsg("daily", plan)).toBe("data: daily 2026-04-07 (2026/W15)");
   });
 });
 
