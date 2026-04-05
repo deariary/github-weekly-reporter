@@ -17,7 +17,7 @@ Every week, this tool looks at everything you did on GitHub (commits, pull reque
 Have these two things ready before running setup:
 
 1. **GitHub fine-grained PAT** with `All repositories` access and these permissions (all Read & Write):
-   `Administration`, `Contents`, `Actions`, `Secrets`, `Pages`, `Workflows`
+   `Actions`, `Administration`, `Contents`,  `Pages`, `Secrets`, `Workflows`
    ([Create one](https://github.com/settings/personal-access-tokens/new))
 
 2. **LLM API key** from any supported provider:
