@@ -58,6 +58,31 @@ The render step cannot find the data files from previous steps. This means an ea
 
 **Fix:** Go to the **Actions** tab, find the failed run, and check which step failed. The pipeline must run in order: `weekly-fetch` then `generate` then `render`.
 
+### "Failed to fetch PR" with 403 Forbidden
+
+When using a fine-grained personal access token (PAT), you may see 403 errors for public repositories in organizations you belong to:
+
+```
+Failed to fetch PR some-org/some-repo#123: 403 Forbidden
+  The 'some-org' organization forbids access via a fine-grained personal access
+  tokens if the token's lifetime is greater than 366 days.
+```
+
+This is a known issue with GitHub's organization token policies. By default, organizations restrict fine-grained PATs with a lifetime exceeding 366 days, and this restriction applies even to public repositories. Non-members are not affected; only members of the organization encounter this block.
+
+GitHub's documentation states that fine-grained PATs "always include read-only access to all public repositories," but the lifetime policy overrides this for organization members. The approval policy correctly exempts public resources, but the lifetime policy does not, which is an inconsistency in GitHub's implementation.
+
+**References:**
+- [composer/composer#12711](https://github.com/composer/composer/issues/12711): Same issue reported by the Composer project
+- [community/community#141929](https://github.com/orgs/community/discussions/141929): GitHub's announcement on PAT lifetime policies
+- [Setting a personal access token policy for your organization](https://docs.github.com/en/organizations/managing-programmatic-access-to-your-organization/setting-a-personal-access-token-policy-for-your-organization)
+
+**Fix (choose one):**
+
+1. **Use a classic PAT instead.** Classic PATs with `repo` scope are not subject to the organization lifetime policy. [Create one here.](https://github.com/settings/tokens/new?scopes=repo)
+2. **Change your organization's token policy.** If you are the organization owner, go to **Organization Settings > Personal access tokens > Settings** and either disable the lifetime requirement or increase the maximum allowed lifetime.
+3. **Shorten your token's lifetime.** Recreate the fine-grained PAT with a lifetime of 366 days or less. Note that this means you must rotate the token annually.
+
 ## Report Issues
 
 ### Report shows no activity or very little data
