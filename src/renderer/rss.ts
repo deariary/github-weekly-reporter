@@ -7,6 +7,7 @@ export type RSSChannelOptions = {
   link: string;
   description: string;
   language: string;
+  timezone: string; // IANA timezone (e.g. "Asia/Tokyo")
 };
 
 const escapeXml = (text: string): string =>
@@ -17,25 +18,52 @@ const escapeXml = (text: string): string =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 
-const weekPathToDate = (path: string): string => {
-  const [yearStr, weekStr] = path.split("/");
-  const year = Number(yearStr);
-  const week = Number(weekStr?.replace("W", ""));
-  // ISO week: Jan 4 is always in week 1. Find the Monday of the given week.
-  const jan4 = new Date(Date.UTC(year, 0, 4));
-  const dayOfWeek = jan4.getUTCDay() || 7; // 1=Mon..7=Sun
-  const monday = new Date(jan4.getTime() + (1 - dayOfWeek + (week - 1) * 7) * 86_400_000);
-  // Use Sunday (end of week) as publication date
-  const sunday = new Date(monday.getTime() + 6 * 86_400_000);
-  return sunday.toUTCString();
+// Compute the pubDate for an RSS item.
+// The weekly report cron fires at local 01:00 on the day after dateRange.to
+// (i.e. Monday 01:00 local time). We reconstruct that UTC instant.
+const computePubDate = (dateTo: string, timezone: string): string => {
+  const [y, m, d] = dateTo.split("-").map(Number);
+  // dateRange.to is Sunday. The next day (Monday) at 01:00 local time.
+  const mondayLocal = new Date(Date.UTC(y, m - 1, d + 1));
+
+  // Find UTC offset for the timezone at that date
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    hourCycle: "h23",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
+  const parts = fmt.formatToParts(mondayLocal);
+  const localHour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+  const localMin = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  const localDay = Number(parts.find((p) => p.type === "day")?.value ?? 0);
+  const localMonth = Number(parts.find((p) => p.type === "month")?.value ?? 0);
+
+  // mondayLocal (UTC midnight of target calendar day) maps to localHour:localMin
+  // in the given timezone. The offset in ms is: localTime - utcTime
+  const offsetMs = ((localDay === d + 1 && localMonth === m)
+    ? (localHour * 60 + localMin) * 60_000
+    : localDay > d + 1 || localMonth > m
+      ? (localHour * 60 + localMin) * 60_000
+      : -((24 * 60 - localHour * 60 - localMin) * 60_000));
+
+  // We want Monday 01:00 local = UTC midnight + (01:00 local offset in UTC)
+  // local 01:00 = utc + offset => utc = local 01:00 - offset
+  const targetUtc = new Date(mondayLocal.getTime() + 1 * 3_600_000 - offsetMs);
+  return targetUtc.toUTCString();
 };
 
-const buildItem = (entry: ReportEntry, baseUrl: string): string => {
+const buildItem = (entry: ReportEntry, baseUrl: string, timezone: string): string => {
   const link = `${baseUrl}/${entry.path}/`;
   const title = escapeXml(entry.title ?? entry.dateLabel);
   const description = escapeXml(entry.subtitle ?? "");
   const ogImageUrl = `${baseUrl}/${entry.path}/og.png`;
-  const pubDate = weekPathToDate(entry.path);
+  const pubDate = entry.dateTo
+    ? computePubDate(entry.dateTo, timezone)
+    : "";
 
   return [
     "    <item>",
@@ -43,7 +71,7 @@ const buildItem = (entry: ReportEntry, baseUrl: string): string => {
     `      <link>${escapeXml(link)}</link>`,
     `      <guid isPermaLink="true">${escapeXml(link)}</guid>`,
     `      <description>${description}</description>`,
-    `      <pubDate>${pubDate}</pubDate>`,
+    ...(pubDate ? [`      <pubDate>${pubDate}</pubDate>`] : []),
     `      <enclosure url="${escapeXml(ogImageUrl)}" type="image/png" length="0" />`,
     "    </item>",
   ].join("\n");
@@ -54,7 +82,7 @@ export const buildRSSFeed = (
   channel: RSSChannelOptions,
 ): string => {
   const sorted = [...entries].sort((a, b) => b.path.localeCompare(a.path));
-  const items = sorted.map((e) => buildItem(e, channel.link)).join("\n");
+  const items = sorted.map((e) => buildItem(e, channel.link, channel.timezone)).join("\n");
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',

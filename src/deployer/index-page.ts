@@ -27,6 +27,7 @@ export type ReportEntry = {
   title?: string;
   subtitle?: string;
   dateLabel: string;
+  dateTo?: string; // ISO date (YYYY-MM-DD) of the week's last day
   stats?: ReportEntryStats;
 };
 
@@ -101,6 +102,7 @@ export const buildReportEntry = (
   title?: string,
   subtitle?: string,
   stats?: ReportEntryStats,
+  dateTo?: string,
 ): ReportEntry => ({
   path,
   week: path.split("/")[1] ?? path,
@@ -108,5 +110,6 @@ export const buildReportEntry = (
   title,
   subtitle,
   dateLabel: weekToDateLabel(path),
+  dateTo,
   stats,
 });

@@ -72,7 +72,8 @@ const buildReportEntries = async (
         prs: ghData.stats.prsOpened,
         reviews: ghData.stats.prsReviewed,
       } : undefined;
-      return buildReportEntry(path, llmData.title, llmData.subtitle, stats);
+      const dateTo = ghData?.dateRange?.to;
+      return buildReportEntry(path, llmData.title, llmData.subtitle, stats, dateTo);
     }),
   );
   return entries.filter((e): e is ReportEntry => e !== null);
@@ -212,6 +213,7 @@ ${sitemapEntries}
     link: base,
     description: `Weekly reports by @${githubData.username}`,
     language: options.language,
+    timezone: options.timezone,
   });
   const feedPath = join(options.outputDir, "feed.xml");
   await writeFile(feedPath, rssFeed, "utf-8");
