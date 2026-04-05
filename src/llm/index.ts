@@ -130,6 +130,6 @@ export const generateContent = async (
     return resolveHighlightUrls(content, input.pullRequests, input.issues, input.events);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`LLM content generation failed (${config.provider}): ${message}`);
+    throw new Error(`LLM content generation failed (${config.provider}): ${message}`, { cause: error });
   }
 };
