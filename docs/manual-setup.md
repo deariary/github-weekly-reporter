@@ -69,8 +69,8 @@ name: Weekly Report
 
 on:
   schedule:
-    # Run Monday, 1 hour after daily fetch (this example is 01:00 JST = 16:00 UTC)
-    - cron: '0 16 * * 1'
+    # Run Monday, 1 hour after daily fetch (this example is Mon 01:00 JST = Sun 16:00 UTC)
+    - cron: '0 16 * * 0'
   workflow_dispatch:
 
 permissions:
