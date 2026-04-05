@@ -8,6 +8,17 @@
 
 <video src="https://github.com/user-attachments/assets/96828826-d694-4338-89b9-974094b0950d" autoplay loop muted playsinline></video>
 
+<details>
+<summary>Screenshots</summary>
+
+![Hero](docs/assets/screenshots/01-hero.png)
+![Weekly Timeline](docs/assets/screenshots/02-weekly-timeline.png)
+![Report Detail](docs/assets/screenshots/03-report-detail.png)
+![Deep Dive](docs/assets/screenshots/04-deep-dive.png)
+![Highlights](docs/assets/screenshots/05-highlights.png)
+
+</details>
+
 Every week, this tool looks at everything you did on GitHub (commits, pull requests, code reviews) and generates a polished, shareable report page with AI-written summaries. It runs as a GitHub Action, deploys to GitHub Pages, and costs nothing.
 
 [See a live example](https://unhappychoice.github.io/weekly-report/)
