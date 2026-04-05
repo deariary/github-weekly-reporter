@@ -36,32 +36,72 @@ export type PRRef = {
   number: number;
 };
 
+const MAX_RETRIES = 3;
+const REQUEST_DELAY_MS = 200;
+const DEFAULT_RETRY_DELAY_MS = 5_000;
+
+const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
+
+const parseRetryDelay = (response: Response): number => {
+  const retryAfter = response.headers.get("retry-after");
+  if (retryAfter) {
+    const seconds = Number(retryAfter);
+    if (!Number.isNaN(seconds)) return seconds * 1000;
+  }
+  return DEFAULT_RETRY_DELAY_MS;
+};
+
+const readErrorBody = async (response: Response): Promise<string> => {
+  try {
+    const body = (await response.json()) as { message?: string };
+    return body.message ?? "";
+  } catch {
+    return "";
+  }
+};
+
+const toPullRequest = (pr: RawPR, repo: string): PullRequest => ({
+  title: pr.title,
+  body: cleanBody(pr.body),
+  url: pr.html_url,
+  repository: repo,
+  state: mapState(pr.state, pr.merged_at),
+  labels: pr.labels.map((l) => l.name),
+  additions: pr.additions,
+  deletions: pr.deletions,
+  changedFiles: pr.changed_files,
+  author: pr.user?.login ?? "unknown",
+  createdAt: pr.created_at,
+  mergedAt: pr.merged_at,
+});
+
 const fetchSinglePR = async (
   token: string,
   ref: PRRef,
 ): Promise<PullRequest | null> => {
   const url = `https://api.github.com/repos/${ref.repo}/pulls/${ref.number}`;
-  const response = await fetch(url, { headers: GITHUB_HEADERS(token) });
-  if (!response.ok) {
-    console.warn(`Failed to fetch PR ${ref.repo}#${ref.number}: ${response.status} ${response.statusText}`);
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const response = await fetch(url, { headers: GITHUB_HEADERS(token) });
+
+    if (response.ok) {
+      return toPullRequest((await response.json()) as RawPR, ref.repo);
+    }
+
+    if (response.status === 429 && attempt < MAX_RETRIES) {
+      const delay = parseRetryDelay(response);
+      console.warn(`  ${ref.repo}#${ref.number}: 429, retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+      await sleep(delay);
+      continue;
+    }
+
+    const message = await readErrorBody(response);
+    console.warn(`  Failed to fetch PR ${ref.repo}#${ref.number}: ${response.status} ${response.statusText}`);
+    if (message) console.warn(`    ${message}`);
     return null;
   }
 
-  const pr = (await response.json()) as RawPR;
-  return {
-    title: pr.title,
-    body: cleanBody(pr.body),
-    url: pr.html_url,
-    repository: ref.repo,
-    state: mapState(pr.state, pr.merged_at),
-    labels: pr.labels.map((l) => l.name),
-    additions: pr.additions,
-    deletions: pr.deletions,
-    changedFiles: pr.changed_files,
-    author: pr.user?.login ?? "unknown",
-    createdAt: pr.created_at,
-    mergedAt: pr.merged_at,
-  };
+  return null;
 };
 
 const CONCURRENCY = 5;
@@ -74,7 +114,10 @@ const runWithConcurrency = async <T>(
   const workers = Array.from({ length: CONCURRENCY }, async () => {
     while (queue.length > 0) {
       const item = queue.shift();
-      if (item) await fn(item);
+      if (item) {
+        await fn(item);
+        await sleep(REQUEST_DELAY_MS);
+      }
     }
   });
   await Promise.all(workers);
