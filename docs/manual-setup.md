@@ -27,7 +27,7 @@ Create two workflow files in your repository.
 
 ### `.github/workflows/daily-fetch.yml`
 
-Runs every day at midnight (your timezone) to collect GitHub events.
+Runs every day at midnight (your timezone) to collect **yesterday's** GitHub events.
 
 ```yaml
 name: Daily Fetch
@@ -100,7 +100,7 @@ jobs:
 
 ### Scheduling
 
-The daily fetch runs every day at midnight (your timezone). The weekly report runs every Monday, 1 hour later. Both use UTC cron.
+The daily fetch runs every day at midnight (your timezone) and collects the previous day's events. The weekly report runs every Monday, 1 hour later, and covers the previous ISO week (Mon-Sun). Both use UTC cron.
 
 Calculate your local midnight for the daily fetch (then add 1 hour for weekly):
 
