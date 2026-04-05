@@ -1,6 +1,6 @@
 {
   "name": "github-weekly-reporter",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Generate beautiful weekly GitHub activity reports with optional AI narratives",
   "type": "module",
   "bin": {
