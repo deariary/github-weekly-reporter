@@ -25,6 +25,7 @@
   <meta property="article:author" content="https://github.com/{{username}}" />
   <link rel="icon" href="{{avatarUrl}}" />
   {{#if canonicalUrl}}<link rel="canonical" href="{{{canonicalUrl}}}" />
+  {{/if}}{{#if baseUrl}}<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{{baseUrl}}}/feed.xml" />
   {{/if}}<meta name="view-transition" content="same-origin" />
   <script type="application/ld+json">
   {

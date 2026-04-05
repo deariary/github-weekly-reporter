@@ -9,6 +9,7 @@ import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deplo
 import { getWeekId } from "../../deployer/week.js";
 import { parseLocalDate } from "../../collector/date-range.js";
 import { generateOGImage, generateIndexOGImage } from "../../renderer/og-image.js";
+import { buildRSSFeed } from "../../renderer/rss.js";
 import type { WeeklyReportData, AIContent, Language } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
@@ -205,6 +206,17 @@ ${sitemapEntries}
   await writeFile(sitemapPath, sitemap, "utf-8");
   console.log(`Sitemap written to ${sitemapPath}`);
 
+  // Generate RSS feed
+  const rssFeed = buildRSSFeed(entries, {
+    title: resolvedSiteTitle,
+    link: base,
+    description: `Weekly reports by @${githubData.username}`,
+    language: options.language,
+  });
+  const feedPath = join(options.outputDir, "feed.xml");
+  await writeFile(feedPath, rssFeed, "utf-8");
+  console.log(`RSS feed written to ${feedPath}`);
+
   // Generate robots.txt
   const robots = `User-agent: *\nAllow: /\nSitemap: ${base}/sitemap.xml\n`;
   const robotsPath = join(options.outputDir, "robots.txt");
@@ -226,7 +238,7 @@ export const registerRender = (program: Command): void => {
     .description("Render HTML report from fetched data and LLM content")
     .option("--data-dir <dir>", "Data directory (env: DATA_DIR, default: ./data)")
     .option("-o, --output-dir <dir>", "Output directory for HTML (env: OUTPUT_DIR, default: ./output)")
-    .option("--base-url <url>", "Base URL for absolute links in OG tags, sitemap, canonical (env: BASE_URL)")
+    .option("--base-url <url>", "Base URL for absolute links in OG tags, sitemap, RSS feed, canonical (env: BASE_URL)")
     .option("--site-title <title>", "Site title for nav header (env: SITE_TITLE, default: {username}'s Weekly Reports)")
     .option("--language <lang>", "Report language: en, ja, zh-CN, zh-TW, ko, es, fr, de, pt, ru (env: LANGUAGE, default: en)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")

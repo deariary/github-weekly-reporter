@@ -17,6 +17,7 @@
   <meta name="twitter:title" content="{{siteTitleInline}}" />
   <meta name="twitter:description" content="{{description}}" />
   {{#if ogImageUrl}}<meta name="twitter:image" content="{{ogImageUrl}}" />{{/if}}
+  {{#if baseUrl}}<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{baseUrl}}/feed.xml" />{{/if}}
   <style>{{{css}}}</style>
   <style>
     body { background: #050505; color: #e8e8e8; overflow-x: hidden; }
