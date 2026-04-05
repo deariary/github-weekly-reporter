@@ -161,7 +161,15 @@ const searchWeeklyPRs = async (
           "User-Agent": "github-weekly-reporter",
         },
       });
-      if (!res.ok) break;
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          throw new Error(
+            `GitHub Search API returned ${res.status}. Check that your token (GH_PAT) is valid.`,
+          );
+        }
+        console.warn(`  Search API error (${res.status}), some PRs may be missing.`);
+        break;
+      }
       const data = (await res.json()) as {
         items: { number: number; pull_request?: { url: string }; repository_url: string }[];
         total_count: number;

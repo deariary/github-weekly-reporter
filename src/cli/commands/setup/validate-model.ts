@@ -71,8 +71,9 @@ export const validateModel = async (
     if (res.ok) return { valid: true };
 
     const body = await res.text();
-    // 404 or "model not found" means wrong model name
-    if (res.status === 404 || body.toLowerCase().includes("model")) {
+    const lower = body.toLowerCase();
+    // 404 or explicit "not found" in body means wrong model name
+    if (res.status === 404 || lower.includes("not_found") || lower.includes("not found")) {
       return { valid: false, error: `Model "${model}" not found (${res.status})` };
     }
     // Rate limit or other non-model errors are fine (model exists)

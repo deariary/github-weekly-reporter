@@ -134,11 +134,17 @@ export const fetchPRsByRefs = async (
   });
 
   const prs: PullRequest[] = [];
+  let failed = 0;
 
   await runWithConcurrency([...unique.values()], async (ref) => {
     const pr = await fetchSinglePR(token, ref);
     if (pr) prs.push(pr);
+    else failed++;
   });
+
+  if (failed > 0) {
+    console.warn(`Warning: ${failed} of ${unique.size} PRs could not be fetched.`);
+  }
 
   return prs;
 };

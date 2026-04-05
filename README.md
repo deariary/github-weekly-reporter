@@ -16,9 +16,13 @@ Every week, this tool looks at everything you did on GitHub (commits, pull reque
 
 Have these two things ready before running setup:
 
-1. **GitHub fine-grained PAT** with `All repositories` access and these permissions (all Read & Write):
-   `Actions`, `Administration`, `Contents`,  `Pages`, `Secrets`, `Workflows`
-   ([Create one](https://github.com/settings/personal-access-tokens/new))
+1. **GitHub personal access token (PAT)**, either type works:
+
+   - **Fine-grained PAT** (recommended): `All repositories` access with permissions: `Actions`, `Administration`, `Contents`, `Pages`, `Secrets`, `Workflows` (all Read & Write).
+     ([Create one](https://github.com/settings/personal-access-tokens/new))
+   - **Classic PAT**: scopes `repo` and `workflow`.
+     ([Create one](https://github.com/settings/tokens/new?scopes=repo,workflow))
+     Use this if you hit 403 errors with fine-grained tokens (e.g. org policy restrictions).
 
 2. **LLM API key** from any supported provider:
 

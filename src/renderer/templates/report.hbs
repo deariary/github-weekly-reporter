@@ -83,9 +83,9 @@
 {{#if canonicalUrl}}
 <div class="share-bar">
   <span class="share-label">{{i18n.share}}</span>
-  <a href="https://x.com/intent/tweet?url={{{canonicalUrl}}}&text={{aiContent.title}}" target="_blank" rel="noopener nofollow" class="share-btn share-x" aria-label="Share on X">𝕏</a>
+  <a href="https://x.com/intent/tweet?url={{{canonicalUrl}}}&text={{urlEncode aiContent.title}}" target="_blank" rel="noopener nofollow" class="share-btn share-x" aria-label="Share on X">𝕏</a>
   <a href="https://www.linkedin.com/sharing/share-offsite/?url={{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn share-linkedin" aria-label="Share on LinkedIn">in</a>
-  <a href="https://bsky.app/intent/compose?text={{aiContent.title}}%20{{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn share-bsky" aria-label="Share on Bluesky">🦋</a>
+  <a href="https://bsky.app/intent/compose?text={{urlEncode aiContent.title}}%20{{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn share-bsky" aria-label="Share on Bluesky">🦋</a>
 </div>
 {{/if}}
 

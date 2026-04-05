@@ -27,12 +27,17 @@ const LLM_API_KEY_INPUT_NAMES: Record<string, string> = {
 // GitHub Actions cron is always UTC, so we calculate the offset.
 
 export const midnightCronUTC = (timezone: string): string => {
-  const now = new Date();
+  // Use Jan 1 (standard time) to avoid DST-dependent offset.
+  // During DST the cron fires ~1h late (e.g. 01:00 local), which is safe
+  // because daily-fetch resolves "yesterday" from the local date.
+  // The opposite (firing 1h early = 23:00 the previous day) would shift
+  // the local date backward and collect the wrong day.
+  const jan1 = new Date(new Date().getFullYear(), 0, 1, 0, 0, 0);
   const utcMidnight = new Date(
-    now.toLocaleString("en-US", { timeZone: "UTC" }),
+    jan1.toLocaleString("en-US", { timeZone: "UTC" }),
   );
   const localMidnight = new Date(
-    now.toLocaleString("en-US", { timeZone: timezone }),
+    jan1.toLocaleString("en-US", { timeZone: timezone }),
   );
   const offsetMinutes = Math.round(
     (utcMidnight.getTime() - localMidnight.getTime()) / 60000,
@@ -151,7 +156,9 @@ export const buildReadme = (opts: {
   timezone: string;
   llmProvider?: LLMProvider;
   llmModel?: string;
-}): string => `# ${opts.siteTitle}
+}): string => {
+  const displayTitle = opts.siteTitle.replace(/\\n/g, " ");
+  return `# ${displayTitle}
 
 Weekly GitHub activity reports for [@${opts.username}](https://github.com/${opts.username}), powered by [github-weekly-reporter](https://github.com/deariary/github-weekly-reporter).
 
@@ -174,7 +181,7 @@ Edit \`.github/workflows/weekly-report.yml\` to change:
 | \`username\` | \`${opts.username}\` | GitHub user to report on |
 | \`language\` | \`${opts.language}\` | Report language (en, ja, zh-CN, zh-TW, ko, es, fr, de, pt, ru) |
 | \`timezone\` | \`${opts.timezone}\` | IANA timezone for date calculations |
-| \`SITE_TITLE\` | \`${opts.siteTitle}\` | Site title in the header and hero |
+| \`SITE_TITLE\` | \`${displayTitle}\` | Site title in the header and hero |
 ${opts.llmProvider ? `| \`llm-provider\` | \`${opts.llmProvider}\` | LLM provider for AI narrative |\n| \`llm-model\` | \`${opts.llmModel}\` | Model name |\n` : ""}
 ## Base URL
 
@@ -208,3 +215,4 @@ Go to [Actions](https://github.com/${opts.repo}/actions), click **Weekly Report*
 
 Supported by [deariary](https://deariary.com)
 `;
+};

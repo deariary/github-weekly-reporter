@@ -134,7 +134,7 @@ const ko: Locale = {
 };
 
 const es: Locale = {
-  weekdaysShort: ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"],
+  weekdaysShort: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
   sectionSummary: "Resumen",
   sectionHighlights: "Destacados",
   allWeeks: "Todas las semanas",
@@ -152,10 +152,10 @@ const es: Locale = {
 
 const fr: Locale = {
   weekdaysShort: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
-  sectionSummary: "Resume",
+  sectionSummary: "Résumé",
   sectionHighlights: "Points forts",
   allWeeks: "Toutes les semaines",
-  prevWeek: "Semaine precedente",
+  prevWeek: "Semaine précédente",
   nextWeek: "Semaine suivante",
   share: "Partager",
   poweredBy: "Powered by",
@@ -163,7 +163,7 @@ const fr: Locale = {
   weeklyReports: "Rapports hebdomadaires",
   weeklyReport: "Rapport hebdomadaire",
   sectionsCount: (n) => `${n} sections`,
-  itemsCount: (n) => `${n} elements`,
+  itemsCount: (n) => `${n} éléments`,
   userWeek: (u) => `Semaine de ${u}`,
 };
 
@@ -173,30 +173,30 @@ const de: Locale = {
   sectionHighlights: "Highlights",
   allWeeks: "Alle Wochen",
   prevWeek: "Vorherige Woche",
-  nextWeek: "Naechste Woche",
+  nextWeek: "Nächste Woche",
   share: "Teilen",
   poweredBy: "Powered by",
   generatedWith: "Generated with",
   weeklyReports: "Wochenberichte",
   weeklyReport: "Wochenbericht",
   sectionsCount: (n) => `${n} Abschnitte`,
-  itemsCount: (n) => `${n} Eintraege`,
+  itemsCount: (n) => `${n} Einträge`,
   userWeek: (u) => `${u}s Woche`,
 };
 
 const pt: Locale = {
-  weekdaysShort: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"],
+  weekdaysShort: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
   sectionSummary: "Resumo",
   sectionHighlights: "Destaques",
   allWeeks: "Todas as semanas",
   prevWeek: "Semana anterior",
-  nextWeek: "Proxima semana",
+  nextWeek: "Próxima semana",
   share: "Compartilhar",
   poweredBy: "Powered by",
   generatedWith: "Generated with",
-  weeklyReports: "Relatorios semanais",
-  weeklyReport: "Relatorio semanal",
-  sectionsCount: (n) => `${n} secoes`,
+  weeklyReports: "Relatórios semanais",
+  weeklyReport: "Relatório semanal",
+  sectionsCount: (n) => `${n} seções`,
   itemsCount: (n) => `${n} itens`,
   userWeek: (u) => `Semana de ${u}`,
 };
