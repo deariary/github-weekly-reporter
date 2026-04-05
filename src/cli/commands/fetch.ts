@@ -260,10 +260,12 @@ const baseOptions = (cmd: Command): Command =>
 
 // Format a commit message from a plan. Used by the commit-msg
 // subcommand so that action.yml produces consistent messages.
+// Includes the UTC range timestamps so the commit is unambiguous
+// regardless of the reader's timezone.
 export const formatCommitMsg = (mode: string, plan: FetchPlan): string =>
   mode === "daily"
-    ? `data: daily ${plan.targetDate} (${plan.weekPath})`
-    : `data: weekly ${plan.weekPath} (${plan.rangeFrom}..${plan.rangeTo})`;
+    ? `data: daily ${plan.weekPath} ${plan.range.from.toISOString()}..${plan.range.to.toISOString()}`
+    : `data: weekly ${plan.weekPath} ${plan.range.from.toISOString()}..${plan.range.to.toISOString()}`;
 
 export const registerFetch = (program: Command): void => {
   baseOptions(

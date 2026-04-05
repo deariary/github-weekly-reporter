@@ -404,20 +404,29 @@ describe("daily/weekly plan consistency", () => {
 // -------------------------------------------------------------------
 
 describe("formatCommitMsg", () => {
-  it("daily: includes target date and week path", () => {
+  it("daily: includes week path and UTC range", () => {
+    // Sun Apr 6 00:00 JST = 2026-04-05T15:00:00Z, yesterday = Sat Apr 5 (W14)
     const plan = buildDailyPlan(new Date("2026-04-05T15:00:00Z"), "Asia/Tokyo", "./data");
-    expect(formatCommitMsg("daily", plan)).toBe("data: daily 2026-04-05 (2026/W14)");
+    const msg = formatCommitMsg("daily", plan);
+    // Apr 5 JST midnight = Apr 4 15:00 UTC, Apr 6 JST midnight - 1ms = Apr 5 14:59:59.999 UTC
+    expect(msg).toBe(`data: daily 2026/W14 ${plan.range.from.toISOString()}..${plan.range.to.toISOString()}`);
+    expect(msg).toMatch(/^data: daily 2026\/W14 2026-04-04T15:00:00\.000Z\.\.2026-04-05T14:59:59\.999Z$/);
   });
 
-  it("weekly: includes week path and full range", () => {
+  it("weekly: includes week path and UTC range", () => {
+    // Mon Apr 7 01:00 JST = 2026-04-06T16:00:00Z
     const plan = buildWeeklyPlan(new Date("2026-04-06T16:00:00Z"), "Asia/Tokyo", "./data");
-    expect(formatCommitMsg("weekly", plan)).toBe("data: weekly 2026/W14 (2026-03-30..2026-04-05)");
+    const msg = formatCommitMsg("weekly", plan);
+    expect(msg).toBe(`data: weekly 2026/W14 ${plan.range.from.toISOString()}..${plan.range.to.toISOString()}`);
+    // W14 in JST: Mon Mar 30 00:00 JST .. Sun Apr 5 23:59:59.999 JST
+    expect(msg).toMatch(/^data: weekly 2026\/W14 2026-03-29T15:00:00\.000Z\.\.2026-04-05T14:59:59\.999Z$/);
   });
 
   it("daily at week boundary: Tue midnight, yesterday=Mon is new week", () => {
     // Tue Apr 8 00:00 JST = 2026-04-07T15:00:00Z, yesterday = Mon Apr 7 (W15)
     const plan = buildDailyPlan(new Date("2026-04-07T15:00:00Z"), "Asia/Tokyo", "./data");
-    expect(formatCommitMsg("daily", plan)).toBe("data: daily 2026-04-07 (2026/W15)");
+    const msg = formatCommitMsg("daily", plan);
+    expect(msg).toMatch(/^data: daily 2026\/W15 /);
   });
 });
 

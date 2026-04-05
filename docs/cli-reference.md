@@ -59,10 +59,10 @@ Print a commit message for use by `action.yml`. Computes the same date range and
 
 ```bash
 github-weekly-reporter commit-msg daily --timezone Asia/Tokyo
-# => data: daily 2026-04-05 (2026/W14)
+# => data: daily 2026/W14 2026-04-04T15:00:00.000Z..2026-04-05T14:59:59.999Z
 
 github-weekly-reporter commit-msg weekly --timezone Asia/Tokyo
-# => data: weekly 2026/W14 (2026-03-30..2026-04-05)
+# => data: weekly 2026/W14 2026-03-29T15:00:00.000Z..2026-04-05T14:59:59.999Z
 ```
 
 ## Environment Variables

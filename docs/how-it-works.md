@@ -107,12 +107,12 @@ data/
       events.yaml         # Next week's events (still accumulating)
 ```
 
-Each daily-fetch commit records exactly what it collected:
+Each commit records the exact UTC time range that was collected:
 
 ```
-data: daily 2026-04-05 (2026/W14)    # Sunday's events stored in W14
-data: daily 2026-04-06 (2026/W15)    # Monday's events start a new week
-data: weekly 2026/W14 (2026-03-30..2026-04-05)  # weekly report for W14
+data: daily 2026/W14 2026-04-04T15:00:00.000Z..2026-04-05T14:59:59.999Z
+data: daily 2026/W15 2026-04-05T15:00:00.000Z..2026-04-06T14:59:59.999Z
+data: weekly 2026/W14 2026-03-29T15:00:00.000Z..2026-04-05T14:59:59.999Z
 ```
 
 This data is committed to the main branch by the GitHub Action. It serves as an audit trail and means old reports can be re-rendered without re-fetching expired data.
