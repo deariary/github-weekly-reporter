@@ -152,7 +152,7 @@ const searchWeeklyPRs = async (
     let page = 1;
     let hasMore = true;
     while (hasMore) {
-      const q = encodeURIComponent(`is:pr ${qualifier} updated:${from}..${to}`);
+      const q = encodeURIComponent(`is:pr is:public ${qualifier} updated:${from}..${to}`);
       const url = `https://api.github.com/search/issues?q=${q}&per_page=100&page=${page}`;
       const res = await fetch(url, {
         headers: {
