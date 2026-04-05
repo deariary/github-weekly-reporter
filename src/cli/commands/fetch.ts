@@ -80,7 +80,11 @@ const runDailyFetch = async (options: BaseOptions): Promise<void> => {
   const reportDir = join(options.dataDir, weekId.path);
   await mkdir(reportDir, { recursive: true });
 
-  console.log(`Fetching yesterday's events for ${options.username} (${weekId.path})...`);
+  console.log(`daily-fetch: user=${options.username} timezone=${options.timezone}`);
+  console.log(`  target date : ${toISODate(yesterday, options.timezone)} (yesterday)`);
+  console.log(`  date range  : ${toISODate(range.from, options.timezone)} .. ${toISODate(range.to, options.timezone)}`);
+  console.log(`  week        : ${weekId.path}`);
+  console.log(`  output      : ${reportDir}/events.yaml`);
   const newEvents = await fetchEvents(options.token, options.username, range);
   console.log(`Fetched ${newEvents.length} events.`);
 
@@ -141,6 +145,11 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   const range = buildWeeklyRange(options.date, options.timezone);
   const reportDir = join(options.dataDir, weekId.path);
   await mkdir(reportDir, { recursive: true });
+
+  console.log(`weekly-fetch: user=${options.username} timezone=${options.timezone}`);
+  console.log(`  date range  : ${toISODate(range.from, options.timezone)} .. ${toISODate(range.to, options.timezone)}`);
+  console.log(`  week        : ${weekId.path}`);
+  console.log(`  data dir    : ${reportDir}`);
 
   // Load accumulated events
   const eventsPath = join(reportDir, "events.yaml");
