@@ -41,6 +41,12 @@ vi.mock("../../renderer/og-image.js", () => ({
   generateIndexOGImage: (...args: unknown[]) => mockGenerateIndexOGImage(...args),
 }));
 
+// Mock RSS
+const mockBuildRSSFeed = vi.fn().mockReturnValue("<?xml version=\"1.0\"?><rss></rss>");
+vi.mock("../../renderer/rss.js", () => ({
+  buildRSSFeed: (...args: unknown[]) => mockBuildRSSFeed(...args),
+}));
+
 // Mock week
 vi.mock("../../deployer/week.js", () => ({
   getWeekId: () => ({ year: 2026, week: 14, path: "2026/W14" }),
@@ -143,6 +149,14 @@ describe("registerRender", () => {
     expect(mockWriteFile).toHaveBeenCalledWith(
       expect.stringContaining("robots.txt"),
       expect.stringContaining("User-agent"),
+      "utf-8",
+    );
+
+    // Should write RSS feed
+    expect(mockBuildRSSFeed).toHaveBeenCalled();
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      expect.stringContaining("feed.xml"),
+      expect.stringContaining("<?xml"),
       "utf-8",
     );
 

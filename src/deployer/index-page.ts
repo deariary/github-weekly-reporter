@@ -26,7 +26,9 @@ export type ReportEntry = {
   year: string;
   title?: string;
   subtitle?: string;
+  overview?: string; // LLM-generated multi-paragraph overview text
   dateLabel: string;
+  dateTo?: string; // ISO date (YYYY-MM-DD) of the week's last day
   stats?: ReportEntryStats;
 };
 
@@ -101,12 +103,16 @@ export const buildReportEntry = (
   title?: string,
   subtitle?: string,
   stats?: ReportEntryStats,
+  dateTo?: string,
+  overview?: string,
 ): ReportEntry => ({
   path,
   week: path.split("/")[1] ?? path,
   year: path.split("/")[0] ?? "",
   title,
   subtitle,
+  overview,
   dateLabel: weekToDateLabel(path),
+  dateTo,
   stats,
 });
