@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildWeeklyRange, buildCurrentWeekRange, toISODate, parseLocalDate } from "./date-range.js";
+import { buildWeeklyRange, buildYesterdayRange, toISODate, parseLocalDate } from "./date-range.js";
 
 // Helper: verify the range covers exactly 7 calendar days.
 // In non-DST zones this is 7 * 86400000 - 1 ms.
@@ -367,64 +367,74 @@ describe("buildWeeklyRange", () => {
 });
 
 // -------------------------------------------------------------------
-// buildCurrentWeekRange
+// buildYesterdayRange
 // -------------------------------------------------------------------
 
-describe("buildCurrentWeekRange", () => {
-  it("returns current ISO week range for the given date (UTC)", () => {
-    // 2026-04-03 is Friday W14 -> current week W14: Mar 30 (Mon) - Apr 3 (today)
-    const now = new Date("2026-04-03T12:00:00Z");
-    const range = buildCurrentWeekRange(now);
+describe("buildYesterdayRange", () => {
+  it("returns yesterday's full day range (UTC)", () => {
+    // Today is 2026-04-04 -> yesterday is Apr 3
+    const now = new Date("2026-04-04T00:05:00Z");
+    const range = buildYesterdayRange(now);
 
-    expect(toISODate(range.from)).toBe("2026-03-30");
+    expect(toISODate(range.from)).toBe("2026-04-03");
     expect(toISODate(range.to)).toBe("2026-04-03");
   });
 
-  it("on Monday, from and to are both Monday", () => {
-    // 2026-03-30 is Monday W14
-    const now = new Date("2026-03-30T12:00:00Z");
-    const range = buildCurrentWeekRange(now);
+  it("from is midnight, to is end of day", () => {
+    const now = new Date("2026-04-04T00:05:00Z");
+    const range = buildYesterdayRange(now);
 
-    expect(toISODate(range.from)).toBe("2026-03-30");
-    expect(toISODate(range.to)).toBe("2026-03-30");
+    expect(range.from.getUTCHours()).toBe(0);
+    expect(range.from.getUTCMinutes()).toBe(0);
+    expect(range.to.getUTCHours()).toBe(23);
+    expect(range.to.getUTCMinutes()).toBe(59);
+    expect(range.to.getUTCSeconds()).toBe(59);
+    expect(range.to.getUTCMilliseconds()).toBe(999);
   });
 
-  it("on Sunday, covers full Mon-Sun", () => {
-    // 2026-04-05 is Sunday W14
-    const now = new Date("2026-04-05T12:00:00Z");
-    const range = buildCurrentWeekRange(now);
+  it("Monday midnight: yesterday is Sunday (critical for week boundary)", () => {
+    // Today is Mon Apr 6 (W15) -> yesterday is Sun Apr 5 (W14)
+    const now = new Date("2026-04-06T00:00:00Z");
+    const range = buildYesterdayRange(now);
 
-    expect(toISODate(range.from)).toBe("2026-03-30");
+    expect(toISODate(range.from)).toBe("2026-04-05");
     expect(toISODate(range.to)).toBe("2026-04-05");
   });
 
   it("respects Asia/Tokyo timezone", () => {
-    // 2026-04-04 08:00 JST = 2026-04-03 23:00 UTC
-    // JST local: Apr 4 (Sat W14) -> current week: Mar 30 (Mon) - Apr 4 (today)
-    const now = new Date("2026-04-03T23:00:00Z");
-    const range = buildCurrentWeekRange(now, "Asia/Tokyo");
+    // Midnight JST Apr 6 = 2026-04-05T15:00:00Z
+    // Yesterday in JST = Apr 5
+    const now = new Date("2026-04-05T15:00:00Z");
+    const range = buildYesterdayRange(now, "Asia/Tokyo");
 
-    expect(toISODate(range.from, "Asia/Tokyo")).toBe("2026-03-30");
-    expect(toISODate(range.to, "Asia/Tokyo")).toBe("2026-04-04");
+    expect(toISODate(range.from, "Asia/Tokyo")).toBe("2026-04-05");
+    expect(toISODate(range.to, "Asia/Tokyo")).toBe("2026-04-05");
   });
 
   it("respects America/New_York timezone", () => {
-    // 2026-04-03 20:00 EDT = 2026-04-04 00:00 UTC
-    // NYC local: Apr 3 (Fri W14) -> current week: Mar 30 (Mon) - Apr 3 (today)
-    const now = new Date("2026-04-04T00:00:00Z");
-    const range = buildCurrentWeekRange(now, "America/New_York");
+    // Midnight EDT Apr 6 = 2026-04-06T04:00:00Z
+    // Yesterday in EDT = Apr 5
+    const now = new Date("2026-04-06T04:00:00Z");
+    const range = buildYesterdayRange(now, "America/New_York");
 
-    expect(toISODate(range.from, "America/New_York")).toBe("2026-03-30");
-    expect(toISODate(range.to, "America/New_York")).toBe("2026-04-03");
+    expect(toISODate(range.from, "America/New_York")).toBe("2026-04-05");
+    expect(toISODate(range.to, "America/New_York")).toBe("2026-04-05");
   });
 
-  it("year boundary: first week of 2026", () => {
-    // 2026-01-01 is Thursday W1. Current week: Dec 29 (Mon) - Jan 1 (today)
-    const now = new Date("2026-01-01T12:00:00Z");
-    const range = buildCurrentWeekRange(now);
+  it("year boundary: Jan 1 -> yesterday is Dec 31", () => {
+    const now = new Date("2026-01-01T00:05:00Z");
+    const range = buildYesterdayRange(now);
 
-    expect(toISODate(range.from)).toBe("2025-12-29");
-    expect(toISODate(range.to)).toBe("2026-01-01");
+    expect(toISODate(range.from)).toBe("2025-12-31");
+    expect(toISODate(range.to)).toBe("2025-12-31");
+  });
+
+  it("month boundary: Mar 1 -> yesterday is Feb 28 (non-leap)", () => {
+    const now = new Date("2026-03-01T00:05:00Z");
+    const range = buildYesterdayRange(now);
+
+    expect(toISODate(range.from)).toBe("2026-02-28");
+    expect(toISODate(range.to)).toBe("2026-02-28");
   });
 });
 

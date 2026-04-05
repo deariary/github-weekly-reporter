@@ -5,7 +5,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { graphql } from "@octokit/graphql";
-import { buildWeeklyRange, buildCurrentWeekRange, toISODate, parseLocalDate, type DateRange } from "../../collector/date-range.js";
+import { buildWeeklyRange, buildYesterdayRange, localDateParts, toISODate, parseLocalDate, type DateRange } from "../../collector/date-range.js";
 import { fetchEvents, dedupeEvents } from "../../collector/fetch-events.js";
 import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
@@ -59,14 +59,28 @@ export const extractPRRefs = (events: GitHubEvent[]): PRRef[] => {
   return refs;
 };
 
-// daily-fetch: accumulate events for the current week
+// Compute yesterday's noon (safe for week-ID calculation) in the given timezone.
+export const getYesterday = (now: Date, timezone: string): Date => {
+  const { year, month, day } = localDateParts(now, timezone);
+  const todayUTC = new Date(Date.UTC(year, month, day));
+  const yesterdayUTC = new Date(todayUTC.getTime() - 86_400_000);
+  const y = yesterdayUTC.getUTCFullYear();
+  const m = String(yesterdayUTC.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(yesterdayUTC.getUTCDate()).padStart(2, "0");
+  return parseLocalDate(`${y}-${m}-${d}`, timezone);
+};
+
+// daily-fetch: collect yesterday's events and store in yesterday's week folder.
+// The cron fires at midnight, so the previous day is fully complete.
 const runDailyFetch = async (options: BaseOptions): Promise<void> => {
-  const weekId = getCurrentWeekId(options.date, options.timezone);
-  const range = buildCurrentWeekRange(options.date, options.timezone);
+  const now = options.date ?? new Date();
+  const yesterday = getYesterday(now, options.timezone);
+  const weekId = getCurrentWeekId(yesterday, options.timezone);
+  const range = buildYesterdayRange(now, options.timezone);
   const reportDir = join(options.dataDir, weekId.path);
   await mkdir(reportDir, { recursive: true });
 
-  console.log(`Fetching events for ${options.username} (${weekId.path})...`);
+  console.log(`Fetching yesterday's events for ${options.username} (${weekId.path})...`);
   const newEvents = await fetchEvents(options.token, options.username, range);
   console.log(`Fetched ${newEvents.length} events.`);
 
@@ -205,7 +219,7 @@ export const registerFetch = (program: Command): void => {
   baseOptions(
     program
       .command("daily-fetch")
-      .description("Fetch today's GitHub events and accumulate (run daily via cron)"),
+      .description("Fetch yesterday's GitHub events and accumulate (run daily via cron at midnight)"),
   ).action(async (opts) => {
     try {
       const options = resolveBaseOptions(opts);

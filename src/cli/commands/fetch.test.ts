@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
-import { resolveBaseOptions, extractPRRefs } from "./fetch.js";
+import { resolveBaseOptions, extractPRRefs, getYesterday } from "./fetch.js";
 import type { GitHubEvent } from "../../types.js";
 
 // Mock fs/promises
@@ -212,6 +212,40 @@ describe("extractPRRefs", () => {
       },
     ];
     expect(extractPRRefs(events)).toEqual([]);
+  });
+});
+
+// -------------------------------------------------------------------
+// getYesterday
+// -------------------------------------------------------------------
+
+describe("getYesterday", () => {
+  it("returns yesterday's noon in UTC", () => {
+    // Today is Apr 4 -> yesterday is Apr 3
+    const now = new Date("2026-04-04T00:05:00Z");
+    const yesterday = getYesterday(now, "UTC");
+    expect(yesterday.toISOString()).toBe("2026-04-03T12:00:00.000Z");
+  });
+
+  it("Monday midnight: yesterday is Sunday", () => {
+    // Mon Apr 6 00:00 UTC -> yesterday is Sun Apr 5
+    const now = new Date("2026-04-06T00:00:00Z");
+    const yesterday = getYesterday(now, "UTC");
+    expect(yesterday.toISOString()).toBe("2026-04-05T12:00:00.000Z");
+  });
+
+  it("respects Asia/Tokyo timezone", () => {
+    // Mon Apr 6 00:00 JST = 2026-04-05T15:00:00Z
+    // Yesterday in JST = Sun Apr 5 -> noon JST = 03:00 UTC
+    const now = new Date("2026-04-05T15:00:00Z");
+    const yesterday = getYesterday(now, "Asia/Tokyo");
+    expect(yesterday.toISOString()).toBe("2026-04-05T03:00:00.000Z");
+  });
+
+  it("year boundary: Jan 1 -> yesterday is Dec 31", () => {
+    const now = new Date("2026-01-01T00:05:00Z");
+    const yesterday = getYesterday(now, "UTC");
+    expect(yesterday.toISOString()).toBe("2025-12-31T12:00:00.000Z");
   });
 });
 
