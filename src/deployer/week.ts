@@ -31,3 +31,20 @@ export const getWeekId = (
   const padded = String(prevWeek).padStart(2, "0");
   return { year: prevYear, week: prevWeek, path: `${prevYear}/W${padded}` };
 };
+
+// Current ISO week ID. Used by daily-fetch to store events for the
+// week that is still in progress.
+export const getCurrentWeekId = (
+  date: Date = new Date(),
+  timezone: string = "UTC",
+): WeekId => {
+  const { year, month, day } = localDateParts(date, timezone);
+  const d = new Date(Date.UTC(year, month, day));
+  const dow = d.getUTCDay() || 7; // 1=Mon..7=Sun
+  // This week's Thursday
+  const thisThursday = new Date(Date.UTC(year, month, day - (dow - 1) + 3));
+  const week = getISOWeekNumber(thisThursday, timezone);
+  const weekYear = localDateParts(thisThursday, timezone).year;
+  const padded = String(week).padStart(2, "0");
+  return { year: weekYear, week, path: `${weekYear}/W${padded}` };
+};

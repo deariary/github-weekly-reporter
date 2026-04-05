@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getWeekId } from "./week.js";
+import { getWeekId, getCurrentWeekId } from "./week.js";
 
 describe("getWeekId", () => {
   // -------------------------------------------------------------------
@@ -169,5 +169,54 @@ describe("getWeekId", () => {
       const result = getWeekId(new Date("2026-04-05T14:59:59.999Z"), "Asia/Tokyo");
       expect(result.week).toBe(13);
     });
+  });
+});
+
+describe("getCurrentWeekId", () => {
+  it("returns current ISO week for 2026-04-04 (Sat W14) in UTC -> W14", () => {
+    const result = getCurrentWeekId(new Date("2026-04-04T12:00:00Z"));
+    expect(result.year).toBe(2026);
+    expect(result.week).toBe(14);
+    expect(result.path).toBe("2026/W14");
+  });
+
+  it("returns W14 on Monday (first day of the week)", () => {
+    // 2026-03-30 is Monday W14
+    const result = getCurrentWeekId(new Date("2026-03-30T12:00:00Z"));
+    expect(result.week).toBe(14);
+  });
+
+  it("returns W14 on Sunday (last day of the week)", () => {
+    // 2026-04-05 is Sunday W14
+    const result = getCurrentWeekId(new Date("2026-04-05T12:00:00Z"));
+    expect(result.week).toBe(14);
+  });
+
+  it("current week is one ahead of previous week", () => {
+    const now = new Date("2026-04-04T12:00:00Z");
+    const prev = getWeekId(now);
+    const curr = getCurrentWeekId(now);
+    expect(curr.week).toBe(prev.week + 1);
+  });
+
+  it("year boundary: Jan 1 2026 is in W01", () => {
+    const result = getCurrentWeekId(new Date("2026-01-01T12:00:00Z"));
+    expect(result.year).toBe(2026);
+    expect(result.week).toBe(1);
+    expect(result.path).toBe("2026/W01");
+  });
+
+  it("timezone-aware: same instant, different weeks across week boundary", () => {
+    // 2026-04-05T23:00:00Z = Apr 5 UTC (Sun W14), Apr 6 JST (Mon W15)
+    const utcResult = getCurrentWeekId(new Date("2026-04-05T23:00:00Z"), "UTC");
+    const jstResult = getCurrentWeekId(new Date("2026-04-05T23:00:00Z"), "Asia/Tokyo");
+
+    expect(utcResult.week).toBe(14); // Sunday W14 in UTC
+    expect(jstResult.week).toBe(15); // Monday W15 in JST
+  });
+
+  it("pads single-digit week numbers", () => {
+    const result = getCurrentWeekId(new Date("2026-01-01T12:00:00Z"));
+    expect(result.path).toBe("2026/W01");
   });
 });

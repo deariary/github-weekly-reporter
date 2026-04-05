@@ -5,12 +5,12 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml, stringify as toYaml } from "yaml";
 import { graphql } from "@octokit/graphql";
-import { buildWeeklyRange, toISODate, parseLocalDate, type DateRange } from "../../collector/date-range.js";
+import { buildWeeklyRange, buildCurrentWeekRange, toISODate, parseLocalDate, type DateRange } from "../../collector/date-range.js";
 import { fetchEvents, dedupeEvents } from "../../collector/fetch-events.js";
 import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
 import { aggregateRepositories } from "../../collector/aggregate.js";
-import { getWeekId } from "../../deployer/week.js";
+import { getWeekId, getCurrentWeekId } from "../../deployer/week.js";
 import type { GitHubEvent } from "../../types.js";
 
 const env = (key: string): string | undefined => process.env[key];
@@ -59,10 +59,10 @@ export const extractPRRefs = (events: GitHubEvent[]): PRRef[] => {
   return refs;
 };
 
-// daily-fetch: accumulate events
+// daily-fetch: accumulate events for the current week
 const runDailyFetch = async (options: BaseOptions): Promise<void> => {
-  const weekId = getWeekId(options.date, options.timezone);
-  const range = buildWeeklyRange(options.date, options.timezone);
+  const weekId = getCurrentWeekId(options.date, options.timezone);
+  const range = buildCurrentWeekRange(options.date, options.timezone);
   const reportDir = join(options.dataDir, weekId.path);
   await mkdir(reportDir, { recursive: true });
 
