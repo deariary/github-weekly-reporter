@@ -84,6 +84,7 @@ const buildItem = (entry: ReportEntry, baseUrl: string, timezone: string): strin
     `      <description>${description}</description>`,
     ...(pubDate ? [`      <pubDate>${pubDate}</pubDate>`] : []),
     `      <enclosure url="${escapeXml(ogImageUrl)}" type="image/png" length="0" />`,
+    `      <media:content url="${escapeXml(ogImageUrl)}" medium="image" type="image/png" width="1200" height="630" />`,
     "    </item>",
   ].join("\n");
 };
@@ -97,13 +98,20 @@ export const buildRSSFeed = (
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">',
     "  <channel>",
     `    <title>${escapeXml(channel.title)}</title>`,
     `    <link>${escapeXml(channel.link)}/</link>`,
     `    <description>${escapeXml(channel.description)}</description>`,
     `    <language>${escapeXml(channel.language)}</language>`,
     `    <atom:link href="${escapeXml(channel.link)}/feed.xml" rel="self" type="application/rss+xml" />`,
+    `    <image>`,
+    `      <url>${escapeXml(channel.link)}/og.png</url>`,
+    `      <title>${escapeXml(channel.title)}</title>`,
+    `      <link>${escapeXml(channel.link)}/</link>`,
+    `      <width>1200</width>`,
+    `      <height>630</height>`,
+    `    </image>`,
     items,
     "  </channel>",
     "</rss>",

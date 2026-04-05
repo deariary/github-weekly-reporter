@@ -51,12 +51,19 @@ describe("buildRSSFeed", () => {
     expect(w13Pos).toBeLessThan(w12Pos);
   });
 
-  it("includes OG image URLs in enclosure tags", () => {
+  it("includes OG image in enclosure and media:content", () => {
     const entries = [makeEntry("2026/W14", "Title", "Subtitle", "2026-04-05")];
     const feed = buildRSSFeed(entries, defaultChannel({ link: "https://example.com" }));
 
+    // enclosure tag
     expect(feed).toContain('url="https://example.com/2026/W14/og.png"');
     expect(feed).toContain('type="image/png"');
+
+    // media:content with dimensions
+    expect(feed).toContain('<media:content url="https://example.com/2026/W14/og.png"');
+    expect(feed).toContain('width="1200"');
+    expect(feed).toContain('height="630"');
+    expect(feed).toContain('medium="image"');
   });
 
   it("includes permalink guids", () => {
@@ -157,6 +164,21 @@ describe("buildRSSFeed", () => {
 
     expect(feed).toContain("Just a subtitle");
     expect(feed).not.toContain("Commits:");
+  });
+
+  it("includes channel image with site OG image", () => {
+    const feed = buildRSSFeed([], defaultChannel({ link: "https://example.com" }));
+
+    expect(feed).toContain("<image>");
+    expect(feed).toContain("<url>https://example.com/og.png</url>");
+    expect(feed).toContain("<width>1200</width>");
+    expect(feed).toContain("<height>630</height>");
+  });
+
+  it("includes media RSS namespace", () => {
+    const feed = buildRSSFeed([], defaultChannel());
+
+    expect(feed).toContain('xmlns:media="http://search.yahoo.com/mrss/"');
   });
 
   it("returns empty items for empty entries", () => {
