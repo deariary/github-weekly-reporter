@@ -72,9 +72,11 @@ describe("buildRepoUrl", () => {
 describe("registerDeploy", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(process, "exit").mockImplementation((() => { throw new Error("process.exit"); }) as never);
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     vi.unstubAllEnvs();
   });
 
@@ -98,5 +100,41 @@ describe("registerDeploy", () => {
       directory: "./output",
       message: "report: 2026/W14",
     });
+  });
+
+  it("exits on deploy error", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "ghp_test");
+    mockDeploy.mockRejectedValueOnce(new Error("deploy failed"));
+
+    const { Command } = await import("commander");
+    const { registerDeploy } = await import("./deploy.js");
+    const program = new Command();
+    registerDeploy(program);
+
+    await expect(
+      program.parseAsync([
+        "node", "cli", "deploy",
+        "--directory", "./output",
+        "--repo", "owner/repo",
+      ]),
+    ).rejects.toThrow("process.exit");
+  });
+
+  it("uses environment variables for defaults", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "ghp_env");
+    vi.stubEnv("OUTPUT_DIR", "./env-output");
+    vi.stubEnv("GITHUB_REPOSITORY", "env-owner/env-repo");
+    vi.stubEnv("TIMEZONE", "Asia/Tokyo");
+
+    const { Command } = await import("commander");
+    const { registerDeploy } = await import("./deploy.js");
+    const program = new Command();
+    registerDeploy(program);
+
+    await program.parseAsync(["node", "cli", "deploy"]);
+
+    expect(mockDeploy).toHaveBeenCalledWith(
+      expect.objectContaining({ directory: "./env-output" }),
+    );
   });
 });

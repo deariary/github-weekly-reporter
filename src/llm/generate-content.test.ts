@@ -196,4 +196,99 @@ describe("generateContent", () => {
     expect(result.summaries).toEqual([]);
     expect(result.highlights).toEqual([]);
   });
+
+  it("resolves PR URL by partial title match", async () => {
+    const yamlPartial = VALID_YAML.replace(
+      '"feat: add OAuth flow"',
+      '"add OAuth flow"',
+    );
+    mockGenerate.mockResolvedValue(yamlPartial);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    const prHighlight = result.highlights.find((h) => h.type === "pr");
+    expect(prHighlight?.url).toBe("https://github.com/org/repo/pull/1");
+  });
+
+  it("does not resolve URL for unmatched issue title", async () => {
+    const yamlNoMatch = VALID_YAML.replace("Bug in parser", "Unknown issue title");
+    mockGenerate.mockResolvedValue(yamlNoMatch);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    const issueHighlight = result.highlights.find((h) => h.type === "issue");
+    expect(issueHighlight?.url).toBeUndefined();
+  });
+
+  it("does not resolve URL for unmatched release", async () => {
+    const yamlNoMatch = VALID_YAML.replace("v1.0.0", "v99.0.0");
+    mockGenerate.mockResolvedValue(yamlNoMatch);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    const releaseHighlight = result.highlights.find((h) => h.type === "release");
+    expect(releaseHighlight?.url).toBeUndefined();
+  });
+
+  it("resolves release by name fallback", async () => {
+    const yamlReleaseName = VALID_YAML.replace("v1.0.0", "First Release");
+    mockGenerate.mockResolvedValue(yamlReleaseName);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    const releaseHighlight = result.highlights.find((h) => h.type === "release");
+    expect(releaseHighlight?.url).toBe("https://github.com/org/repo/releases/tag/v1.0.0");
+  });
+
+  it("passes through unknown highlight types without URL", async () => {
+    const yamlUnknownType = `title: Test
+subtitle: Sub
+overview: Overview.
+summaries: []
+highlights:
+  - type: other
+    title: Something
+    repo: org/repo
+    meta: note
+    body: An unknown type.
+`;
+    mockGenerate.mockResolvedValue(yamlUnknownType);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    expect(result.highlights[0].url).toBeUndefined();
+  });
+
+  it("wraps provider error with context", async () => {
+    mockGenerate.mockRejectedValue(new Error("API rate limit"));
+    const { generateContent } = await import("./index.js");
+    await expect(generateContent(MOCK_INPUT, config)).rejects.toThrow(
+      "LLM content generation failed (openai): API rate limit",
+    );
+  });
+
+  it("wraps non-Error throw with context", async () => {
+    mockGenerate.mockRejectedValue("string error");
+    const { generateContent } = await import("./index.js");
+    await expect(generateContent(MOCK_INPUT, config)).rejects.toThrow(
+      "LLM content generation failed (openai): string error",
+    );
+  });
+
+  it("handles null LLM response", async () => {
+    mockGenerate.mockResolvedValue(null);
+    const { generateContent } = await import("./index.js");
+    await expect(generateContent(MOCK_INPUT, config)).rejects.toThrow("LLM content generation failed");
+  });
+
+  it("handles summaries without chips field", async () => {
+    const yamlNoChips = `title: Test
+subtitle: Sub
+overview: Overview.
+summaries:
+  - type: commit-summary
+    heading: 10 commits
+    body: Some commits.
+highlights: []
+`;
+    mockGenerate.mockResolvedValue(yamlNoChips);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    expect(result.summaries[0].chips).toBeUndefined();
+  });
 });

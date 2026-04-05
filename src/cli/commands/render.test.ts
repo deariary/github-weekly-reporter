@@ -227,4 +227,140 @@ describe("registerRender", () => {
     );
     expect(cnameCall).toBeUndefined();
   });
+
+  it("exits when llm-data.yaml is missing", async () => {
+    mockReadFile.mockImplementation((path: string) => {
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+    mockReaddir.mockResolvedValue([]);
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await expect(
+      program.parseAsync([
+        "node", "cli", "render",
+        "--data-dir", "./data",
+        "--output-dir", "./output",
+        "--base-url", "https://example.com",
+      ]),
+    ).rejects.toThrow("process.exit");
+  });
+
+  it("exits when --base-url is not provided", async () => {
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await expect(
+      program.parseAsync([
+        "node", "cli", "render",
+        "--data-dir", "./data",
+        "--output-dir", "./output",
+      ]),
+    ).rejects.toThrow("process.exit");
+  });
+
+  it("re-renders previous week with next-week link", async () => {
+    const PREV_GITHUB_YAML = GITHUB_DATA_YAML.replace("2026-03-28", "2026-03-21").replace("2026-04-03", "2026-03-27");
+    const PREV_LLM_YAML = LLM_DATA_YAML.replace("Weekly Summary", "Previous Week Summary");
+
+    mockReadFile.mockImplementation((path: string) => {
+      if (path.includes("W13") && path.includes("github-data.yaml")) return Promise.resolve(PREV_GITHUB_YAML);
+      if (path.includes("W13") && path.includes("llm-data.yaml")) return Promise.resolve(PREV_LLM_YAML);
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+
+    // Two weeks exist: W13 and W14
+    mockReaddir.mockImplementation((dir: string) => {
+      if (dir.endsWith("data")) return Promise.resolve(["2026"]);
+      if (dir.includes("2026")) return Promise.resolve(["W13", "W14"]);
+      return Promise.resolve([]);
+    });
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await program.parseAsync([
+      "node", "cli", "render",
+      "--data-dir", "./data",
+      "--output-dir", "./output",
+      "--base-url", "https://user.github.io/repo",
+      "--date", "2026-04-01",
+    ]);
+
+    // renderReport should be called twice: once for current week, once for previous week
+    expect(mockRenderReport).toHaveBeenCalledTimes(2);
+
+    // Second call should include nextWeek link
+    const prevWeekCall = mockRenderReport.mock.calls[1];
+    expect(prevWeekCall[1]).toHaveProperty("nextWeek", "../../2026/W14/");
+  });
+
+  it("skips prev week re-render when prev week data is missing", async () => {
+    mockReadFile.mockImplementation((path: string) => {
+      // Only current week has data
+      if (path.includes("W13")) return Promise.reject(new Error("not found"));
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+
+    mockReaddir.mockImplementation((dir: string) => {
+      if (dir.endsWith("data")) return Promise.resolve(["2026"]);
+      if (dir.includes("2026")) return Promise.resolve(["W13", "W14"]);
+      return Promise.resolve([]);
+    });
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await program.parseAsync([
+      "node", "cli", "render",
+      "--data-dir", "./data",
+      "--output-dir", "./output",
+      "--base-url", "https://user.github.io/repo",
+      "--date", "2026-04-01",
+    ]);
+
+    // Only current week should be rendered (prev week data is missing)
+    expect(mockRenderReport).toHaveBeenCalledTimes(1);
+  });
+
+  it("uses environment variables for options", async () => {
+    vi.stubEnv("BASE_URL", "https://env-base.example.com");
+    vi.stubEnv("DATA_DIR", "./env-data");
+    vi.stubEnv("OUTPUT_DIR", "./env-output");
+    vi.stubEnv("LANGUAGE", "ja");
+    vi.stubEnv("TIMEZONE", "Asia/Tokyo");
+    vi.stubEnv("SITE_TITLE", "My Reports");
+
+    mockReadFile.mockImplementation((path: string) => {
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+    mockReaddir.mockImplementation((dir: string) => {
+      if (dir.endsWith("env-data")) return Promise.resolve(["2026"]);
+      if (dir.includes("2026")) return Promise.resolve(["W14"]);
+      return Promise.resolve([]);
+    });
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await program.parseAsync(["node", "cli", "render"]);
+
+    expect(mockRenderReport).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({ language: "ja", siteTitle: "My Reports" }),
+    );
+  });
 });
