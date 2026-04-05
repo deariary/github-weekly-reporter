@@ -1,7 +1,7 @@
 // render command: read github-data.yaml + llm-data.yaml and produce HTML
 
 import { Command } from "commander";
-import { readFile, writeFile, readdir, mkdir } from "node:fs/promises";
+import { readFile, writeFile, readdir, mkdir, access } from "node:fs/promises";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { renderReport } from "../../renderer/index.js";
@@ -23,7 +23,11 @@ type RenderOptions = {
   date?: Date;
 };
 
-const listReportDirs = async (dir: string): Promise<string[]> => {
+const fileExists = async (path: string): Promise<boolean> => {
+  try { await access(path); return true; } catch { return false; }
+};
+
+const listCompletedReportDirs = async (dir: string): Promise<string[]> => {
   const paths: string[] = [];
   let entries: string[];
   try {
@@ -33,9 +37,11 @@ const listReportDirs = async (dir: string): Promise<string[]> => {
   }
   for (const year of entries.filter((n) => /^\d{4}$/.test(n))) {
     const weeks = await readdir(join(dir, year));
-    weeks
-      .filter((n) => /^W\d{2}$/.test(n))
-      .forEach((w) => paths.push(`${year}/${w}`));
+    for (const w of weeks.filter((n) => /^W\d{2}$/.test(n))) {
+      if (await fileExists(join(dir, year, w, "llm-data.yaml"))) {
+        paths.push(`${year}/${w}`);
+      }
+    }
   }
   return paths;
 };
@@ -52,21 +58,24 @@ const tryReadYaml = async <T>(path: string): Promise<T | null> => {
 const buildReportEntries = async (
   dataDir: string,
   reportPaths: string[],
-): Promise<ReportEntry[]> =>
-  Promise.all(
+): Promise<ReportEntry[]> => {
+  const entries = await Promise.all(
     reportPaths.map(async (path) => {
       const [llmData, ghData] = await Promise.all([
         tryReadYaml<AIContent>(join(dataDir, path, "llm-data.yaml")),
         tryReadYaml<WeeklyReportData>(join(dataDir, path, "github-data.yaml")),
       ]);
+      if (!llmData) return null;
       const stats = ghData ? {
         commits: ghData.stats.totalCommits,
         prs: ghData.stats.prsOpened,
         reviews: ghData.stats.prsReviewed,
       } : undefined;
-      return buildReportEntry(path, llmData?.title, llmData?.subtitle, stats);
+      return buildReportEntry(path, llmData.title, llmData.subtitle, stats);
     }),
   );
+  return entries.filter((e): e is ReportEntry => e !== null);
+};
 
 const run = async (options: RenderOptions): Promise<void> => {
   const weekId = getWeekId(options.date, options.timezone);
@@ -92,7 +101,7 @@ const run = async (options: RenderOptions): Promise<void> => {
   const data: WeeklyReportData = { ...githubData, aiContent };
 
   // Determine prev/next week paths for internal linking
-  const allPaths = (await listReportDirs(options.dataDir)).sort();
+  const allPaths = (await listCompletedReportDirs(options.dataDir)).sort();
   if (!allPaths.includes(weekId.path)) allPaths.push(weekId.path);
   allPaths.sort();
   const currentIdx = allPaths.indexOf(weekId.path);
