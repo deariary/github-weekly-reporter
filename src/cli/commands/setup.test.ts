@@ -18,6 +18,7 @@ vi.mock("@inquirer/prompts", () => ({
 
 const mockValidateToken = vi.fn();
 const mockEnsureRepo = vi.fn();
+const mockSetRepoTopics = vi.fn();
 const mockAddFileToRepo = vi.fn();
 const mockEnablePages = vi.fn();
 const mockSetRepoSecret = vi.fn();
@@ -28,6 +29,7 @@ const mockSleep = vi.fn();
 vi.mock("./setup/github-api.js", () => ({
   validateToken: (...args: unknown[]) => mockValidateToken(...args),
   ensureRepo: (...args: unknown[]) => mockEnsureRepo(...args),
+  setRepoTopics: (...args: unknown[]) => mockSetRepoTopics(...args),
   addFileToRepo: (...args: unknown[]) => mockAddFileToRepo(...args),
   enablePages: (...args: unknown[]) => mockEnablePages(...args),
   setRepoSecret: (...args: unknown[]) => mockSetRepoSecret(...args),
@@ -238,6 +240,7 @@ const setupPromptDefaults = () => {
 
   // setup actions
   mockEnsureRepo.mockResolvedValue(true);
+  mockSetRepoTopics.mockResolvedValue(undefined);
   mockSetRepoSecret.mockResolvedValue(true);
   mockAddFileToRepo.mockResolvedValue(undefined);
   mockEnablePages.mockResolvedValue("https://testuser.github.io/my-reports");
@@ -272,6 +275,9 @@ describe("registerSetup (full flow)", () => {
 
     // Created repo
     expect(mockEnsureRepo).toHaveBeenCalledWith("ghp_testtoken123", "testuser/my-reports");
+
+    // Set topics
+    expect(mockSetRepoTopics).toHaveBeenCalledWith("ghp_testtoken123", "testuser/my-reports");
 
     // Set GH_PAT secret
     expect(mockSetRepoSecret).toHaveBeenCalledWith(
@@ -326,6 +332,7 @@ describe("registerSetup (full flow)", () => {
     mockValidateModel.mockResolvedValue({ valid: true });
     mockConfirm.mockResolvedValue(true);
     mockEnsureRepo.mockResolvedValue(false);
+    mockSetRepoTopics.mockResolvedValue(undefined);
     mockSetRepoSecret.mockResolvedValue(true);
     mockAddFileToRepo.mockResolvedValue(undefined);
     mockEnablePages.mockResolvedValue("https://testuser.github.io/existing-repo");
@@ -407,6 +414,7 @@ describe("registerSetup (full flow)", () => {
       .mockResolvedValueOnce(true)  // retry model
       .mockResolvedValueOnce(true); // proceed with setup
     mockEnsureRepo.mockResolvedValue(true);
+    mockSetRepoTopics.mockResolvedValue(undefined);
     mockSetRepoSecret.mockResolvedValue(true);
     mockAddFileToRepo.mockResolvedValue(undefined);
     mockEnablePages.mockResolvedValue("https://testuser.github.io/my-reports");
@@ -447,6 +455,7 @@ describe("registerSetup (full flow)", () => {
     mockValidateModel.mockResolvedValue({ valid: true });
     mockConfirm.mockResolvedValue(true);
     mockEnsureRepo.mockResolvedValue(true);
+    mockSetRepoTopics.mockResolvedValue(undefined);
     mockSetRepoSecret.mockResolvedValue(true);
     mockAddFileToRepo.mockResolvedValue(undefined);
     mockEnablePages.mockResolvedValue("https://testuser.github.io/my-reports");

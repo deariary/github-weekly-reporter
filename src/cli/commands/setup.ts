@@ -3,7 +3,7 @@
 import { Command } from "commander";
 import { input, select, password, confirm } from "@inquirer/prompts";
 import type { LLMProvider, Language } from "../../types.js";
-import { validateToken, ensureRepo, addFileToRepo, enablePages, setRepoSecret, ghGet, ghPost, sleep } from "./setup/github-api.js";
+import { validateToken, ensureRepo, setRepoTopics, addFileToRepo, enablePages, setRepoSecret, ghGet, ghPost, sleep } from "./setup/github-api.js";
 import { midnightCronUTC, buildDailyWorkflow, buildWeeklyWorkflow, buildReadme, LLM_SECRET_NAMES } from "./setup/workflows.js";
 import type { WorkflowOpts } from "./setup/workflows.js";
 import { TIMEZONE_CHOICES, LANGUAGE_CHOICES, MODEL_LIST_URLS } from "./setup/constants.js";
@@ -218,6 +218,8 @@ const run = async (cliRepo?: string): Promise<void> => {
   step("Setting up repository...");
   const created = await ensureRepo(config.token, fullRepo);
   ok(created ? `Created ${fullRepo}` : `Using existing ${fullRepo}`);
+  await setRepoTopics(config.token, fullRepo);
+  ok("Topics configured.");
 
   // 2. PAT secret (needed to read activity across all repos)
   step("Setting secret GH_PAT...");
