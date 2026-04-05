@@ -4,25 +4,25 @@ import type { LLMConfig } from "../types.js";
 // Mock OpenAI SDK
 const mockCreate = vi.fn();
 vi.mock("openai", () => ({
-  default: vi.fn().mockImplementation(() => ({
-    chat: { completions: { create: mockCreate } },
-  })),
+  default: vi.fn().mockImplementation(function () {
+    return { chat: { completions: { create: mockCreate } } };
+  }),
 }));
 
 // Mock Anthropic SDK
 const mockAnthropicCreate = vi.fn();
 vi.mock("@anthropic-ai/sdk", () => ({
-  default: vi.fn().mockImplementation(() => ({
-    messages: { create: mockAnthropicCreate },
-  })),
+  default: vi.fn().mockImplementation(function () {
+    return { messages: { create: mockAnthropicCreate } };
+  }),
 }));
 
 // Mock Gemini SDK
 const mockGenerateContent = vi.fn();
 vi.mock("@google/generative-ai", () => ({
-  GoogleGenerativeAI: vi.fn().mockImplementation(() => ({
-    getGenerativeModel: () => ({ generateContent: mockGenerateContent }),
-  })),
+  GoogleGenerativeAI: vi.fn().mockImplementation(function () {
+    return { getGenerativeModel: () => ({ generateContent: mockGenerateContent }) };
+  }),
 }));
 
 const baseConfig: LLMConfig = {
