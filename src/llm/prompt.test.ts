@@ -39,6 +39,7 @@ const MOCK_INPUT: NarrativeInput = {
   issues: [],
   events: [],
   commitMessages: [],
+  releases: [],
   externalContributions: [],
 };
 

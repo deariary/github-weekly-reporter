@@ -73,6 +73,7 @@ pullRequests: []
 issues: []
 events: []
 commitMessages: []
+releases: []
 externalContributions: []
 `;
 

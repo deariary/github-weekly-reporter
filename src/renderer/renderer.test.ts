@@ -22,6 +22,7 @@ const MOCK_DATA: WeeklyReportData = {
   issues: [],
   events: [],
   commitMessages: [],
+  releases: [],
   externalContributions: [],
   aiContent: {
     title: "Auth refactor completed",

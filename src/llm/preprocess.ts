@@ -3,7 +3,7 @@
 
 import { stringify as toYaml } from "yaml";
 import type { NarrativeInput } from "./types.js";
-import type { PullRequest, Issue, GitHubEvent, PullRequestReviewEventPayload, ReleaseEventPayload, RepoCommitMessages } from "../types.js";
+import type { PullRequest, Issue, GitHubEvent, PullRequestReviewEventPayload, RepoCommitMessages, Release } from "../types.js";
 
 const MAX_PRS = 20;
 const MAX_ISSUES = 15;
@@ -55,22 +55,25 @@ export const buildLLMContext = (input: NarrativeInput): string => {
       .map(formatIssue);
   }
 
-  // Include review and release events (other event types have empty payloads)
-  const reviewsAndReleases = input.events
+  // Include review events (other event types have empty payloads from Events API)
+  const reviews = input.events
+    .filter((event: GitHubEvent) => event.payload.kind === "review")
     .map((event: GitHubEvent) => {
-      if (event.payload.kind === "review") {
-        const r = event.payload as PullRequestReviewEventPayload;
-        return { type: "review", repo: event.repo, pr: r.prTitle, state: r.state };
-      }
-      if (event.payload.kind === "release") {
-        const rel = event.payload as ReleaseEventPayload;
-        return { type: "release", repo: event.repo, tag: rel.tag, name: rel.name };
-      }
-      return null;
-    })
-    .filter(Boolean);
-  if (reviewsAndReleases.length > 0) {
-    context.reviews_and_releases = reviewsAndReleases;
+      const r = event.payload as PullRequestReviewEventPayload;
+      return { repo: event.repo, pr: r.prTitle, state: r.state };
+    });
+  if (reviews.length > 0) {
+    context.reviews = reviews;
+  }
+
+  // Include releases fetched via Releases API (with full body)
+  if (input.releases && input.releases.length > 0) {
+    context.releases = input.releases.map((r: Release) => ({
+      repo: r.repo,
+      tag: r.tag,
+      name: r.name,
+      ...(r.body ? { body: r.body } : {}),
+    }));
   }
 
   if (input.repositories.length > 0) {

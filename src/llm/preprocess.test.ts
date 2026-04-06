@@ -42,6 +42,7 @@ const MOCK_INPUT: NarrativeInput = {
   issues: [],
   events: [],
   commitMessages: [],
+  releases: [],
   externalContributions: [],
 };
 
@@ -168,19 +169,11 @@ describe("buildLLMContext", () => {
           createdAt: "2026-04-01T10:00:00Z",
           payload: { kind: "push", ref: "refs/heads/main", commits: [] },
         },
-        {
-          id: "w1",
-          type: "WatchEvent",
-          repo: "org/repo-a",
-          createdAt: "2026-04-01T10:00:00Z",
-          payload: { kind: "generic", action: "started" },
-        },
       ],
     };
     const context = buildLLMContext(input);
-    expect(context).not.toContain("reviews_and_releases:");
+    expect(context).not.toContain("\nreviews:");
     expect(context).not.toContain("PushEvent");
-    expect(context).not.toContain("WatchEvent");
   });
 
   it("includes review events in LLM context", () => {
@@ -197,27 +190,34 @@ describe("buildLLMContext", () => {
       ],
     };
     const context = buildLLMContext(input);
-    expect(context).toContain("reviews_and_releases:");
+    expect(context).toContain("reviews:");
     expect(context).toContain("Add feature");
     expect(context).toContain("approved");
   });
 
-  it("includes release events in LLM context", () => {
+  it("includes releases with body in LLM context", () => {
     const input: NarrativeInput = {
       ...MOCK_INPUT,
-      events: [
+      releases: [
         {
-          id: "rel1",
-          type: "ReleaseEvent",
           repo: "org/repo-a",
-          createdAt: "2026-04-01T10:00:00Z",
-          payload: { kind: "release", action: "published", tag: "v2.0.0", name: "Major Release" },
+          tag: "v2.0.0",
+          name: "Major Release",
+          body: "## What's Changed\n- Added OAuth2 flow\n- Fixed rate limiting",
+          url: "https://github.com/org/repo-a/releases/tag/v2.0.0",
+          publishedAt: "2026-04-01T10:00:00Z",
         },
       ],
     };
     const context = buildLLMContext(input);
-    expect(context).toContain("reviews_and_releases:");
+    expect(context).toContain("releases:");
     expect(context).toContain("v2.0.0");
     expect(context).toContain("Major Release");
+    expect(context).toContain("OAuth2 flow");
+  });
+
+  it("omits releases when empty", () => {
+    const context = buildLLMContext(MOCK_INPUT);
+    expect(context).not.toContain("releases:");
   });
 });
