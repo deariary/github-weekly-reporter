@@ -18,6 +18,7 @@ type RawCommit = {
 
 const MAX_MESSAGES_PER_REPO = 10;
 const MAX_TOTAL_MESSAGES = 50;
+const MAX_MESSAGE_LENGTH = 120;
 const MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY_MS = 5_000;
 
@@ -39,9 +40,13 @@ const parseRetryDelay = (response: Response): number => {
   return DEFAULT_RETRY_DELAY_MS;
 };
 
-// Extract the first line of a commit message (subject line)
-const firstLine = (message: string): string =>
-  message.split("\n")[0]?.trim() ?? message.trim();
+// Extract the first line of a commit message and truncate to MAX_MESSAGE_LENGTH
+const firstLine = (message: string): string => {
+  const subject = message.split("\n")[0]?.trim() ?? message.trim();
+  return subject.length > MAX_MESSAGE_LENGTH
+    ? `${subject.slice(0, MAX_MESSAGE_LENGTH)}...`
+    : subject;
+};
 
 const fetchRepoCommits = async (
   token: string,
