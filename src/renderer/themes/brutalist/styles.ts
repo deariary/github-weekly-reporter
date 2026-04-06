@@ -180,7 +180,7 @@ export const buildCSS = (language: Language = "en"): string => {
       font-family: ${f.bodyFamily};
       background: var(--b-bg);
       color: var(--b-text);
-      line-height: 1.7;
+      line-height: ${f.lineHeight};
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
       overflow-x: hidden;

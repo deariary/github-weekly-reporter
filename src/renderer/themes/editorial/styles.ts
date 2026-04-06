@@ -139,7 +139,7 @@ export const buildCSS = (language: Language = "en"): string => {
       font-family: ${body};
       background: var(--e-bg);
       color: var(--e-text);
-      line-height: 1.8;
+      line-height: ${f.lineHeight};
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
@@ -193,7 +193,7 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     .header-sub {
       font-size: 1.125rem; color: var(--e-text-secondary);
-      font-weight: 400; line-height: 1.6;
+      font-weight: 400;
     }
     .header-rule {
       border: none; border-top: 1px solid var(--e-border);
@@ -207,7 +207,7 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     .overview p {
       font-size: 1.0625rem; color: var(--e-text-secondary);
-      line-height: 1.9; margin-bottom: 1.25rem;
+      margin-bottom: 1.25rem;
     }
     .overview p:last-child { margin-bottom: 0; }
     .overview p:first-child::first-letter {
@@ -263,7 +263,6 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     .section-body {
       color: var(--e-text-secondary);
-      line-height: 1.85;
     }
 
     /* CHIPS */
@@ -361,7 +360,7 @@ export const buildCSS = (language: Language = "en"): string => {
       font-family: ${mono}; font-size: 0.6875rem;
       color: var(--e-text-tertiary); margin-bottom: 0.5rem;
     }
-    .highlight-body { font-size: 0.9375rem; color: var(--e-text-secondary); line-height: 1.7; }
+    .highlight-body { font-size: 0.9375rem; color: var(--e-text-secondary); }
 
     /* SHARE */
     .share-bar {
@@ -433,7 +432,7 @@ export const buildIndexCSS = (language: Language = "en"): string => {
       font-size: clamp(2.5rem, 8vw, 4rem);
       font-weight: 700;
       letter-spacing: -0.03em;
-      line-height: 0.95;
+      line-height: 1.15;
       color: var(--e-heading);
       margin-bottom: 1.5rem;
     }
@@ -481,7 +480,7 @@ export const buildIndexCSS = (language: Language = "en"): string => {
     }
     .week-item-subtitle {
       font-size: 0.875rem; color: var(--e-text-secondary);
-      margin-top: 0.25rem; line-height: 1.5;
+      margin-top: 0.25rem;
     }
 
     /* FOOTER */
