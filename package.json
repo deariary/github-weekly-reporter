@@ -22,7 +22,7 @@
     "assets/"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/cli/index.js",
     "dev": "tsc --watch",
     "lint": "eslint src/",
     "test": "vitest run",
