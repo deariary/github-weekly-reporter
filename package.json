@@ -18,7 +18,7 @@
   "files": [
     "dist/",
     "!dist/**/*.test.*",
-    "src/renderer/templates/",
+    "src/renderer/themes/",
     "assets/"
   ],
   "scripts": {
