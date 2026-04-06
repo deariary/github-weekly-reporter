@@ -2,6 +2,7 @@
 // Light-first with automatic dark mode via prefers-color-scheme
 
 import type { Language } from "../../../types.js";
+import { getFontConfig } from "../../../i18n/index.js";
 
 const c = {
   bg: "#ffffff",
@@ -116,7 +117,9 @@ export const THEME_TOGGLE_SCRIPT = `<script>
 })();
 </script>`;
 
-export const buildCSS = (_language: Language = "en"): string => `
+export const buildCSS = (_language: Language = "en"): string => {
+  const f = getFontConfig(_language);
+  return `
   ${COLOR_VARS}
   ${THEME_TOGGLE_CSS}
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -125,7 +128,7 @@ export const buildCSS = (_language: Language = "en"): string => `
     font-family: ${FONT};
     background: var(--bg);
     color: var(--text);
-    line-height: 1.8;
+    line-height: ${f.lineHeight};
     max-width: 640px;
     margin: 0 auto;
     padding: 2rem 1.5rem;
@@ -240,6 +243,7 @@ export const buildCSS = (_language: Language = "en"): string => `
     nav, .share-bar, .week-nav { display: none; }
   }
 `;
+};
 
 export const buildIndexCSS = (_language: Language = "en"): string => `
   body { max-width: 640px; }

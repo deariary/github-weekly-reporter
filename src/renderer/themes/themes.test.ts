@@ -57,6 +57,10 @@ describe("AVAILABLE_THEMES", () => {
   it("includes minimal", () => {
     expect(AVAILABLE_THEMES).toContain("minimal");
   });
+
+  it("includes editorial", () => {
+    expect(AVAILABLE_THEMES).toContain("editorial");
+  });
 });
 
 describe("loadTheme", () => {
@@ -256,5 +260,93 @@ describe("readThemeTemplate", () => {
     const content = readThemeTemplate(theme, "index-page.hbs");
     expect(content).toContain("<!DOCTYPE html>");
     expect(content).toContain("index-header");
+  });
+
+  it("reads report.hbs from editorial theme", () => {
+    const theme = loadTheme("editorial");
+    const content = readThemeTemplate(theme, "report.hbs");
+    expect(content).toContain("<!DOCTYPE html>");
+    expect(content).toContain("{{themeColor}}");
+  });
+
+  it("reads index-page.hbs from editorial theme", () => {
+    const theme = loadTheme("editorial");
+    const content = readThemeTemplate(theme, "index-page.hbs");
+    expect(content).toContain("<!DOCTYPE html>");
+    expect(content).toContain("index-header");
+  });
+});
+
+describe("editorial theme", () => {
+  it("loads editorial theme", () => {
+    const theme = loadTheme("editorial");
+    expect(theme.buildCSS).toBeTypeOf("function");
+    expect(theme.colors.bg).toBe("#faf8f5");
+    expect(theme.colors.accent).toBe("#c45d3e");
+    expect(theme.templatesDir).toContain("themes/editorial/templates");
+  });
+
+  it("buildCSS includes Playfair Display and Newsreader", () => {
+    const theme = loadTheme("editorial");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("Playfair Display");
+    expect(css).toContain("Newsreader");
+  });
+
+  it("buildCSS uses CSS custom properties", () => {
+    const theme = loadTheme("editorial");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("var(--e-bg)");
+    expect(css).toContain("var(--e-accent)");
+    expect(css).toContain("var(--e-drop-cap)");
+  });
+
+  it("buildCSS includes drop cap styling", () => {
+    const theme = loadTheme("editorial");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("first-letter");
+  });
+
+  it("buildCSS includes dark mode", () => {
+    const theme = loadTheme("editorial");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("prefers-color-scheme: dark");
+    expect(css).toContain("--e-bg: #1a1816");
+  });
+
+  it("buildCSS supports data-theme override", () => {
+    const theme = loadTheme("editorial");
+    const css = theme.buildCSS("en");
+    expect(css).toContain('html[data-theme="light"]');
+    expect(css).toContain('html[data-theme="dark"]');
+  });
+
+  it("has theme toggle scripts", () => {
+    const theme = loadTheme("editorial");
+    expect(theme.themeInitScript).toContain("localStorage");
+    expect(theme.themeToggleScript).toContain("theme-toggle");
+  });
+
+  it("renders report with editorial theme", () => {
+    const html = renderReport(MOCK_DATA, { theme: "editorial" });
+    expect(html).toMatch(/^<!DOCTYPE html>/);
+    expect(html).toContain("Auth refactor completed");
+    expect(html).toContain("Playfair Display");
+    expect(html).toContain("first-letter");
+  });
+
+  it("renders highlights in column stack", () => {
+    const html = renderReport(MOCK_DATA, { theme: "editorial" });
+    expect(html).toContain("stack-card");
+    expect(html).toContain("highlight-badge");
+    expect(html).toContain("feat: add OAuth flow");
+  });
+
+  it("includes horizontal scroll strip layout with fixed footer", () => {
+    const html = renderReport(MOCK_DATA, { theme: "editorial" });
+    expect(html).toContain("scroll-strip");
+    expect(html).toContain("panel-cover");
+    expect(html).toContain("column-stack");
+    expect(html).toContain("fixed-footer");
   });
 });

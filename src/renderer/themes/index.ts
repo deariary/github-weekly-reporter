@@ -18,6 +18,13 @@ import {
   THEME_INIT_SCRIPT as minimalInitScript,
   THEME_TOGGLE_SCRIPT as minimalToggleScript,
 } from "./minimal/index.js";
+import {
+  buildCSS as editorialBuildCSS,
+  buildIndexCSS as editorialBuildIndexCSS,
+  colors as editorialColors,
+  THEME_INIT_SCRIPT as editorialInitScript,
+  THEME_TOGGLE_SCRIPT as editorialToggleScript,
+} from "./editorial/index.js";
 
 export type ThemeColors = {
   bg: string;
@@ -57,6 +64,13 @@ const themeModules: Record<Theme, Omit<ThemeModule, "templatesDir">> = {
     colors: minimalColors,
     themeInitScript: minimalInitScript,
     themeToggleScript: minimalToggleScript,
+  },
+  editorial: {
+    buildCSS: editorialBuildCSS,
+    buildIndexCSS: editorialBuildIndexCSS,
+    colors: editorialColors,
+    themeInitScript: editorialInitScript,
+    themeToggleScript: editorialToggleScript,
   },
 };
 
