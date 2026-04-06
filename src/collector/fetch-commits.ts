@@ -19,7 +19,6 @@ type RawCommit = {
 const MAX_MESSAGES_PER_REPO = 10;
 const MAX_TOTAL_MESSAGES = 50;
 const MAX_RETRIES = 3;
-const REQUEST_DELAY_MS = 200;
 const DEFAULT_RETRY_DELAY_MS = 5_000;
 
 const GITHUB_HEADERS = (token: string) => ({
@@ -110,7 +109,6 @@ export const fetchCommitMessages = async (
       totalMessages += trimmed.length;
     }
 
-    await sleep(REQUEST_DELAY_MS);
   }
 
   return results;
