@@ -195,7 +195,7 @@ export type AIContent = {
 
 // Configuration types
 
-export type Theme = "brutalist";
+export type Theme = "brutalist" | "minimal";
 
 export type LLMProvider = "openai" | "anthropic" | "gemini" | "openrouter" | "groq" | "grok";
 

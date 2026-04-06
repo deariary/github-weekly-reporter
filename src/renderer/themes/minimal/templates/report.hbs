@@ -5,8 +5,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="{{aiContent.subtitle}}" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <meta property="og:title" content="{{aiContent.title}}" />
   <meta property="og:description" content="{{aiContent.subtitle}}" />
   <meta property="og:image" content="{{{ogImageUrl}}}" />
@@ -59,53 +57,45 @@
 </head>
 <body>
 
-<a href="#main-content" class="skip-link">Skip to content</a>
-
-<nav aria-label="Site navigation">
-  <div class="nav-inner">
-    <a href="../../" class="nav-site-title">{{siteTitleInline}}</a>
-    <a href="../../" class="nav-back">&larr; {{i18n.allWeeks}}</a>
-  </div>
+<nav>
+  <a href="../../" class="nav-site-title">{{siteTitleInline}}</a>
+  <a href="../../">&larr; {{i18n.allWeeks}}</a>
 </nav>
 
-<div class="report-hero">
-  <div class="report-hero-inner">
-    {{> header}}
-  </div>
+<div class="header">
+  {{> header}}
 </div>
 
-<main id="main-content">
-<article class="page">
+<main>
   {{> overview}}
   {{> summaries}}
   {{> highlights}}
-</article>
 </main>
 
 {{#if canonicalUrl}}
 <div class="share-bar">
   <span class="share-label">{{i18n.share}}</span>
-  <a href="https://x.com/intent/tweet?url={{{canonicalUrl}}}&text={{urlEncode aiContent.title}}&hashtags=GHWeeklyReporter" target="_blank" rel="noopener nofollow" class="share-btn share-x" aria-label="Share on X">𝕏</a>
-  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn share-linkedin" aria-label="Share on LinkedIn">in</a>
-  <a href="https://bsky.app/intent/compose?text={{urlEncode aiContent.title}}%20{{{canonicalUrl}}}%20%23GHWeeklyReporter" target="_blank" rel="noopener nofollow" class="share-btn share-bsky" aria-label="Share on Bluesky">🦋</a>
+  <a href="https://x.com/intent/tweet?url={{{canonicalUrl}}}&text={{urlEncode aiContent.title}}" target="_blank" rel="noopener nofollow" class="share-btn">X</a>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn">LinkedIn</a>
+  <a href="https://bsky.app/intent/compose?text={{urlEncode aiContent.title}}%20{{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn">Bluesky</a>
 </div>
 {{/if}}
 
 {{#if prevWeek}}{{#if nextWeek}}
-<nav class="week-nav" aria-label="Week navigation">
-  <a href="{{prevWeek}}" class="week-nav-link">&larr; {{i18n.prevWeek}}</a>
-  <a href="{{nextWeek}}" class="week-nav-link">{{i18n.nextWeek}} &rarr;</a>
-</nav>
+<div class="week-nav">
+  <a href="{{prevWeek}}">&larr; {{i18n.prevWeek}}</a>
+  <a href="{{nextWeek}}">{{i18n.nextWeek}} &rarr;</a>
+</div>
 {{else}}
-<nav class="week-nav" aria-label="Week navigation">
-  <a href="{{prevWeek}}" class="week-nav-link">&larr; {{i18n.prevWeek}}</a>
+<div class="week-nav">
+  <a href="{{prevWeek}}">&larr; {{i18n.prevWeek}}</a>
   <span></span>
-</nav>
+</div>
 {{/if}}{{else}}{{#if nextWeek}}
-<nav class="week-nav" aria-label="Week navigation">
+<div class="week-nav">
   <span></span>
-  <a href="{{nextWeek}}" class="week-nav-link">{{i18n.nextWeek}} &rarr;</a>
-</nav>
+  <a href="{{nextWeek}}">{{i18n.nextWeek}} &rarr;</a>
+</div>
 {{/if}}{{/if}}
 
 {{> footer}}
