@@ -1,6 +1,6 @@
 // Workflow YAML templates and README generation
 
-import type { LLMProvider, Language } from "../../../types.js";
+import type { LLMProvider, Language, Theme } from "../../../types.js";
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -54,6 +54,7 @@ export type WorkflowOpts = {
   language: Language;
   timezone: string;
   siteTitle: string;
+  theme: Theme;
   llmProvider?: LLMProvider;
   llmModel?: string;
   llmSecretName?: string;
@@ -163,6 +164,7 @@ jobs:
           mode: 'weekly'
           language: '${opts.language}'
           timezone: '${opts.timezone}'
+          theme: '${opts.theme}'
           date: \${{ inputs.date }}
 ${llmInputs}
 `;
@@ -177,6 +179,7 @@ export const buildReadme = (opts: {
   pagesUrl: string;
   language: Language;
   timezone: string;
+  theme: Theme;
   llmProvider?: LLMProvider;
   llmModel?: string;
 }): string => {
@@ -204,6 +207,7 @@ Edit \`.github/workflows/weekly-report.yml\` to change:
 | \`username\` | \`${opts.username}\` | GitHub user to report on |
 | \`language\` | \`${opts.language}\` | Report language (en, ja, zh-CN, zh-TW, ko, es, fr, de, pt, ru) |
 | \`timezone\` | \`${opts.timezone}\` | IANA timezone for date calculations |
+| \`theme\` | \`${opts.theme}\` | Report theme (brutalist, minimal, editorial) |
 | \`SITE_TITLE\` | \`${displayTitle}\` | Site title in the header and hero |
 ${opts.llmProvider ? `| \`llm-provider\` | \`${opts.llmProvider}\` | LLM provider for AI narrative |\n| \`llm-model\` | \`${opts.llmModel}\` | Model name |\n` : ""}
 ## Base URL

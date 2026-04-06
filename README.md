@@ -94,7 +94,8 @@ Private repositories work too. GitHub Free gives 2,000 Actions minutes/month (th
 - Language breakdown (CSS-only chart)
 - 7-day contribution heatmap
 - AI-generated narrative summary
-- Dark theme with responsive design
+- 3 themes: brutalist (default), minimal, editorial
+- Light/dark mode with responsive design
 - Self-contained HTML, no JavaScript
 - SEO optimized (OG images, JSON-LD, sitemap)
 - Deploys to GitHub Pages with weekly archive

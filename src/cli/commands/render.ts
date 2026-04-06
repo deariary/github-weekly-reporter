@@ -249,7 +249,7 @@ export const registerRender = (program: Command): void => {
     .option("--site-title <title>", "Site title for nav header (env: SITE_TITLE, default: {username}'s Weekly Reports)")
     .option("--language <lang>", "Report language: en, ja, zh-CN, zh-TW, ko, es, fr, de, pt, ru (env: LANGUAGE, default: en)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
-    .option("--theme <name>", `Theme name: ${AVAILABLE_THEMES.join(", ")} (env: THEME, default: dark)`)
+    .option("--theme <name>", `Theme name: ${AVAILABLE_THEMES.join(", ")} (env: THEME, default: brutalist)`)
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
