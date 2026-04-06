@@ -1,0 +1,118 @@
+title: Building github-weekly-reporter from zero to npm package
+subtitle: Shipped a complete GitHub activity reporting tool with AI narratives, i18n support, and automated deployment
+  in one intensive week
+overview: >
+  This week was all about building github-weekly-reporter from the ground up - a tool that generates beautiful weekly
+  development reports from GitHub activity data. What started as a simple idea turned into a full-featured package with
+  AI integration, internationalization, and automated deployment capabilities.
+
+
+  The development followed a clear progression: core data collection and rendering, then AI narrative generation,
+  followed by deployment automation and GitHub Actions integration. Tuesday and Friday were the heaviest coding days
+  with 161 and 153 commits respectively, showing the sprint-like intensity of getting this project to a shippable state.
+
+
+  By week's end, I had a complete npm package published under the @deariary scope, with comprehensive CI/CD pipelines
+  and ready-to-use GitHub Actions for automated weekly report generation. The tool now supports multiple LLM providers,
+  10 languages, and generates SEO-optimized static sites with social sharing capabilities.
+summaries:
+  - type: repo-summary
+    heading: Laser focus on github-weekly-reporter
+    body: The deariary/github-weekly-reporter repository dominated this week with 19 of the 20 total PRs. This was pure
+      greenfield development, building everything from the initial TypeScript scaffold to a production-ready npm
+      package. The remaining activity was just maintenance across my other projects - a dependency bump in cycle-flyer
+      and some review work.
+    chips:
+      - label: deariary/github-weekly-reporter
+        value: 19 PRs
+        color: green
+      - label: other repos
+        value: 1 PR
+        color: default
+      - label: reviews given
+        value: "48"
+        color: blue
+  - type: architecture
+    heading: Full-stack developer tooling architecture
+    body: Built a complete pipeline from GitHub API data collection through AI narrative generation to static site
+      deployment. The architecture includes GraphQL and REST API integration, multi-provider LLM abstraction (OpenAI,
+      Anthropic, Gemini), timezone-aware date handling, and automated GitHub Pages deployment. Added comprehensive SEO
+      features including OG image generation, JSON-LD structured data, and sitemap generation.
+    chips:
+      - label: API integrations
+        value: GraphQL + REST
+        color: blue
+      - label: LLM providers
+        value: 3 supported
+        color: purple
+      - label: languages
+        value: 10 i18n
+        color: green
+  - type: activity-pattern
+    heading: Sprint-style development with two peak days
+    body: Tuesday and Friday were the heavy lifting days with 161 and 153 commits each, showing intense focused development
+      sessions. The middle of the week had more moderate activity around 30-90 commits per day, likely spent on
+      refinement and testing. This pattern suggests I was tackling the core architecture challenges on the peak days and
+      polishing features during the quieter periods.
+    chips:
+      - label: peak day
+        value: Tue 161
+        color: green
+      - label: second peak
+        value: Fri 153
+        color: green
+      - label: total commits
+        value: "476"
+        color: blue
+  - type: devops
+    heading: Production-ready CI/CD and npm publishing
+    body: Set up complete automation for a professional open-source project. Added GitHub Actions for CI (lint, build, test)
+      and automated npm publishing with provenance on releases. The package is now available as
+      @deariary/github-weekly-reporter with proper scoping and access controls. Also built the GitHub Action integration
+      so users can automate their weekly reports with a simple workflow file.
+    chips:
+      - label: CI workflow
+        value: Node 24
+        color: green
+      - label: npm scope
+        value: "@deariary"
+        color: blue
+      - label: GitHub Action
+        value: ready
+        color: purple
+highlights:
+  - type: pr
+    title: "feat: add project scaffold and GitHub API data collection module"
+    repo: deariary/github-weekly-reporter
+    meta: merged Mar 29 · +3903 -0 · 16 files
+    body: The foundation PR that started everything - set up the TypeScript project structure and implemented the core
+      GitHub API integration using GraphQL for efficient data collection.
+    url: https://github.com/deariary/github-weekly-reporter/pull/11
+  - type: pr
+    title: "feat: add LLM integration for AI narrative generation"
+    repo: deariary/github-weekly-reporter
+    meta: merged Apr 1 · +313 -2 · 11 files
+    body: Added the AI narrative feature with multi-provider support and graceful degradation. This turned the tool from a
+      simple data collector into an intelligent report generator.
+    url: https://github.com/deariary/github-weekly-reporter/pull/13
+  - type: pr
+    title: "feat: add timezone-aware date ranges and i18n support (en/ja)"
+    repo: deariary/github-weekly-reporter
+    meta: merged Apr 2 · +1734 -133 · 35 files
+    body: Major internationalization effort that fixed timezone handling and added support for 10 languages. The date range
+      calculation now works correctly for developers in any timezone.
+    url: https://github.com/deariary/github-weekly-reporter/pull/39
+  - type: pr
+    title: "feat: SEO optimization with OG images, JSON-LD, sitemap, and internal linking"
+    repo: deariary/github-weekly-reporter
+    meta: merged Apr 3 · +1166 -15 · 17 files
+    body: Comprehensive SEO implementation that makes the generated reports social-media ready with proper OG images and
+      structured data for search engines.
+    url: https://github.com/deariary/github-weekly-reporter/pull/48
+  - type: pr
+    title: "ci: add GitHub Actions workflows for CI and npm publish"
+    repo: deariary/github-weekly-reporter
+    meta: merged Apr 4 · +103 -1 · 3 files
+    body: The final piece that made this a professional open-source project - automated testing and publishing workflows
+      that ensure quality and streamline releases.
+    url: https://github.com/deariary/github-weekly-reporter/pull/27

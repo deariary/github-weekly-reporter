@@ -1,0 +1,87 @@
+title: github-weekly-reporterを0から本格プロダクトまで一気に構築
+subtitle: TypeScriptプロジェクトの立ち上げからGitHub Action、LLM統合、SEO最適化まで20のPRで完成させた
+overview: |
+  今週は新しいプロジェクトdeariary/github-weekly-reporterに完全に集中した一週間だった。開発者向けの週次レポート自動生成ツールを0から作り上げ、TypeScriptの基盤構築からGitHub API連携、LLM統合、GitHub Pagesデプロイまで一気に実装した。
+
+  火曜日に161コミットのピークを迎え、週全体で476コミット、+14158行の大規模開発となった。単なるスクリプトではなく、GitHub Actionとして使える本格的なプロダクトを目指し、OpenAI/Anthropic/Gemini対応、SEO最適化、多言語対応まで盛り込んだ。20のPRを通じて段階的に機能を積み上げ、最終的にはnpmパッケージとして公開可能な状態まで持っていった。
+
+  技術的にはGraphQL APIでのデータ収集からHandlebarsテンプレート、OG画像生成、JSON-LD構造化データまで幅広い要素を統合した。一人でのスプリント開発だったが、設計から実装、テスト、ドキュメント整備まで一貫して進められた充実した週だった。
+summaries:
+  - type: repo-summary
+    heading: deariary/github-weekly-reporterに全集中
+    body: 新プロジェクトのgithub-weekly-reporterに20のPRを集中投下し、0からプロダクトレベルまで一気に構築した。TypeScript + ESMの基盤からGitHub
+      API連携、LLM統合、デプロイ機能まで全て実装。他のリポジトリはdependency更新やレビューのみで、完全にこのプロジェクトにフォーカスした週だった。npmパッケージとして@deariary/github-weekly-reporterで公開準備も完了。
+    chips:
+      - label: deariary/github-weekly-reporter
+        value: 20 PRs
+        color: green
+      - label: 新規追加行
+        value: "+14158"
+        color: default
+      - label: その他リポジトリ
+        value: 5 PRs
+        color: default
+  - type: architecture
+    heading: GitHub API + LLM + デプロイの統合アーキテクチャ
+    body: GraphQL APIでGitHubデータを収集し、OpenAI/Anthropic/Gemini APIでAIナラティブを生成、GitHub Pagesに自動デプロイする統合システムを構築した。CLI、GitHub
+      Action、npmパッケージの3つの使用形態に対応し、タイムゾーン対応や多言語化も実装。OG画像生成、JSON-LD、sitemap.xmlまで含むSEO最適化も完備した本格的なアーキテクチャだ。
+    chips:
+      - label: LLMプロバイダー
+        value: 3社対応
+        color: default
+      - label: 言語
+        value: en/ja
+        color: default
+      - label: デプロイ先
+        value: GitHub Pages
+        color: default
+  - type: activity-pattern
+    heading: 火曜日ピークの集中開発パターン
+    body: 火曜日に161コミットの大きなピークを記録し、金曜日も153コミットと高い活動量を維持した。週末も含めて毎日コミットを続け、特に平日は大規模な機能実装に集中。一つのプロジェクトに完全フォーカスした結果、週全体で476コミットという高い生産性を実現できた。
+    chips:
+      - label: ピーク日
+        value: 火曜 161
+        color: green
+      - label: 週末活動
+        value: 土曜 58
+        color: default
+      - label: 平均/日
+        value: 68コミット
+        color: default
+  - type: collaboration-summary
+    heading: レビュー活動で他プロジェクトをサポート
+    body: 自分のプロジェクト開発と並行して48件のレビューを実施し、bitflyer-tools/cycle-flyerやunhappychoice/gitlogueなど複数のリポジトリでapprovedを出した。dependency更新PRのレビューも含め、開発コミュニティへの貢献も継続。一人スプリント開発をしながらも、他のプロジェクトのサポートを怠らなかった。
+    chips:
+      - label: レビュー数
+        value: 48件
+        color: default
+      - label: 承認リポジトリ
+        value: 5個
+        color: default
+      - label: dependency更新
+        value: 1件
+        color: default
+highlights:
+  - type: pr
+    title: "feat: project scaffold and GitHub API data collection module"
+    repo: deariary/github-weekly-reporter
+    meta: merged Mar 30 · +3903 -0 · 16 files
+    body: プロジェクトの基盤となるTypeScript + ESM構成とGitHub GraphQL API連携モジュールを実装。週次活動データの収集、ページネーション対応など、全ての機能の土台を一気に構築した。
+  - type: pr
+    title: "feat: add LLM integration for AI narrative generation"
+    repo: deariary/github-weekly-reporter
+    meta: merged Apr 1 · +313 -2 · 11 files
+    body: OpenAI、Anthropic、Google Geminiの3つのLLMプロバイダーに対応した抽象化レイヤーを実装。API キーから自動検出し、エラー時のgraceful degradationも組み込んだ。
+    url: https://github.com/deariary/github-weekly-reporter/pull/13
+  - type: pr
+    title: "feat: SEO optimization with OG images, JSON-LD, sitemap, and internal linking"
+    repo: deariary/github-weekly-reporter
+    meta: merged Apr 3 · +1166 -15 · 17 files
+    body: 1200x630のOG画像生成、JSON-LD構造化データ、sitemap.xml、前後週ナビゲーションまで含む本格的なSEO最適化を実装。ただのツールではなくWebプロダクトとしての完成度を高めた。
+    url: https://github.com/deariary/github-weekly-reporter/pull/48
+  - type: pr
+    title: "feat: add timezone-aware date ranges and i18n support (en/ja)"
+    repo: deariary/github-weekly-reporter
+    meta: merged Apr 2 · +1734 -133 · 35 files
+    body: タイムゾーン対応の日付範囲計算とen/ja多言語化を実装。Intl.DateTimeFormatを使った正確な現地時刻計算で、グローバルな開発者に対応した。
+    url: https://github.com/deariary/github-weekly-reporter/pull/39
