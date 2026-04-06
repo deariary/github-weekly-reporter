@@ -226,6 +226,14 @@ export const buildCSS = (language: Language = "en"): string => {
       max-width: 680px; margin: 0 auto 3.5rem;
       padding: 0 2rem;
     }
+    .section-group::before {
+      content: "\\2766";
+      display: block;
+      text-align: center;
+      font-size: 1.5rem;
+      color: var(--e-border);
+      margin-bottom: 2.5rem;
+    }
     .section-group-header {
       margin-bottom: 2rem;
       border-bottom: 2px solid var(--e-heading);
@@ -242,13 +250,22 @@ export const buildCSS = (language: Language = "en"): string => {
       float: right; margin-top: 0.75rem;
     }
 
+    /* ORNAMENTAL DIVIDER */
+    .section-summary + .section-summary::before {
+      content: "\\2767";
+      display: block;
+      text-align: center;
+      font-size: 1.25rem;
+      color: var(--e-border);
+      margin: -0.5rem 0 1.5rem;
+      letter-spacing: 0.5em;
+    }
+
     /* SUMMARY */
     .section-summary {
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid var(--e-border);
+      margin-bottom: 2.5rem;
+      position: relative;
     }
-    .section-summary:last-child { border-bottom: none; padding-bottom: 0; }
     .section-type {
       font-size: 0.6875rem; color: var(--e-accent);
       text-transform: uppercase; letter-spacing: 0.15em;
@@ -264,16 +281,30 @@ export const buildCSS = (language: Language = "en"): string => {
     .section-body {
       color: var(--e-text-secondary);
     }
+    .section-body::first-letter {
+      font-family: ${heading};
+      float: left;
+      font-size: 2.5rem;
+      line-height: 0.8;
+      font-weight: 700;
+      color: var(--e-drop-cap);
+      padding-right: 0.35rem;
+      padding-top: 0.1rem;
+    }
 
-    /* CHIPS */
+    /* CHIPS as margin notes */
     .data-chips {
-      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;
+      font-family: ${mono}; font-size: 0.6875rem;
+      color: var(--e-text-tertiary);
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--e-border-subtle);
+      display: flex; flex-wrap: wrap; gap: 0.25rem 1rem;
     }
     .chip {
-      font-family: ${mono}; font-size: 0.75rem;
-      padding: 0.25rem 0.5rem; border-radius: 3px;
-      background: var(--e-accent-light);
-      color: var(--e-text-secondary);
+      padding: 0; border-radius: 0;
+      background: none;
+      color: var(--e-text-tertiary);
     }
     .chip-green { color: var(--e-green); font-weight: 600; }
     .chip-red { color: var(--e-red); font-weight: 600; }
@@ -314,6 +345,15 @@ export const buildCSS = (language: Language = "en"): string => {
       max-width: 680px; margin: 0 auto 3rem;
       padding: 0 2rem;
     }
+    .highlight-section::before {
+      content: "\\2022  \\2022  \\2022";
+      display: block;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--e-border);
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.3em;
+    }
     .highlight-header {
       margin-bottom: 1.5rem;
       border-bottom: 2px solid var(--e-heading);
@@ -342,8 +382,10 @@ export const buildCSS = (language: Language = "en"): string => {
     .highlight-badge {
       font-size: 0.625rem; font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.1em;
-      display: inline-block; padding: 0.15rem 0.4rem;
+      display: inline-flex; align-items: center;
+      padding: 0.2rem 0.4rem; line-height: 1;
       border-radius: 2px; margin-bottom: 0.5rem; color: #fff;
+      vertical-align: middle;
     }
     .highlight-pr { background: var(--e-badge-pr); }
     .highlight-release { background: var(--e-badge-release); }
