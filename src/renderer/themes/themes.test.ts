@@ -74,10 +74,32 @@ describe("loadTheme", () => {
     expect(theme.colors.bg).toBe("#050505");
   });
 
-  it("brutalist has no theme toggle scripts", () => {
+  it("brutalist has theme toggle scripts", () => {
     const theme = loadTheme("brutalist");
-    expect(theme.themeInitScript).toBeUndefined();
-    expect(theme.themeToggleScript).toBeUndefined();
+    expect(theme.themeInitScript).toContain("localStorage");
+    expect(theme.themeToggleScript).toContain("theme-toggle");
+  });
+
+  it("brutalist buildCSS uses CSS custom properties", () => {
+    const theme = loadTheme("brutalist");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("var(--b-bg)");
+    expect(css).toContain("var(--b-text)");
+    expect(css).toContain("var(--b-accent)");
+  });
+
+  it("brutalist buildCSS includes light mode via prefers-color-scheme", () => {
+    const theme = loadTheme("brutalist");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("prefers-color-scheme: light");
+    expect(css).toContain("--b-bg: #fafafa");
+  });
+
+  it("brutalist buildCSS supports data-theme attribute override", () => {
+    const theme = loadTheme("brutalist");
+    const css = theme.buildCSS("en");
+    expect(css).toContain('html[data-theme="light"]');
+    expect(css).toContain('html[data-theme="dark"]');
   });
 
   it("loads minimal theme", () => {
@@ -106,7 +128,7 @@ describe("loadTheme", () => {
     const theme = loadTheme("brutalist");
     const css = theme.buildIndexCSS("en");
     expect(css).toContain(".hero");
-    expect(css).toContain("#050505");
+    expect(css).toContain("var(--b-bg)");
   });
 });
 

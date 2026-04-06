@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>deariary/github-weekly-reporter: LLM統合でAIナラティブ生成を実現 - 2026-03-29 - 2026-04-04</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="OpenAI、Anthropic、Geminiの自動検出対応とエラー耐性を実装。SEO最適化とタイムゾーン対応も同時に完了。" />
+  <meta property="og:title" content="deariary/github-weekly-reporter: LLM統合でAIナラティブ生成を実現" />
+  <meta property="og:description" content="OpenAI、Anthropic、Geminiの自動検出対応とエラー耐性を実装。SEO最適化とタイムゾーン対応も同時に完了。" />
+  <meta property="og:image" content="http://localhost:8084/2026/W14/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="http://localhost:8084/2026/W14/" />
+  <meta property="og:site_name" content="unhappychoice Weekly Reports" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="deariary/github-weekly-reporter: LLM統合でAIナラティブ生成を実現" />
+  <meta name="twitter:description" content="OpenAI、Anthropic、Geminiの自動検出対応とエラー耐性を実装。SEO最適化とタイムゾーン対応も同時に完了。" />
+  <meta name="twitter:image" content="http://localhost:8084/2026/W14/og.png" />
+  <meta name="author" content="unhappychoice" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="article:published_time" content="2026-04-04" />
+  <meta property="article:author" content="https://github.com/unhappychoice" />
+  <link rel="icon" href="https://avatars.githubusercontent.com/u/5608948?u&#x3D;6ca2fca8320cb6be5b802f6c5a6359933754ab2e&amp;v&#x3D;4" />
+  <link rel="canonical" href="http://localhost:8084/2026/W14/" />
+  <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="http://localhost:8084/feed.xml" />
+  <meta name="view-transition" content="same-origin" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "deariary/github-weekly-reporter: LLM統合でAIナラティブ生成を実現",
+    "description": "OpenAI、Anthropic、Geminiの自動検出対応とエラー耐性を実装。SEO最適化とタイムゾーン対応も同時に完了。",
+    "author": {
+      "@type": "Person",
+      "name": "unhappychoice",
+      "url": "https://github.com/unhappychoice"
+    },
+    "image": "http://localhost:8084/2026/W14/og.png",
+    "datePublished": "2026-04-04"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "http://localhost:8084/" },
+      { "@type": "ListItem", "position": 2, "name": "2026-03-29 - 2026-04-04", "item": "http://localhost:8084/2026/W14/" }
+    ]
+  }
+  </script>
+  <style>
+  
+  :root { 
+    --bg: #ffffff;
+    --text: #111111;
+    --text-secondary: #555555;
+    --text-tertiary: #999999;
+    --border: #e0e0e0;
+    --border-subtle: #f0f0f0;
+    --accent: #0066cc;
+    --code-bg: #f6f6f6;
+    --green: #1a7f37;
+    --red: #cf222e;
+    --badge-pr: #8250df;
+    --badge-release: #1a7f37;
+    --badge-issue: #9a6700;
+    --badge-discussion: #0969da;
+    --heatmap-0: #f0f0f0;
+    --heatmap-1: #d0e8d0;
+    --heatmap-2: #a0d0a0;
+    --heatmap-3: #60b060;
+    --heatmap-4: #1a7f37;
+    --heatmap-text: #fff;
+ }
+  @media (prefers-color-scheme: dark) { :root { 
+    --bg: #111111;
+    --text: #e0e0e0;
+    --text-secondary: #aaaaaa;
+    --text-tertiary: #777777;
+    --border: #333333;
+    --border-subtle: #222222;
+    --accent: #4d9eef;
+    --code-bg: #1a1a1a;
+    --green: #3fb950;
+    --red: #f85149;
+    --badge-pr: #a371f7;
+    --badge-release: #3fb950;
+    --badge-issue: #d29922;
+    --badge-discussion: #58a6ff;
+    --heatmap-0: #1a1a1a;
+    --heatmap-1: #0e4429;
+    --heatmap-2: #006d32;
+    --heatmap-3: #26a641;
+    --heatmap-4: #39d353;
+    --heatmap-text: #000;
+ } }
+  html[data-theme="light"] { 
+    --bg: #ffffff;
+    --text: #111111;
+    --text-secondary: #555555;
+    --text-tertiary: #999999;
+    --border: #e0e0e0;
+    --border-subtle: #f0f0f0;
+    --accent: #0066cc;
+    --code-bg: #f6f6f6;
+    --green: #1a7f37;
+    --red: #cf222e;
+    --badge-pr: #8250df;
+    --badge-release: #1a7f37;
+    --badge-issue: #9a6700;
+    --badge-discussion: #0969da;
+    --heatmap-0: #f0f0f0;
+    --heatmap-1: #d0e8d0;
+    --heatmap-2: #a0d0a0;
+    --heatmap-3: #60b060;
+    --heatmap-4: #1a7f37;
+    --heatmap-text: #fff;
+ }
+  html[data-theme="dark"] { 
+    --bg: #111111;
+    --text: #e0e0e0;
+    --text-secondary: #aaaaaa;
+    --text-tertiary: #777777;
+    --border: #333333;
+    --border-subtle: #222222;
+    --accent: #4d9eef;
+    --code-bg: #1a1a1a;
+    --green: #3fb950;
+    --red: #f85149;
+    --badge-pr: #a371f7;
+    --badge-release: #3fb950;
+    --badge-issue: #d29922;
+    --badge-discussion: #58a6ff;
+    --heatmap-0: #1a1a1a;
+    --heatmap-1: #0e4429;
+    --heatmap-2: #006d32;
+    --heatmap-3: #26a641;
+    --heatmap-4: #39d353;
+    --heatmap-text: #000;
+ }
+
+  
+  .theme-toggle {
+    background: none; border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text-tertiary); cursor: pointer; font-size: 0.8125rem;
+    padding: 0.25rem 0.5rem; margin-left: 0.5rem;
+  }
+  .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  a { color: var(--accent); }
+  a:hover { text-decoration: none; }
+
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 0.875em;
+    padding: 0.1em 0.3em;
+    background: var(--code-bg);
+    border-radius: 3px;
+  }
+
+  /* NAV */
+  nav { margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  nav a { text-decoration: none; font-size: 0.875rem; }
+  .nav-site-title { font-size: 0.875rem; font-weight: 600; color: var(--text-secondary); }
+
+  /* HEADER */
+  .header { margin-bottom: 2rem; }
+  .header-meta { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+  .header-meta a { color: var(--text-secondary); text-decoration: none; }
+  .header-meta a:hover { color: var(--accent); }
+  .header-meta img { width: 20px; height: 20px; border-radius: 50%; vertical-align: middle; margin-right: 0.25rem; }
+  h1 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.25rem; }
+  .header-sub { color: var(--text-secondary); font-size: 1rem; }
+
+  /* OVERVIEW */
+  .overview { margin-bottom: 2rem; }
+  .overview p { margin-bottom: 1rem; color: var(--text-secondary); }
+  .overview p:last-child { margin-bottom: 0; }
+
+  /* SECTIONS */
+  .section-group { margin-bottom: 2.5rem; }
+  h2 { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+  .section-group-count { font-size: 0.75rem; color: var(--text-tertiary); }
+
+  /* SUMMARY */
+  .section-summary { margin-bottom: 1.5rem; }
+  .section-type { font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+  .section-heading { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .section-body { color: var(--text-secondary); }
+
+  /* CHIPS */
+  .data-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+  .chip { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 0.75rem; color: var(--text-secondary); }
+  .chip-label::after { content: ": "; }
+  .chip-green { color: var(--green); }
+  .chip-red { color: var(--red); }
+
+  /* DIFF BAR */
+  .diff-bar { display: flex; height: 4px; border-radius: 2px; overflow: hidden; margin-top: 0.75rem; margin-bottom: 0.25rem; background: var(--border-subtle); }
+  .diff-add { background: var(--green); height: 100%; }
+  .diff-del { background: var(--red); height: 100%; }
+  .diff-labels { display: flex; justify-content: space-between; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 0.75rem; }
+  .diff-label-add { color: var(--green); }
+  .diff-label-del { color: var(--red); }
+
+  /* HEATMAP */
+  .mini-heatmap { display: flex; gap: 4px; margin-top: 0.75rem; }
+  .mh-day { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .mh-block { width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 0.75rem; }
+  .mh-label { font-size: 0.625rem; color: var(--text-tertiary); }
+  .mh-level-0 { background: var(--heatmap-0); color: var(--text-tertiary); }
+  .mh-level-1 { background: var(--heatmap-1); }
+  .mh-level-2 { background: var(--heatmap-2); }
+  .mh-level-3 { background: var(--heatmap-3); color: var(--heatmap-text); }
+  .mh-level-4 { background: var(--heatmap-4); color: var(--heatmap-text); }
+
+  /* REPO BARS */
+  .repo-bars { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .repo-bar-header { display: flex; justify-content: space-between; font-size: 0.75rem; }
+  .repo-bar-label { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; color: var(--text-secondary); }
+  .repo-bar-value { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; color: var(--text-tertiary); }
+  .repo-bar-track { width: 100%; height: 3px; border-radius: 2px; background: var(--border-subtle); overflow: hidden; }
+  .repo-bar-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+
+  /* HIGHLIGHTS */
+  .highlight-list { list-style: none; }
+  .highlight-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); }
+  .highlight-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .highlight-badge { font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-right: 0.5rem; }
+  .highlight-pr { color: var(--badge-pr); }
+  .highlight-release { color: var(--badge-release); }
+  .highlight-issue { color: var(--badge-issue); }
+  .highlight-discussion { color: var(--badge-discussion); }
+  .highlight-title { font-weight: 600; }
+  .highlight-title a { color: var(--text); }
+  .highlight-meta { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.125rem; }
+  .highlight-body { color: var(--text-secondary); margin-top: 0.25rem; }
+
+  /* SHARE */
+  .share-bar { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.875rem; display: flex; gap: 1rem; align-items: center; }
+  .share-label { color: var(--text-tertiary); font-size: 0.75rem; }
+  .share-btn { color: var(--accent); text-decoration: none; font-size: 0.875rem; }
+  .share-btn:hover { text-decoration: underline; }
+
+  /* WEEK NAV */
+  .week-nav { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.875rem; }
+  .week-nav a { color: var(--accent); text-decoration: none; }
+  .week-nav a:hover { text-decoration: underline; }
+
+  /* FOOTER */
+  .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); text-align: center; font-size: 0.8125rem; color: var(--text-tertiary); }
+  .footer a { color: var(--text-secondary); }
+
+  @media print {
+    body { max-width: 100%; padding: 0; color-scheme: light; }
+    nav, .share-bar, .week-nav { display: none; }
+  }
+</style>
+  <script>
+(function(){
+  var s=localStorage.getItem("theme");
+  if(s)document.documentElement.setAttribute("data-theme",s);
+})();
+</script>
+</head>
+<body>
+
+<nav>
+  <a href="../../" class="nav-site-title">Dev Pulse</a>
+  <a href="../../">&larr; All weeks</a>
+</nav>
+
+<div class="header">
+  <div class="header-meta">
+    <a href="https://github.com/unhappychoice" target="_blank" rel="noopener nofollow">
+      <img src="https://avatars.githubusercontent.com/u/5608948?u&#x3D;6ca2fca8320cb6be5b802f6c5a6359933754ab2e&amp;v&#x3D;4" alt="unhappychoice" width="20" height="20" loading="lazy" />
+      unhappychoice
+    </a>
+    &middot;
+    2026-03-29 - 2026-04-04
+  </div>
+  <h1>deariary/github-weekly-reporter: LLM統合でAIナラティブ生成を実現</h1>
+  <p class="header-sub">OpenAI、Anthropic、Geminiの自動検出対応とエラー耐性を実装。SEO最適化とタイムゾーン対応も同時に完了。</p>
+</div>
+
+<main>
+  <div class="overview">
+    <p>今週はdeariary/github-weekly-reporterの開発に完全没入した。このツールはGitHubのアクティビティを週次でレポートするものだが、ゼロから構築を進めてきた。特にLLMを活用したAIナラティブ生成機能の実装に注力し、複数プロバイダー対応と自動検出を実現した。</p>
+  <p>主な流れとしては、まずプロジェクトのスキャフォールドとGitHub APIからのデータ収集モジュールを完成させた。そこからCLIとデプロイ機能を追加し、GitHub Actionsでの自動化を可能にした。そしてクライマックスとしてLLM統合をマージ。同時にSEO最適化（OG画像、JSON-LD、サイトマップ）とタイムゾーン対応・i18n（日英）も実装し、ツールとしての完成度を一気に高めた。</p>
+  <p>結果として20件のPRをマージし、476コミットを記録。他リポジトリへの軽微な貢献もありつつ、今週はひたすらこのプロジェクトに集中したと言える。</p>
+  
+  </div>
+  <div class="section-group">
+    <h2>Summary <span class="section-group-count">5 sections</span></h2>
+  
+    <div class="section-summary">
+      <div class="section-type">deep-dive</div>
+      <div class="section-heading">LLM統合：マルチプロバイダー対応と自動検出</div>
+      <div class="section-body">OpenAI、Anthropic、Geminiの3プロバイダーをサポートし、利用可能なAPIキーに応じて自動的に選択する。デフォルトモデルは各プロバイダーの最新高速モデル（gpt-4o-mini, claude-sonnet-4, gemini-2.0-flash）に設定。LLM呼び出しに失敗した場合でも、エラーハンドリングをしてツール全体が停止しないようにフォールバックする。これにより、ユーザーはAPIキーを設定するだけでAIナラティブを生成できる。</div>
+  
+  
+  
+  
+      <div class="data-chips">
+        <span class="chip"><span class="chip-label">プロバイダー</span><span class="chip-value chip-default">3 (OpenAI, Anthropic, Gemini)</span></span>
+        <span class="chip"><span class="chip-label">自動検出</span><span class="chip-value chip-default">APIキーに基づく</span></span>
+      </div>
+    </div>
+    <div class="section-summary">
+      <div class="section-type">repo-summary</div>
+      <div class="section-heading">deariary/github-weekly-reporterが圧倒的多数</div>
+      <div class="section-body">メインプロジェクトで20件のPRをマージ。現在はデザイン調整とシェアボタン機能の2件がオープン中。その他4つのリポジトリ（bitflyer-tools/cycle-flyer, 個人リポジトリ3つ）で計4件のPRをマージし、小さな改善を施した。</div>
+  
+  
+  
+      <div class="repo-bars">
+        <div class="repo-bar-item">
+          <div class="repo-bar-header">
+            <span class="repo-bar-label">deariary/github-weekly-reporter</span>
+            <span class="repo-bar-value">20 PRs</span>
+          </div>
+          <div class="repo-bar-track">
+            <div class="repo-bar-fill" style="width:100%"></div>
+          </div>
+        </div>
+        <div class="repo-bar-item">
+          <div class="repo-bar-header">
+            <span class="repo-bar-label">bitflyer-tools/cycle-flyer</span>
+            <span class="repo-bar-value">2 PRs</span>
+          </div>
+          <div class="repo-bar-track">
+            <div class="repo-bar-fill" style="width:10%"></div>
+          </div>
+        </div>
+        <div class="repo-bar-item">
+          <div class="repo-bar-header">
+            <span class="repo-bar-label">unhappychoice/gitlogue</span>
+            <span class="repo-bar-value">1 PRs</span>
+          </div>
+          <div class="repo-bar-track">
+            <div class="repo-bar-fill" style="width:5%"></div>
+          </div>
+        </div>
+        <div class="repo-bar-item">
+          <div class="repo-bar-header">
+            <span class="repo-bar-label">unhappychoice/cycle-pusher</span>
+            <span class="repo-bar-value">1 PRs</span>
+          </div>
+          <div class="repo-bar-track">
+            <div class="repo-bar-fill" style="width:5%"></div>
+          </div>
+        </div>
+        <div class="repo-bar-item">
+          <div class="repo-bar-header">
+            <span class="repo-bar-label">unhappychoice/mdts</span>
+            <span class="repo-bar-value">1 PRs</span>
+          </div>
+          <div class="repo-bar-track">
+            <div class="repo-bar-fill" style="width:5%"></div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="data-chips">
+        <span class="chip"><span class="chip-label">deariary/github-weekly-reporter</span><span class="chip-value chip-default">20 PRs</span></span>
+        <span class="chip"><span class="chip-label">other repos</span><span class="chip-value chip-default">4 PRs</span></span>
+      </div>
+    </div>
+    <div class="section-summary">
+      <div class="section-type">activity-pattern</div>
+      <div class="section-heading">バースト型開発：火曜と金曜がピーク</div>
+      <div class="section-body">コミットは7日間で476件。火曜に161件、金曜に153件と2つの大きな山があり、水木は比較的落ち着いていた。1日平均68件だが、最大最小の差が大きく、集中して一気に書き上げるスタイル。</div>
+  
+      <div class="mini-heatmap">
+        <div class="mh-day">
+          <div class="mh-block mh-level-1">26</div>
+          <div class="mh-label">Sun</div>
+        </div>
+        <div class="mh-day">
+          <div class="mh-block mh-level-3">102</div>
+          <div class="mh-label">Mon</div>
+        </div>
+        <div class="mh-day">
+          <div class="mh-block mh-level-1">29</div>
+          <div class="mh-label">Tue</div>
+        </div>
+        <div class="mh-day">
+          <div class="mh-block mh-level-4">161</div>
+          <div class="mh-label">Wed</div>
+        </div>
+        <div class="mh-day">
+          <div class="mh-block mh-level-3">88</div>
+          <div class="mh-label">Thu</div>
+        </div>
+        <div class="mh-day">
+          <div class="mh-block mh-level-2">58</div>
+          <div class="mh-label">Fri</div>
+        </div>
+        <div class="mh-day">
+          <div class="mh-block mh-level-4">153</div>
+          <div class="mh-label">Sat</div>
+        </div>
+      </div>
+  
+  
+  
+      <div class="data-chips">
+        <span class="chip"><span class="chip-label">peak</span><span class="chip-value chip-green">Tue 161</span></span>
+        <span class="chip"><span class="chip-label">total commits</span><span class="chip-value chip-default">476</span></span>
+      </div>
+    </div>
+    <div class="section-summary">
+      <div class="section-type">review-summary</div>
+      <div class="section-heading">48件のコードレビューを実施</div>
+      <div class="section-body">主にgithub-weekly-reporterプロジェクトに対して48件のレビューを行った。機能の完全性やコードスタイルに焦点を当て、品質を担保。レビューを通じてチームメンバー（というより自分自身だが）のフィードバックを反映。</div>
+  
+  
+  
+  
+      <div class="data-chips">
+        <span class="chip"><span class="chip-label">reviews</span><span class="chip-value chip-default">48</span></span>
+      </div>
+    </div>
+    <div class="section-summary">
+      <div class="section-type">infrastructure</div>
+      <div class="section-heading">インフラ整備：GitHub Actionsとnpmパッケージ</div>
+      <div class="section-body">CIワークフロー（lint, build, test）とnpmパブリッシュワークフローを追加。パッケージ名を@deariary/github-weekly-reporterにスコープ化し、GitHub Action Marketplaceへの公開準備を整えた。デプロイ先をgh-pagesとし、データの永続化も実現。</div>
+  
+  
+  
+  
+      <div class="data-chips">
+        <span class="chip"><span class="chip-label">workflows added</span><span class="chip-value chip-default">2 (CI, publish)</span></span>
+        <span class="chip"><span class="chip-label">npm package</span><span class="chip-value chip-default">@deariary/github-weekly-reporter</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="section-group">
+    <h2>Highlights <span class="section-group-count">4 items</span></h2>
+  
+    <ul class="highlight-list">
+    <li class="highlight-item">
+      <span class="highlight-badge highlight-pr">pr</span>
+      <span class="highlight-title"><a href="https://github.com/deariary/github-weekly-reporter/pull/13" target="_blank" rel="noopener nofollow">feat: add LLM integration for AI narrative generation</a></span>
+      <div class="highlight-meta">deariary/github-weekly-reporter &middot; merged · +313 -2 · 11 files</div>
+      <div class="highlight-body">マルチプロバイダーLLM統合の実装。APIキーで自動検出し、フォールバック処理も備える。これにより、ユーザーはAIによる自然言語レポート生成を最小構成で利用可能になった。</div>
+    </li>
+    <li class="highlight-item">
+      <span class="highlight-badge highlight-pr">pr</span>
+      <span class="highlight-title"><a href="https://github.com/deariary/github-weekly-reporter/pull/17" target="_blank" rel="noopener nofollow">feat: add GitHub Action scaffold</a></span>
+      <div class="highlight-meta">deariary/github-weekly-reporter &middot; merged · +2314 -2210 · 6 files</div>
+      <div class="highlight-body">GitHub Actionのスキャフォールドを追加。ワンステップでgenerateとdeployを実行可能に。データ永続化とレポートURL出力により、CI/CD完全自動化を実現。</div>
+    </li>
+    <li class="highlight-item">
+      <span class="highlight-badge highlight-pr">pr</span>
+      <span class="highlight-title"><a href="https://github.com/deariary/github-weekly-reporter/pull/39" target="_blank" rel="noopener nofollow">feat: add timezone-aware date ranges and i18n support (en/ja)</a></span>
+      <div class="highlight-meta">deariary/github-weekly-reporter &middot; merged · +1734 -133 · 35 files</div>
+      <div class="highlight-body">タイムゾーン対応と日英i18nを実装。Intl.DateTimeFormatを用いて現地時間で週範囲を計算。これにより、JSTなど非UTCタイムゾーンのユーザーでも正確な週レポートが生成される。</div>
+    </li>
+    <li class="highlight-item">
+      <span class="highlight-badge highlight-pr">pr</span>
+      <span class="highlight-title"><a href="https://github.com/deariary/github-weekly-reporter/pull/48" target="_blank" rel="noopener nofollow">feat: SEO optimization with OG images, JSON-LD, sitemap, and internal linking</a></span>
+      <div class="highlight-meta">deariary/github-weekly-reporter &middot; merged · +1166 -15 · 17 files</div>
+      <div class="highlight-body">SEO最適化としてOG画像（1200x630）生成、JSON-LD構造化データ、サイトマップ、週間レポート間のナビゲーションリンクを追加。検索エンジンとソーシャル共有での可視性を向上。</div>
+    </li>
+    </ul>
+  </div>
+</main>
+
+<div class="share-bar">
+  <span class="share-label">Share</span>
+  <a href="https://x.com/intent/tweet?url=http://localhost:8084/2026/W14/&text=deariary%2Fgithub-weekly-reporter%3A%20LLM%E7%B5%B1%E5%90%88%E3%81%A7AI%E3%83%8A%E3%83%A9%E3%83%86%E3%82%A3%E3%83%96%E7%94%9F%E6%88%90%E3%82%92%E5%AE%9F%E7%8F%BE" target="_blank" rel="noopener nofollow" class="share-btn">X</a>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url=http://localhost:8084/2026/W14/" target="_blank" rel="noopener nofollow" class="share-btn">LinkedIn</a>
+  <a href="https://bsky.app/intent/compose?text=deariary%2Fgithub-weekly-reporter%3A%20LLM%E7%B5%B1%E5%90%88%E3%81%A7AI%E3%83%8A%E3%83%A9%E3%83%86%E3%82%A3%E3%83%96%E7%94%9F%E6%88%90%E3%82%92%E5%AE%9F%E7%8F%BE%20http://localhost:8084/2026/W14/" target="_blank" rel="noopener nofollow" class="share-btn">Bluesky</a>
+</div>
+
+
+
+<footer class="footer">
+  Powered by <a href="https://deariary.com?utm_source=github-weekly-reporter&utm_medium=footer" target="_blank" rel="noopener">deariary</a>
+  &middot;
+  Generated with <a href="https://github.com/deariary/github-weekly-reporter" target="_blank" rel="noopener">github-weekly-reporter</a>
+  <button class="theme-toggle" type="button" aria-label="Toggle theme">Dark</button>
+</footer>
+
+<script>
+(function(){
+  var btn=document.querySelector(".theme-toggle");
+  if(!btn)return;
+  function current(){
+    return document.documentElement.getAttribute("data-theme")
+      || (matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
+  }
+  function update(){
+    btn.textContent=current()==="dark"?"Light":"Dark";
+  }
+  update();
+  btn.addEventListener("click",function(){
+    var next=current()==="dark"?"light":"dark";
+    document.documentElement.setAttribute("data-theme",next);
+    localStorage.setItem("theme",next);
+    update();
+  });
+})();
+</script>
+</body>
+</html>

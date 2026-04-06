@@ -8,6 +8,8 @@ import {
   buildCSS as brutalistBuildCSS,
   buildIndexCSS as brutalistBuildIndexCSS,
   colors as brutalistColors,
+  THEME_INIT_SCRIPT as brutalistInitScript,
+  THEME_TOGGLE_SCRIPT as brutalistToggleScript,
 } from "./brutalist/index.js";
 import {
   buildCSS as minimalBuildCSS,
@@ -42,7 +44,13 @@ const THEMES_DIR = join(
 );
 
 const themeModules: Record<Theme, Omit<ThemeModule, "templatesDir">> = {
-  brutalist: { buildCSS: brutalistBuildCSS, buildIndexCSS: brutalistBuildIndexCSS, colors: brutalistColors },
+  brutalist: {
+    buildCSS: brutalistBuildCSS,
+    buildIndexCSS: brutalistBuildIndexCSS,
+    colors: brutalistColors,
+    themeInitScript: brutalistInitScript,
+    themeToggleScript: brutalistToggleScript,
+  },
   minimal: {
     buildCSS: minimalBuildCSS,
     buildIndexCSS: minimalBuildIndexCSS,
