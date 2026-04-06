@@ -8,20 +8,7 @@
 
 <video src="https://github.com/user-attachments/assets/96828826-d694-4338-89b9-974094b0950d" autoplay loop muted playsinline></video>
 
-<details>
-<summary>Screenshots</summary>
-
-![Hero](docs/assets/screenshots/01-hero.png)
-![Weekly Timeline](docs/assets/screenshots/02-weekly-timeline.png)
-![Report Detail](docs/assets/screenshots/03-report-detail.png)
-![Deep Dive](docs/assets/screenshots/04-deep-dive.png)
-![Highlights](docs/assets/screenshots/05-highlights.png)
-
-</details>
-
 Every week, this tool looks at everything you did on GitHub (commits, pull requests, code reviews) and generates a polished, shareable report page with AI-written summaries. It runs as a GitHub Action, deploys to GitHub Pages, and costs nothing.
-
-[See a live example](https://unhappychoice.github.io/weekly-report/)
 
 ## What You Need
 
@@ -91,11 +78,23 @@ Private repositories work too. GitHub Free gives 2,000 Actions minutes/month (th
 
 Three built-in themes, each with light/dark mode and responsive design.
 
-| Theme | Description | Demo |
-|---|---|---|
-| **brutalist** | Bold, high-contrast dark theme with monospace typography (default) | [Example](https://deariary.github.io/github-weekly-reporter/brutalist/en/2026/W14/) |
-| **minimal** | Clean lines, generous whitespace, understated elegance | [Example](https://deariary.github.io/github-weekly-reporter/minimal/en/2026/W14/) |
-| **editorial** | Horizontal-scroll magazine with serif typography and column layout | [Example](https://deariary.github.io/github-weekly-reporter/editorial/en/2026/W14/) |
+### brutalist (default)
+
+Bold, high-contrast dark theme with monospace typography. ([Example](https://deariary.github.io/github-weekly-reporter/brutalist/en/2026/W14/))
+
+![brutalist](scripts/screenshots/brutalist-dark.png)
+
+### minimal
+
+Clean lines, generous whitespace, understated elegance. ([Example](https://deariary.github.io/github-weekly-reporter/minimal/en/2026/W14/))
+
+![minimal](scripts/screenshots/minimal-light.png)
+
+### editorial
+
+Horizontal-scroll magazine with serif typography and column layout. ([Example](https://deariary.github.io/github-weekly-reporter/editorial/en/2026/W14/))
+
+![editorial](scripts/screenshots/editorial-light.png)
 
 Set the theme in your workflow or during `setup`:
 
