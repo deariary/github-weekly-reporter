@@ -1,0 +1,2144 @@
+- id: "10176424981"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:58:08Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10176385904"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:55:40Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10176283591"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:49:14Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10176231239"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:45:46Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10176197620"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:43:39Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10176107300"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:38:10Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10176063885"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:35:36Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10176036522"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:33:57Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175978797"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:30:47Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175904073"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:26:39Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175851002"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:23:39Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175746334"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:17:42Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175678542"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:13:43Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175608707"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:09:46Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175483133"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-04T00:02:57Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175390739"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:58:22Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175303697"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:52:52Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175251236"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:49:34Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175200965"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:46:28Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "10175131964"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:42:21Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/design-polish
+    commits: []
+- id: "8079826675"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:37:55Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 50
+    title: ""
+- id: "10175049489"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:37:42Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8079726495"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:29:55Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 49
+    title: ""
+- id: "10174906510"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:29:47Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10174754805"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:21:45Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10174754342"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:21:43Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8079631041"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:21:42Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 48
+    title: ""
+- id: "8079630875"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:21:44Z
+  payload:
+    kind: issues
+    action: closed
+    number: 38
+    title: "SEO optimization: OG image generation, internal linking, keywords"
+- id: "10174728217"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:20:16Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "10174695731"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:18:30Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "10174656348"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:16:29Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "10174558149"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:10:58Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "10174545777"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:10:15Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "10174503849"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:07:58Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "10174477606"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:06:31Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "10174448259"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:05:02Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "10174386559"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T23:01:54Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/seo-optimization
+    commits: []
+- id: "8079271993"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:54:02Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 48
+    title: ""
+- id: "10174225031"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:53:52Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10174035427"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:44:38Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10174035071"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:44:37Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8079141777"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:44:37Z
+  payload:
+    kind: issues
+    action: closed
+    number: 21
+    title: Make LLM narrative required (remove non-AI fallback)
+- id: "8079141709"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:44:35Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 47
+    title: ""
+- id: "8079125777"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:43:26Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 47
+    title: ""
+- id: "10174007712"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:43:16Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8079066888"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:38:57Z
+  payload:
+    kind: issues
+    action: closed
+    number: 24
+    title: Improve LLM narrative quality with richer data and preprocessing
+- id: "8079066854"
+  type: IssueCommentEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:38:56Z
+  payload:
+    kind: generic
+    action: created
+- id: "10173869800"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:36:15Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8079031513"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:36:12Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 46
+    title: ""
+- id: "8079031389"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:36:14Z
+  payload:
+    kind: issues
+    action: closed
+    number: 31
+    title: Add author GitHub profile and repository links to pages
+- id: "10173869024"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:36:13Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "10173806871"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:33:08Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/author-profile-links
+    commits: []
+- id: "8078956850"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:30:52Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 46
+    title: ""
+- id: "10173755781"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:30:43Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8078954976"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:30:44Z
+  payload:
+    kind: issues
+    action: opened
+    number: 45
+    title: Security check
+- id: "8078952013"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:30:33Z
+  payload:
+    kind: issues
+    action: opened
+    number: 44
+    title: Share button
+- id: "10173720770"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:29:09Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "10173721105"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:29:11Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8078930571"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:29:10Z
+  payload:
+    kind: issues
+    action: closed
+    number: 33
+    title: Set up GitHub Action workflow for daily-fetch and weekly report generation
+- id: "8078930418"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:29:08Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 43
+    title: ""
+- id: "10173693130"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:27:48Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/action-data-persistence
+    commits: []
+- id: "10173678799"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:27:07Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/action-data-persistence
+    commits: []
+- id: "10173646853"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:25:36Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/action-data-persistence
+    commits: []
+- id: "10173460392"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:17:02Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/action-data-persistence
+    commits: []
+- id: "10173322946"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:10:46Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/action-data-persistence
+    commits: []
+- id: "8078600794"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:07:30Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 43
+    title: ""
+- id: "10173249929"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:07:21Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10173195688"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:04:51Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10173195057"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:04:50Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8078560684"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:04:50Z
+  payload:
+    kind: issues
+    action: closed
+    number: 34
+    title: Separate data files and HTML output into different directories
+- id: "8078560508"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:04:48Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 42
+    title: ""
+- id: "8078533843"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:03:04Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 42
+    title: ""
+- id: "10173151283"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T22:02:55Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10173057638"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:59:42Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10173057161"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:59:41Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8078482809"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:59:40Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 41
+    title: ""
+- id: "8078482584"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:59:41Z
+  payload:
+    kind: issues
+    action: closed
+    number: 35
+    title: Switch config file format from TOML to YAML
+- id: "8078465032"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:58:28Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 41
+    title: ""
+- id: "10173028079"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:58:20Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10172948479"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:54:41Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10172947384"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:54:39Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8078401433"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:54:39Z
+  payload:
+    kind: issues
+    action: closed
+    number: 32
+    title: "Fix: release highlights not linked, external links not opening in new tab"
+- id: "8078401420"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:54:37Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 40
+    title: ""
+- id: "10172931075"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:53:53Z
+  payload:
+    kind: push
+    ref: refs/heads/fix/release-highlight-links
+    commits: []
+- id: "10172900701"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:52:28Z
+  payload:
+    kind: push
+    ref: refs/heads/fix/release-highlight-links
+    commits: []
+- id: "8078319421"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:50:04Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 40
+    title: ""
+- id: "10172844496"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:49:55Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10172642119"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:40:50Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10172641817"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:40:48Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8078175164"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:40:49Z
+  payload:
+    kind: issues
+    action: closed
+    number: 37
+    title: "Internationalization: configurable language and timezone"
+- id: "8078175089"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:40:49Z
+  payload:
+    kind: issues
+    action: closed
+    number: 36
+    title: "Fix: date range calculation may be off"
+- id: "8078174931"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:40:47Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 39
+    title: ""
+- id: "10172617204"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:39:44Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10172320670"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:26:43Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10172287787"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:25:16Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10172204630"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:21:41Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10172129776"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:18:30Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10171953932"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:11:10Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10171708471"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T21:01:41Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10171591031"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:57:26Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10171432986"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:51:00Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "10171001992"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:33:08Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/i18n-timezone
+    commits: []
+- id: "8076834876"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:26:54Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 39
+    title: ""
+- id: "10170829635"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:26:38Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8076462242"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:06:52Z
+  payload:
+    kind: issues
+    action: opened
+    number: 38
+    title: "SEO optimization: OG image generation, internal linking, keywords"
+- id: "8076457644"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:06:37Z
+  payload:
+    kind: issues
+    action: opened
+    number: 37
+    title: "Internationalization: configurable language and timezone"
+- id: "8076453935"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:06:25Z
+  payload:
+    kind: issues
+    action: opened
+    number: 36
+    title: "Fix: date range calculation may be off"
+- id: "8076450386"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:06:13Z
+  payload:
+    kind: issues
+    action: opened
+    number: 35
+    title: Switch config file format from TOML to YAML
+- id: "8076447371"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:06:04Z
+  payload:
+    kind: issues
+    action: opened
+    number: 34
+    title: Separate data files and HTML output into different directories
+- id: "8076443564"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:05:51Z
+  payload:
+    kind: issues
+    action: opened
+    number: 33
+    title: Set up GitHub Action workflow for daily-fetch and weekly report generation
+- id: "8076439756"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:05:38Z
+  payload:
+    kind: issues
+    action: opened
+    number: 32
+    title: "Fix: release highlights not linked, external links not opening in new tab"
+- id: "8076436175"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:05:26Z
+  payload:
+    kind: issues
+    action: opened
+    number: 31
+    title: Add author GitHub profile and repository links to pages
+- id: "8076433537"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T20:05:17Z
+  payload:
+    kind: issues
+    action: opened
+    number: 30
+    title: "Design polish: hover effects, spacing, typography, animations"
+- id: "10170123064"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:58:45Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10170122513"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:58:44Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8076316191"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:58:43Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 29
+    title: ""
+- id: "10169909104"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:50:40Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10169863757"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:48:49Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10169823044"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:47:17Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10169758331"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:44:52Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10169744442"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:44:17Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10169719910"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:43:19Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10169588916"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:38:11Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10169540282"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:36:19Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10168913143"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T19:11:59Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10168562223"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:59:08Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10168537872"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:58:11Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10168389686"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:52:40Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10168242312"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:47:17Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10168128719"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:43:09Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10168026760"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:39:32Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167934895"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:36:14Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167920927"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:36:14Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167914956"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:36:14Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167774456"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:31:23Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167689887"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:28:20Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167568082"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:23:49Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167428752"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:18:30Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167251816"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:12:24Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167118065"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:07:23Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10167071908"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T18:05:44Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10166838932"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T17:57:51Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10166696524"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T17:52:35Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10166593170"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T17:48:53Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10166570804"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T17:48:03Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "10165231996"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T17:00:21Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/enrich-data-collection
+    commits: []
+- id: "8072562392"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:58:03Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 29
+    title: ""
+- id: "10165163481"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:57:52Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8071939970"
+  type: IssueCommentEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:27:41Z
+  payload:
+    kind: generic
+    action: created
+- id: "8071939933"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:27:42Z
+  payload:
+    kind: issues
+    action: closed
+    number: 25
+    title: Publish to npm
+- id: "10164234689"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:23:46Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10164233881"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:23:45Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8071849389"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:23:44Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 28
+    title: ""
+- id: "8071833779"
+  type: WatchEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:22:59Z
+  payload:
+    kind: generic
+    action: started
+- id: "10164204509"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:22:40Z
+  payload:
+    kind: push
+    ref: refs/heads/chore/npm-scope
+    commits: []
+- id: "8071701281"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:16:28Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 28
+    title: ""
+- id: "10164025203"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:16:21Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10163815674"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:08:52Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10163815068"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:08:51Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8071540482"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:08:51Z
+  payload:
+    kind: issues
+    action: closed
+    number: 26
+    title: Add CI/CD GitHub Actions (test, lint, publish)
+- id: "8071539921"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:08:49Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 27
+    title: ""
+- id: "10163750419"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:06:34Z
+  payload:
+    kind: push
+    ref: refs/heads/ci/github-actions
+    commits: []
+- id: "10163726895"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:05:48Z
+  payload:
+    kind: push
+    ref: refs/heads/ci/github-actions
+    commits: []
+- id: "10163538913"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T16:00:02Z
+  payload:
+    kind: push
+    ref: refs/heads/ci/github-actions
+    commits: []
+- id: "8071323800"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:58:58Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 27
+    title: ""
+- id: "10163504121"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:58:51Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8071276629"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:56:43Z
+  payload:
+    kind: issues
+    action: opened
+    number: 26
+    title: Add CI/CD GitHub Actions (test, lint, publish)
+- id: "8071273288"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:56:33Z
+  payload:
+    kind: issues
+    action: opened
+    number: 25
+    title: Publish to npm
+- id: "8071269866"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:56:24Z
+  payload:
+    kind: issues
+    action: opened
+    number: 24
+    title: Improve LLM narrative quality with richer data and preprocessing
+- id: "8071265543"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:56:12Z
+  payload:
+    kind: issues
+    action: opened
+    number: 23
+    title: Add more LLM providers
+- id: "8071262207"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:56:02Z
+  payload:
+    kind: issues
+    action: opened
+    number: 22
+    title: Support Anthropic subscription OAuth keys (Claude Code Action)
+- id: "8071258498"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:55:52Z
+  payload:
+    kind: issues
+    action: opened
+    number: 21
+    title: Make LLM narrative required (remove non-AI fallback)
+- id: "8071255090"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:55:42Z
+  payload:
+    kind: issues
+    action: opened
+    number: 20
+    title: Multiple themes and templates, selectable via config
+- id: "8071251085"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:55:30Z
+  payload:
+    kind: issues
+    action: opened
+    number: 19
+    title: Dramatically improve HTML report visual design
+- id: "8071247356"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:55:20Z
+  payload:
+    kind: issues
+    action: opened
+    number: 18
+    title: CLI setup command for interactive one-command setup
+- id: "8071142385"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:50:14Z
+  payload:
+    kind: issues
+    action: closed
+    number: 9
+    title: GitHub Marketplace listing
+- id: "8071142133"
+  type: IssueCommentEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:50:12Z
+  payload:
+    kind: generic
+    action: created
+- id: "10163245441"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:49:41Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10163245122"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:49:40Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8071130870"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:49:41Z
+  payload:
+    kind: issues
+    action: closed
+    number: 2
+    title: GitHub Action scaffold and input configuration
+- id: "8071130814"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:49:39Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 17
+    title: ""
+- id: "10163192226"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:47:42Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-action
+    commits: []
+- id: "10163132897"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:45:34Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-action
+    commits: []
+- id: "10163103229"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:44:31Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-action
+    commits: []
+- id: "10163042505"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:42:17Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-action
+    commits: []
+- id: "10163014953"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:41:18Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-action
+    commits: []
+- id: "10162988483"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:40:22Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-action
+    commits: []
+- id: "10162969407"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:39:42Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-action
+    commits: []
+- id: "8070829730"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:35:37Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 17
+    title: ""
+- id: "10162848228"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:35:29Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10162810965"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:34:05Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "10162807001"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:34:05Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8070795802"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:34:03Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 16
+    title: ""
+- id: "8070795790"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:34:05Z
+  payload:
+    kind: issues
+    action: closed
+    number: 8
+    title: README and documentation
+- id: "8070741598"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:31:36Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 16
+    title: ""
+- id: "10162731376"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:31:29Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8070652088"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:27:31Z
+  payload:
+    kind: issues
+    action: closed
+    number: 1
+    title: "Project overview: GitHub Weekly Reporter"
+- id: "10162591001"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:26:38Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10162590268"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:26:36Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8070632342"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:26:37Z
+  payload:
+    kind: issues
+    action: closed
+    number: 10
+    title: CLI for one-command setup
+- id: "8070631973"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:26:34Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 15
+    title: ""
+- id: "10162540818"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:24:50Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/cli
+    commits: []
+- id: "10162372446"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:18:51Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/cli
+    commits: []
+- id: "8070412897"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:16:46Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 15
+    title: ""
+- id: "10162309186"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:16:38Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10162280865"
+  type: DeleteEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:15:43Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10162263206"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:15:05Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8070375349"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:15:06Z
+  payload:
+    kind: issues
+    action: closed
+    number: 6
+    title: GitHub Pages deployment
+- id: "8070375179"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:15:04Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 14
+    title: ""
+- id: "10162253368"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:14:45Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-pages-deployment
+    commits: []
+- id: "10162224513"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:13:45Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-pages-deployment
+    commits: []
+- id: "10162177287"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:12:05Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/github-pages-deployment
+    commits: []
+- id: "8070287588"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:11:02Z
+  payload:
+    kind: pull_request
+    action: reopened
+    number: 14
+    title: ""
+- id: "8070282277"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:09:14Z
+  payload:
+    kind: pull_request
+    action: closed
+    number: 14
+    title: ""
+- id: "8070281804"
+  type: IssueCommentEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:10:46Z
+  payload:
+    kind: generic
+    action: created
+- id: "8070248104"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:09:14Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 14
+    title: ""
+- id: "10162090526"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:09:06Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10162047334"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:07:40Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8070211361"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:07:39Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 13
+    title: ""
+- id: "8070211250"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:07:41Z
+  payload:
+    kind: issues
+    action: closed
+    number: 5
+    title: LLM integration for AI narrative
+- id: "10162040322"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:07:21Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/llm-integration
+    commits: []
+- id: "8070138889"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:04:25Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 13
+    title: ""
+- id: "10161945388"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:04:17Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10161901070"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:02:49Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8070102881"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:02:50Z
+  payload:
+    kind: issues
+    action: closed
+    number: 7
+    title: Powered by deariary.com footer and SEO optimization
+- id: "8070102825"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:02:50Z
+  payload:
+    kind: issues
+    action: closed
+    number: 4
+    title: HTML report generation and theming
+- id: "8070102799"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:02:48Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 12
+    title: ""
+- id: "10161862149"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T15:01:38Z
+  payload:
+    kind: push
+    ref: refs/heads/feat/html-report-generation
+    commits: []
+- id: "8069998393"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:59:05Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 12
+    title: ""
+- id: "10161769777"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:58:57Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10161707541"
+  type: PushEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:56:58Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8069937231"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:56:58Z
+  payload:
+    kind: issues
+    action: closed
+    number: 3
+    title: GitHub API data collection
+- id: "8069937129"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:56:56Z
+  payload:
+    kind: pull_request
+    action: merged
+    number: 11
+    title: ""
+- id: "10161637988"
+  type: PushEvent
+  repo: unhappychoice/gitlogue
+  createdAt: 2026-04-03T14:54:47Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "10161638080"
+  type: DeleteEvent
+  repo: bitflyer-tools/cycle-flyer
+  createdAt: 2026-04-03T14:54:53Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10161636727"
+  type: PushEvent
+  repo: bitflyer-tools/cycle-flyer
+  createdAt: 2026-04-03T14:54:50Z
+  payload:
+    kind: push
+    ref: refs/heads/master
+    commits: []
+- id: "10161636164"
+  type: DeleteEvent
+  repo: unhappychoice/gitlogue
+  createdAt: 2026-04-03T14:54:49Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10161632637"
+  type: PushEvent
+  repo: unhappychoice/cycle-pusher
+  createdAt: 2026-04-03T14:54:44Z
+  payload:
+    kind: push
+    ref: refs/heads/master
+    commits: []
+- id: "10161630080"
+  type: PushEvent
+  repo: bitflyer-tools/cycle-flyer
+  createdAt: 2026-04-03T14:54:39Z
+  payload:
+    kind: push
+    ref: refs/heads/master
+    commits: []
+- id: "10161630367"
+  type: DeleteEvent
+  repo: bitflyer-tools/cycle-flyer
+  createdAt: 2026-04-03T14:54:41Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10161628112"
+  type: DeleteEvent
+  repo: unhappychoice/mdts
+  createdAt: 2026-04-03T14:54:36Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10161627760"
+  type: PushEvent
+  repo: unhappychoice/mdts
+  createdAt: 2026-04-03T14:54:35Z
+  payload:
+    kind: push
+    ref: refs/heads/main
+    commits: []
+- id: "8069876029"
+  type: PullRequestReviewEvent
+  repo: bitflyer-tools/cycle-flyer
+  createdAt: 2026-04-03T14:54:32Z
+  payload:
+    kind: review
+    action: created
+    prNumber: 863
+    prTitle: ""
+    state: approved
+- id: "8069875062"
+  type: PullRequestReviewEvent
+  repo: unhappychoice/gitlogue
+  createdAt: 2026-04-03T14:54:29Z
+  payload:
+    kind: review
+    action: created
+    prNumber: 186
+    prTitle: ""
+    state: approved
+- id: "8069873559"
+  type: PullRequestReviewEvent
+  repo: unhappychoice/cycle-pusher
+  createdAt: 2026-04-03T14:54:26Z
+  payload:
+    kind: review
+    action: created
+    prNumber: 351
+    prTitle: ""
+    state: approved
+- id: "8069872266"
+  type: PullRequestReviewEvent
+  repo: bitflyer-tools/cycle-flyer
+  createdAt: 2026-04-03T14:54:23Z
+  payload:
+    kind: review
+    action: created
+    prNumber: 864
+    prTitle: ""
+    state: approved
+- id: "8069870768"
+  type: PullRequestReviewEvent
+  repo: unhappychoice/mdts
+  createdAt: 2026-04-03T14:54:18Z
+  payload:
+    kind: review
+    action: created
+    prNumber: 626
+    prTitle: ""
+    state: approved
+- id: "8069826083"
+  type: PullRequestEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:52:33Z
+  payload:
+    kind: pull_request
+    action: opened
+    number: 11
+    title: ""
+- id: "10161559551"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:52:24Z
+  payload:
+    kind: generic
+    action: ""
+- id: "10161551435"
+  type: CreateEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:52:12Z
+  payload:
+    kind: generic
+    action: ""
+- id: "8069180111"
+  type: WatchEvent
+  repo: lowlighter/metrics
+  createdAt: 2026-04-03T14:24:44Z
+  payload:
+    kind: generic
+    action: started
+- id: "8069046994"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:18:48Z
+  payload:
+    kind: issues
+    action: opened
+    number: 10
+    title: CLI for one-command setup
+- id: "8068883156"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:11:43Z
+  payload:
+    kind: issues
+    action: opened
+    number: 9
+    title: GitHub Marketplace listing
+- id: "8068881474"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:11:38Z
+  payload:
+    kind: issues
+    action: opened
+    number: 8
+    title: README and documentation
+- id: "8068878440"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:11:30Z
+  payload:
+    kind: issues
+    action: opened
+    number: 7
+    title: Powered by deariary.com footer and SEO optimization
+- id: "8068874510"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:11:21Z
+  payload:
+    kind: issues
+    action: opened
+    number: 6
+    title: GitHub Pages deployment
+- id: "8068870979"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:11:12Z
+  payload:
+    kind: issues
+    action: opened
+    number: 5
+    title: LLM integration for AI narrative
+- id: "8068864926"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:10:57Z
+  payload:
+    kind: issues
+    action: opened
+    number: 4
+    title: HTML report generation and theming
+- id: "8068860434"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:10:46Z
+  payload:
+    kind: issues
+    action: opened
+    number: 3
+    title: GitHub API data collection
+- id: "8068857049"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:10:37Z
+  payload:
+    kind: issues
+    action: opened
+    number: 2
+    title: GitHub Action scaffold and input configuration
+- id: "8068849923"
+  type: IssuesEvent
+  repo: deariary/github-weekly-reporter
+  createdAt: 2026-04-03T14:10:20Z
+  payload:
+    kind: issues
+    action: opened
+    number: 1
+    title: "Project overview: GitHub Weekly Reporter"
