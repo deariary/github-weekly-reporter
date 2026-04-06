@@ -9,7 +9,7 @@ const MAX_PRS = 20;
 const MAX_ISSUES = 15;
 const MAX_EVENTS = 40;
 const MAX_COMMITS_PER_PUSH = 5;
-const MAX_COMMIT_MESSAGES = 50;
+
 
 const formatPR = (pr: PullRequest): Record<string, unknown> => ({
   title: pr.title,
@@ -94,16 +94,8 @@ export const buildLLMContext = (input: NarrativeInput): string => {
   }
 
   if (input.commitMessages && input.commitMessages.length > 0) {
-    let count = 0;
     context.commit_messages = input.commitMessages
-      .filter((r: RepoCommitMessages) => r.messages.length > 0)
-      .map((r: RepoCommitMessages) => {
-        const remaining = MAX_COMMIT_MESSAGES - count;
-        const msgs = r.messages.slice(0, remaining);
-        count += msgs.length;
-        return { repo: r.repo, messages: msgs };
-      })
-      .filter((r) => r.messages.length > 0);
+      .filter((r: RepoCommitMessages) => r.messages.length > 0);
   }
 
   if (input.externalContributions.length > 0) {

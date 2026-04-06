@@ -16,8 +16,7 @@ type RawCommit = {
   };
 };
 
-const MAX_MESSAGES_PER_REPO = 10;
-const MAX_TOTAL_MESSAGES = 50;
+const PER_PAGE = 100;
 const MAX_MESSAGE_LENGTH = 200;
 const MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY_MS = 5_000;
@@ -40,12 +39,49 @@ const parseRetryDelay = (response: Response): number => {
   return DEFAULT_RETRY_DELAY_MS;
 };
 
+// Parse Link header to find next page URL
+const parseNextUrl = (response: Response): string | null => {
+  const link = response.headers.get("link");
+  if (!link) return null;
+  const match = link.match(/<([^>]+)>;\s*rel="next"/);
+  return match?.[1] ?? null;
+};
+
 // Extract the first line of a commit message and truncate to MAX_MESSAGE_LENGTH
 const firstLine = (message: string): string => {
   const subject = message.split("\n")[0]?.trim() ?? message.trim();
   return subject.length > MAX_MESSAGE_LENGTH
     ? `${subject.slice(0, MAX_MESSAGE_LENGTH)}...`
     : subject;
+};
+
+const fetchPage = async (
+  token: string,
+  url: string,
+): Promise<{ commits: RawCommit[]; nextUrl: string | null } | null> => {
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const response = await fetch(url, { headers: GITHUB_HEADERS(token) });
+
+    if (response.ok) {
+      const commits = (await response.json()) as RawCommit[];
+      return { commits, nextUrl: parseNextUrl(response) };
+    }
+
+    if (response.status === 409) return null; // Empty repository
+    if (response.status === 403 || response.status === 404) return null;
+
+    if (response.status === 429 && attempt < MAX_RETRIES) {
+      const delay = parseRetryDelay(response);
+      console.warn(`  429, retrying in ${Math.round(delay / 1000)}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
+      await sleep(delay);
+      continue;
+    }
+
+    console.warn(`  Failed to fetch commits: ${response.status} ${response.statusText}`);
+    return null;
+  }
+
+  return null;
 };
 
 const fetchRepoCommits = async (
@@ -58,40 +94,19 @@ const fetchRepoCommits = async (
     author,
     since: range.from.toISOString(),
     until: range.to.toISOString(),
-    per_page: String(MAX_MESSAGES_PER_REPO),
+    per_page: String(PER_PAGE),
   });
-  const url = `https://api.github.com/repos/${repo}/commits?${params}`;
+  let url: string | null = `https://api.github.com/repos/${repo}/commits?${params}`;
+  const messages: string[] = [];
 
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    const response = await fetch(url, { headers: GITHUB_HEADERS(token) });
-
-    if (response.ok) {
-      const commits = (await response.json()) as RawCommit[];
-      return commits.map((c) => firstLine(c.commit.message));
-    }
-
-    if (response.status === 409) {
-      // Empty repository
-      return [];
-    }
-
-    if (response.status === 429 && attempt < MAX_RETRIES) {
-      const delay = parseRetryDelay(response);
-      console.warn(`  ${repo}: 429, retrying in ${Math.round(delay / 1000)}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
-      await sleep(delay);
-      continue;
-    }
-
-    if (response.status === 403 || response.status === 404) {
-      // Permission denied or repo not found (private, deleted, etc.)
-      return [];
-    }
-
-    console.warn(`  Failed to fetch commits for ${repo}: ${response.status} ${response.statusText}`);
-    return [];
+  while (url) {
+    const result = await fetchPage(token, url);
+    if (!result) break;
+    messages.push(...result.commits.map((c) => firstLine(c.commit.message)));
+    url = result.nextUrl;
   }
 
-  return [];
+  return messages;
 };
 
 const CONCURRENCY = 5;
@@ -129,16 +144,5 @@ export const fetchCommitMessages = async (
     }
   });
 
-  // Cap total messages after all fetches complete
-  const capped: RepoCommits[] = [];
-  let total = 0;
-  for (const entry of results) {
-    if (total >= MAX_TOTAL_MESSAGES) break;
-    const remaining = MAX_TOTAL_MESSAGES - total;
-    const trimmed = entry.messages.slice(0, remaining);
-    capped.push({ repo: entry.repo, messages: trimmed });
-    total += trimmed.length;
-  }
-
-  return capped;
+  return results;
 };
