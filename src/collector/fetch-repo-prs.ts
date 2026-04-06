@@ -37,7 +37,7 @@ export type PRRef = {
 };
 
 const MAX_RETRIES = 3;
-const REQUEST_DELAY_MS = 200;
+const REQUEST_DELAY_MS = 100;
 const DEFAULT_RETRY_DELAY_MS = 5_000;
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));

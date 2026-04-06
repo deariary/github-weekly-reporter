@@ -95,6 +95,7 @@ const fetchRepoCommits = async (
 };
 
 const CONCURRENCY = 5;
+const REQUEST_DELAY_MS = 100;
 
 const runWithConcurrency = async <T>(
   items: T[],
@@ -104,7 +105,10 @@ const runWithConcurrency = async <T>(
   const workers = Array.from({ length: CONCURRENCY }, async () => {
     while (queue.length > 0) {
       const item = queue.shift();
-      if (item) await fn(item);
+      if (item) {
+        await fn(item);
+        await sleep(REQUEST_DELAY_MS);
+      }
     }
   });
   await Promise.all(workers);
