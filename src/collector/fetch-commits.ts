@@ -94,6 +94,22 @@ const fetchRepoCommits = async (
   return [];
 };
 
+const CONCURRENCY = 5;
+
+const runWithConcurrency = async <T>(
+  items: T[],
+  fn: (item: T) => Promise<void>,
+): Promise<void> => {
+  const queue = [...items];
+  const workers = Array.from({ length: CONCURRENCY }, async () => {
+    while (queue.length > 0) {
+      const item = queue.shift();
+      if (item) await fn(item);
+    }
+  });
+  await Promise.all(workers);
+};
+
 export const fetchCommitMessages = async (
   token: string,
   username: string,
@@ -101,20 +117,24 @@ export const fetchCommitMessages = async (
   range: DateRange,
 ): Promise<RepoCommits[]> => {
   const results: RepoCommits[] = [];
-  let totalMessages = 0;
 
-  for (const repo of repos) {
-    if (totalMessages >= MAX_TOTAL_MESSAGES) break;
-
+  await runWithConcurrency(repos, async (repo) => {
     const messages = await fetchRepoCommits(token, repo, username, range);
     if (messages.length > 0) {
-      const remaining = MAX_TOTAL_MESSAGES - totalMessages;
-      const trimmed = messages.slice(0, remaining);
-      results.push({ repo, messages: trimmed });
-      totalMessages += trimmed.length;
+      results.push({ repo, messages });
     }
+  });
 
+  // Cap total messages after all fetches complete
+  const capped: RepoCommits[] = [];
+  let total = 0;
+  for (const entry of results) {
+    if (total >= MAX_TOTAL_MESSAGES) break;
+    const remaining = MAX_TOTAL_MESSAGES - total;
+    const trimmed = entry.messages.slice(0, remaining);
+    capped.push({ repo: entry.repo, messages: trimmed });
+    total += trimmed.length;
   }
 
-  return results;
+  return capped;
 };
