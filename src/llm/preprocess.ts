@@ -3,7 +3,7 @@
 
 import { stringify as toYaml } from "yaml";
 import type { NarrativeInput } from "./types.js";
-import type { PullRequest, Issue, RepoCommitMessages } from "../types.js";
+import type { PullRequest, Issue, GitHubEvent, PullRequestReviewEventPayload, ReleaseEventPayload, RepoCommitMessages } from "../types.js";
 
 const MAX_PRS = 20;
 const MAX_ISSUES = 15;
@@ -53,6 +53,24 @@ export const buildLLMContext = (input: NarrativeInput): string => {
     context.issues = input.issues
       .slice(0, MAX_ISSUES)
       .map(formatIssue);
+  }
+
+  // Include review and release events (other event types have empty payloads)
+  const reviewsAndReleases = input.events
+    .map((event: GitHubEvent) => {
+      if (event.payload.kind === "review") {
+        const r = event.payload as PullRequestReviewEventPayload;
+        return { type: "review", repo: event.repo, pr: r.prTitle, state: r.state };
+      }
+      if (event.payload.kind === "release") {
+        const rel = event.payload as ReleaseEventPayload;
+        return { type: "release", repo: event.repo, tag: rel.tag, name: rel.name };
+      }
+      return null;
+    })
+    .filter(Boolean);
+  if (reviewsAndReleases.length > 0) {
+    context.reviews_and_releases = reviewsAndReleases;
   }
 
   if (input.repositories.length > 0) {

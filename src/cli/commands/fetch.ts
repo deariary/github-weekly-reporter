@@ -257,7 +257,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     repositories,
     pullRequests,
     issues: [],
-    events: [],
+    events: events.filter((e) => e.payload.kind === "review" || e.payload.kind === "release"),
     commitMessages,
     externalContributions: [],
   };

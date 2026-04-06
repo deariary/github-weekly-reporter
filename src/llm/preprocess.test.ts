@@ -157,8 +157,67 @@ describe("buildLLMContext", () => {
     expect(context).not.toContain("commit_messages:");
   });
 
-  it("does not include events in LLM context", () => {
-    const context = buildLLMContext(MOCK_INPUT);
-    expect(context).not.toContain("events:");
+  it("does not include push/generic events in LLM context", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      events: [
+        {
+          id: "p1",
+          type: "PushEvent",
+          repo: "org/repo-a",
+          createdAt: "2026-04-01T10:00:00Z",
+          payload: { kind: "push", ref: "refs/heads/main", commits: [] },
+        },
+        {
+          id: "w1",
+          type: "WatchEvent",
+          repo: "org/repo-a",
+          createdAt: "2026-04-01T10:00:00Z",
+          payload: { kind: "generic", action: "started" },
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).not.toContain("reviews_and_releases:");
+    expect(context).not.toContain("PushEvent");
+    expect(context).not.toContain("WatchEvent");
+  });
+
+  it("includes review events in LLM context", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      events: [
+        {
+          id: "r1",
+          type: "PullRequestReviewEvent",
+          repo: "org/repo-a",
+          createdAt: "2026-04-01T10:00:00Z",
+          payload: { kind: "review", action: "submitted", prNumber: 42, prTitle: "Add feature", state: "approved" },
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("reviews_and_releases:");
+    expect(context).toContain("Add feature");
+    expect(context).toContain("approved");
+  });
+
+  it("includes release events in LLM context", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      events: [
+        {
+          id: "rel1",
+          type: "ReleaseEvent",
+          repo: "org/repo-a",
+          createdAt: "2026-04-01T10:00:00Z",
+          payload: { kind: "release", action: "published", tag: "v2.0.0", name: "Major Release" },
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("reviews_and_releases:");
+    expect(context).toContain("v2.0.0");
+    expect(context).toContain("Major Release");
   });
 });
