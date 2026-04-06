@@ -33,6 +33,9 @@ for theme in $THEMES; do
   done
 done
 
+# Copy theme screenshots for LP
+cp -r scripts/screenshots "$OUT_DIR/screenshots"
+
 # Generate top-level index
 node scripts/generate-preview-index.js "$OUT_DIR" "$BASE_URL" "$THEMES" "$LANGS"
 
