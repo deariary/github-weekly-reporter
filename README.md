@@ -93,9 +93,9 @@ Three built-in themes, each with light/dark mode and responsive design.
 
 | Theme | Description | Demo |
 |---|---|---|
-| **brutalist** | Bold, high-contrast dark theme with monospace typography (default) | [EN](https://deariary.github.io/github-weekly-reporter/brutalist/en/2026/W14/) / [JA](https://deariary.github.io/github-weekly-reporter/brutalist/ja/2026/W14/) |
-| **minimal** | Clean lines, generous whitespace, understated elegance | [EN](https://deariary.github.io/github-weekly-reporter/minimal/en/2026/W14/) / [JA](https://deariary.github.io/github-weekly-reporter/minimal/ja/2026/W14/) |
-| **editorial** | Horizontal-scroll magazine with serif typography and column layout | [EN](https://deariary.github.io/github-weekly-reporter/editorial/en/2026/W14/) / [JA](https://deariary.github.io/github-weekly-reporter/editorial/ja/2026/W14/) |
+| **brutalist** | Bold, high-contrast dark theme with monospace typography (default) | [Example](https://deariary.github.io/github-weekly-reporter/brutalist/en/2026/W14/) |
+| **minimal** | Clean lines, generous whitespace, understated elegance | [Example](https://deariary.github.io/github-weekly-reporter/minimal/en/2026/W14/) |
+| **editorial** | Horizontal-scroll magazine with serif typography and column layout | [Example](https://deariary.github.io/github-weekly-reporter/editorial/en/2026/W14/) |
 
 Set the theme in your workflow or during `setup`:
 
