@@ -78,23 +78,11 @@ Private repositories work too. GitHub Free gives 2,000 Actions minutes/month (th
 
 Three built-in themes, each with light/dark mode and responsive design.
 
-### brutalist (default)
-
-Bold, high-contrast dark theme with monospace typography. ([Example](https://deariary.github.io/github-weekly-reporter/brutalist/en/2026/W14/))
-
-![brutalist](scripts/screenshots/brutalist-dark.png)
-
-### minimal
-
-Clean lines, generous whitespace, understated elegance. ([Example](https://deariary.github.io/github-weekly-reporter/minimal/en/2026/W14/))
-
-![minimal](scripts/screenshots/minimal-light.png)
-
-### editorial
-
-Horizontal-scroll magazine with serif typography and column layout. ([Example](https://deariary.github.io/github-weekly-reporter/editorial/en/2026/W14/))
-
-![editorial](scripts/screenshots/editorial-light.png)
+| Theme | Screenshot | Description |
+|---|---|---|
+| **brutalist** (default) | <img src="scripts/screenshots/brutalist-dark.png" width="400" /> | Bold, high-contrast dark theme with monospace typography. [Example](https://deariary.github.io/github-weekly-reporter/brutalist/en/2026/W14/) |
+| **minimal** | <img src="scripts/screenshots/minimal-light.png" width="400" /> | Clean lines, generous whitespace, understated elegance. [Example](https://deariary.github.io/github-weekly-reporter/minimal/en/2026/W14/) |
+| **editorial** | <img src="scripts/screenshots/editorial-light.png" width="400" /> | Horizontal-scroll magazine with serif typography and column layout. [Example](https://deariary.github.io/github-weekly-reporter/editorial/en/2026/W14/) |
 
 Set the theme in your workflow or during `setup`:
 
