@@ -130,6 +130,15 @@ export type RepoCommitMessages = {
   messages: string[];
 };
 
+export type Release = {
+  repo: string;
+  tag: string;
+  name: string;
+  body: string | null;
+  url: string;
+  publishedAt: string;
+};
+
 export type WeeklyReportData = {
   username: string;
   avatarUrl: string;
@@ -142,6 +151,7 @@ export type WeeklyReportData = {
   issues: Issue[];
   events: GitHubEvent[];
   commitMessages: RepoCommitMessages[];
+  releases: Release[];
   externalContributions: ExternalContribution[];
   aiContent: AIContent;
 };

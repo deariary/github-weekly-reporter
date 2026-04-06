@@ -10,6 +10,7 @@ import { fetchEvents, dedupeEvents } from "../../collector/fetch-events.js";
 import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
 import { fetchCommitMessages } from "../../collector/fetch-commits.js";
+import { fetchReleases } from "../../collector/fetch-releases.js";
 import { aggregateRepositories } from "../../collector/aggregate.js";
 import { getWeekId, getCurrentWeekId } from "../../deployer/week.js";
 import type { GitHubEvent } from "../../types.js";
@@ -238,6 +239,11 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   const totalMsgs = commitMessages.reduce((sum, r) => sum + r.messages.length, 0);
   console.log(`Collected ${totalMsgs} commit messages from ${commitMessages.length} repositories.`);
 
+  // Fetch releases per repository
+  console.log(`Fetching releases for ${repoNames.length} repositories...`);
+  const releases = await fetchReleases(options.token, repoNames, plan.range);
+  console.log(`Collected ${releases.length} releases.`);
+
   const githubData = {
     username: contributions.username,
     avatarUrl: contributions.avatarUrl,
@@ -257,8 +263,9 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     repositories,
     pullRequests,
     issues: [],
-    events,
+    events: events.filter((e) => e.payload.kind === "review"),
     commitMessages,
+    releases,
     externalContributions: [],
   };
   const dataPath = join(plan.reportDir, "github-data.yaml");

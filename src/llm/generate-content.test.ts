@@ -77,6 +77,7 @@ const MOCK_INPUT: NarrativeInput = {
     },
   ],
   commitMessages: [],
+  releases: [],
   externalContributions: [],
 };
 

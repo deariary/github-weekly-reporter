@@ -3,13 +3,11 @@
 
 import { stringify as toYaml } from "yaml";
 import type { NarrativeInput } from "./types.js";
-import type { PullRequest, Issue, GitHubEvent, PushEventPayload, PullRequestReviewEventPayload, ReleaseEventPayload, RepoCommitMessages } from "../types.js";
+import type { PullRequest, Issue, GitHubEvent, PullRequestReviewEventPayload, RepoCommitMessages, Release } from "../types.js";
 
 const MAX_PRS = 20;
 const MAX_ISSUES = 15;
-const MAX_EVENTS = 40;
-const MAX_COMMITS_PER_PUSH = 5;
-const MAX_COMMIT_MESSAGES = 50;
+
 
 const formatPR = (pr: PullRequest): Record<string, unknown> => ({
   title: pr.title,
@@ -28,28 +26,6 @@ const formatIssue = (issue: Issue): Record<string, unknown> => ({
   ...(issue.labels.length > 0 ? { labels: issue.labels } : {}),
   ...(issue.body ? { body: issue.body } : {}),
 });
-
-const formatEvent = (event: GitHubEvent): Record<string, unknown> | null => {
-  const base = { type: event.type, repo: event.repo, at: event.createdAt.split("T")[0] };
-
-  switch (event.payload.kind) {
-    case "push": {
-      const p = event.payload as PushEventPayload;
-      const commits = p.commits.slice(0, MAX_COMMITS_PER_PUSH);
-      return { ...base, ref: p.ref, commits };
-    }
-    case "review": {
-      const r = event.payload as PullRequestReviewEventPayload;
-      return { ...base, pr: r.prTitle, state: r.state };
-    }
-    case "release": {
-      const rel = event.payload as ReleaseEventPayload;
-      return { ...base, tag: rel.tag, name: rel.name };
-    }
-    default:
-      return null;
-  }
-};
 
 export const buildLLMContext = (input: NarrativeInput): string => {
   const context: Record<string, unknown> = {
@@ -79,12 +55,25 @@ export const buildLLMContext = (input: NarrativeInput): string => {
       .map(formatIssue);
   }
 
-  const formattedEvents = input.events
-    .slice(0, MAX_EVENTS)
-    .map(formatEvent)
-    .filter(Boolean);
-  if (formattedEvents.length > 0) {
-    context.events = formattedEvents;
+  // Include review events (other event types have empty payloads from Events API)
+  const reviews = input.events
+    .filter((event: GitHubEvent) => event.payload.kind === "review")
+    .map((event: GitHubEvent) => {
+      const r = event.payload as PullRequestReviewEventPayload;
+      return { repo: event.repo, pr: r.prTitle, state: r.state };
+    });
+  if (reviews.length > 0) {
+    context.reviews = reviews;
+  }
+
+  // Include releases fetched via Releases API (with full body)
+  if (input.releases && input.releases.length > 0) {
+    context.releases = input.releases.map((r: Release) => ({
+      repo: r.repo,
+      tag: r.tag,
+      name: r.name,
+      ...(r.body ? { body: r.body } : {}),
+    }));
   }
 
   if (input.repositories.length > 0) {
@@ -94,16 +83,8 @@ export const buildLLMContext = (input: NarrativeInput): string => {
   }
 
   if (input.commitMessages && input.commitMessages.length > 0) {
-    let count = 0;
     context.commit_messages = input.commitMessages
-      .filter((r: RepoCommitMessages) => r.messages.length > 0)
-      .map((r: RepoCommitMessages) => {
-        const remaining = MAX_COMMIT_MESSAGES - count;
-        const msgs = r.messages.slice(0, remaining);
-        count += msgs.length;
-        return { repo: r.repo, messages: msgs };
-      })
-      .filter((r) => r.messages.length > 0);
+      .filter((r: RepoCommitMessages) => r.messages.length > 0);
   }
 
   if (input.externalContributions.length > 0) {

@@ -12,6 +12,13 @@ const makeRawCommit = (message: string) => ({
   commit: { message, author: { date: "2026-04-01T12:00:00Z" } },
 });
 
+// Helper to create a Response with a Link header for pagination
+const pagedResponse = (commits: unknown[], nextUrl?: string) => {
+  const headers: Record<string, string> = {};
+  if (nextUrl) headers["link"] = `<${nextUrl}>; rel="next"`;
+  return new Response(JSON.stringify(commits), { status: 200, headers });
+};
+
 describe("fetchCommitMessages", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -19,17 +26,13 @@ describe("fetchCommitMessages", () => {
 
   it("fetches commit messages for multiple repos", async () => {
     vi.spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify([
-          makeRawCommit("feat: add login"),
-          makeRawCommit("fix: typo in header"),
-        ]), { status: 200 }),
-      )
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify([
-          makeRawCommit("chore: update deps"),
-        ]), { status: 200 }),
-      );
+      .mockResolvedValueOnce(pagedResponse([
+        makeRawCommit("feat: add login"),
+        makeRawCommit("fix: typo in header"),
+      ]))
+      .mockResolvedValueOnce(pagedResponse([
+        makeRawCommit("chore: update deps"),
+      ]));
 
     const result = await fetchCommitMessages("token", "user", ["org/repo-a", "org/repo-b"], range);
 
@@ -38,11 +41,24 @@ describe("fetchCommitMessages", () => {
     expect(result[1]).toEqual({ repo: "org/repo-b", messages: ["chore: update deps"] });
   });
 
+  it("paginates through multiple pages", async () => {
+    const page1 = Array.from({ length: 100 }, (_, i) => makeRawCommit(`page1-${i}`));
+    const page2 = Array.from({ length: 50 }, (_, i) => makeRawCommit(`page2-${i}`));
+
+    vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(pagedResponse(page1, "https://api.github.com/repos/org/repo/commits?page=2"))
+      .mockResolvedValueOnce(pagedResponse(page2));
+
+    const result = await fetchCommitMessages("token", "user", ["org/repo"], range);
+
+    expect(result[0].messages).toHaveLength(150);
+    expect(result[0].messages[0]).toBe("page1-0");
+    expect(result[0].messages[100]).toBe("page2-0");
+  });
+
   it("extracts only the first line of multi-line commit messages", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify([
-        makeRawCommit("feat: new feature\n\nLong description here\nMore details"),
-      ]), { status: 200 }),
+      pagedResponse([makeRawCommit("feat: new feature\n\nLong description here\nMore details")]),
     );
 
     const result = await fetchCommitMessages("token", "user", ["org/repo"], range);
@@ -53,7 +69,7 @@ describe("fetchCommitMessages", () => {
   it("truncates long commit messages to 200 characters", async () => {
     const longMessage = "a".repeat(300);
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify([makeRawCommit(longMessage)]), { status: 200 }),
+      pagedResponse([makeRawCommit(longMessage)]),
     );
 
     const result = await fetchCommitMessages("token", "user", ["org/repo"], range);
@@ -63,9 +79,7 @@ describe("fetchCommitMessages", () => {
   });
 
   it("skips repos with no commits", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify([]), { status: 200 }),
-    );
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(pagedResponse([]));
 
     const result = await fetchCommitMessages("token", "user", ["org/empty"], range);
 
@@ -92,32 +106,6 @@ describe("fetchCommitMessages", () => {
     expect(result).toHaveLength(0);
   });
 
-  it("respects per_page limit from API (10 per repo)", async () => {
-    // API honors per_page=10, so even if repo has more commits, only 10 are returned
-    const commits = Array.from({ length: 10 }, (_, i) => makeRawCommit(`commit ${i}`));
-    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
-      new Response(JSON.stringify(commits), { status: 200 }),
-    );
-
-    const result = await fetchCommitMessages("token", "user", ["org/busy"], range);
-
-    expect(result[0].messages.length).toBe(10);
-  });
-
-  it("caps total messages at 50 across all repos", async () => {
-    // 6 repos each returning 10 commits = 60 total, should be capped at 50
-    const commits = Array.from({ length: 10 }, (_, i) => makeRawCommit(`msg ${i}`));
-    vi.spyOn(globalThis, "fetch").mockImplementation(
-      () => Promise.resolve(new Response(JSON.stringify(commits), { status: 200 })),
-    );
-
-    const repos = Array.from({ length: 6 }, (_, i) => `org/repo-${i}`);
-    const result = await fetchCommitMessages("token", "user", repos, range);
-
-    const totalMsgs = result.reduce((sum, r) => sum + r.messages.length, 0);
-    expect(totalMsgs).toBeLessThanOrEqual(50);
-  });
-
   it("returns empty array for empty repos list", async () => {
     const result = await fetchCommitMessages("token", "user", [], range);
 
@@ -129,9 +117,7 @@ describe("fetchCommitMessages", () => {
       .mockResolvedValueOnce(
         new Response("", { status: 429, headers: { "retry-after": "0" } }),
       )
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify([makeRawCommit("after retry")]), { status: 200 }),
-      );
+      .mockResolvedValueOnce(pagedResponse([makeRawCommit("after retry")]));
 
     const result = await fetchCommitMessages("token", "user", ["org/repo"], range);
 
