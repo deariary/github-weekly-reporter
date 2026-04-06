@@ -122,21 +122,21 @@ export const THEME_TOGGLE_SCRIPT = `<script>
 
 export const buildCSS = (language: Language = "en"): string => {
   const f = getFontConfig(language);
-  const serif = `'Cormorant Garamond', ${f.bodyFamily}, Georgia, 'Times New Roman', serif`;
-  const sans = `'DM Sans', ${f.bodyFamily}`;
+  const heading = `'Playfair Display', ${f.bodyFamily}, Georgia, 'Times New Roman', serif`;
+  const body = `'Newsreader', ${f.bodyFamily}, Georgia, serif`;
   const mono = f.monoFamily;
 
   return `
     ${COLOR_VARS}
     ${THEME_TOGGLE_CSS}
 
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,700;1,6..72,400&display=swap');
     ${f.importUrl ? `@import url('${f.importUrl}');` : ""}
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: ${sans};
+      font-family: ${body};
       background: var(--e-bg);
       color: var(--e-text);
       line-height: 1.8;
@@ -162,7 +162,7 @@ export const buildCSS = (language: Language = "en"): string => {
     nav a { color: var(--e-text-secondary); text-decoration: none; font-size: 0.875rem; }
     nav a:hover { color: var(--e-accent); }
     .nav-site-title {
-      font-family: ${serif}; font-size: 1rem; font-weight: 600;
+      font-family: ${heading}; font-size: 1rem; font-weight: 600;
       font-style: italic; color: var(--e-text-tertiary);
       letter-spacing: 0.02em;
     }
@@ -184,9 +184,9 @@ export const buildCSS = (language: Language = "en"): string => {
       vertical-align: middle; margin-right: 0.375rem;
     }
     h1 {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 500; font-style: italic;
+      font-weight: 700;
       line-height: 1.15; letter-spacing: -0.02em;
       color: var(--e-heading);
       margin-bottom: 0.75rem;
@@ -211,7 +211,7 @@ export const buildCSS = (language: Language = "en"): string => {
     }
     .overview p:last-child { margin-bottom: 0; }
     .overview p:first-child::first-letter {
-      font-family: ${serif};
+      font-family: ${heading};
       float: left;
       font-size: 3.5rem;
       line-height: 0.8;
@@ -232,7 +232,7 @@ export const buildCSS = (language: Language = "en"): string => {
       padding-bottom: 0.5rem;
     }
     .section-group-title {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: 2rem; font-weight: 500;
       letter-spacing: -0.02em;
     }
@@ -255,7 +255,7 @@ export const buildCSS = (language: Language = "en"): string => {
       font-weight: 500; margin-bottom: 0.375rem;
     }
     .section-heading {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: 1.5rem; font-weight: 500;
       letter-spacing: -0.01em;
       margin-bottom: 0.5rem;
@@ -322,7 +322,7 @@ export const buildCSS = (language: Language = "en"): string => {
       display: flex; justify-content: space-between; align-items: baseline;
     }
     .highlight-header-title {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: 2rem; font-weight: 500;
       letter-spacing: -0.02em;
     }
@@ -351,7 +351,7 @@ export const buildCSS = (language: Language = "en"): string => {
     .highlight-issue { background: var(--e-badge-issue); color: #000; }
     .highlight-discussion { background: var(--e-badge-discussion); }
     .highlight-title {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: 1.125rem; font-weight: 500;
       margin-bottom: 0.25rem;
     }
@@ -415,11 +415,12 @@ export const buildCSS = (language: Language = "en"): string => {
 
 export const buildIndexCSS = (language: Language = "en"): string => {
   const f = getFontConfig(language);
-  const serif = `'Cormorant Garamond', ${f.bodyFamily}, Georgia, serif`;
+  const heading = `'Playfair Display', ${f.bodyFamily}, Georgia, serif`;
+  const body = `'Newsreader', ${f.bodyFamily}, Georgia, serif`;
   const mono = f.monoFamily;
 
   return `
-    body { max-width: 680px; margin: 0 auto; padding: 0 2rem; }
+    body { max-width: 680px; margin: 0 auto; padding: 0 2rem; font-family: ${body}; }
 
     /* HEADER */
     .index-header {
@@ -428,9 +429,9 @@ export const buildIndexCSS = (language: Language = "en"): string => {
       margin-bottom: 2.5rem;
     }
     .index-header h1 {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: clamp(2.5rem, 8vw, 4rem);
-      font-weight: 500; font-style: italic;
+      font-weight: 700;
       letter-spacing: -0.03em;
       line-height: 0.95;
       color: var(--e-heading);
@@ -443,7 +444,7 @@ export const buildIndexCSS = (language: Language = "en"): string => {
     .index-profile:hover { color: var(--e-accent); }
     .index-profile img { width: 48px; height: 48px; border-radius: 50%; }
     .index-profile-name {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: 1.125rem; font-weight: 500;
     }
     .index-profile-handle { font-size: 0.8125rem; color: var(--e-text-tertiary); }
@@ -452,7 +453,7 @@ export const buildIndexCSS = (language: Language = "en"): string => {
     /* YEAR */
     .year-group { margin-bottom: 3rem; }
     .year-label {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: 1.25rem; font-weight: 500; font-style: italic;
       color: var(--e-text-tertiary);
       margin-bottom: 1rem;
@@ -469,7 +470,7 @@ export const buildIndexCSS = (language: Language = "en"): string => {
     .week-item:hover .week-item-title { color: var(--e-accent); }
     .week-item-header { display: flex; justify-content: space-between; align-items: baseline; }
     .week-item-title {
-      font-family: ${serif};
+      font-family: ${heading};
       font-size: 1.125rem; font-weight: 500;
       transition: color 0.2s;
     }

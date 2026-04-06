@@ -286,11 +286,11 @@ describe("editorial theme", () => {
     expect(theme.templatesDir).toContain("themes/editorial/templates");
   });
 
-  it("buildCSS includes serif font (Cormorant Garamond)", () => {
+  it("buildCSS includes Playfair Display and Newsreader", () => {
     const theme = loadTheme("editorial");
     const css = theme.buildCSS("en");
-    expect(css).toContain("Cormorant Garamond");
-    expect(css).toContain("DM Sans");
+    expect(css).toContain("Playfair Display");
+    expect(css).toContain("Newsreader");
   });
 
   it("buildCSS uses CSS custom properties", () => {
@@ -331,7 +331,7 @@ describe("editorial theme", () => {
     const html = renderReport(MOCK_DATA, { theme: "editorial" });
     expect(html).toMatch(/^<!DOCTYPE html>/);
     expect(html).toContain("Auth refactor completed");
-    expect(html).toContain("Cormorant Garamond");
+    expect(html).toContain("Playfair Display");
     expect(html).toContain("first-letter");
   });
 
