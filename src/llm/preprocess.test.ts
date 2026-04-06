@@ -49,6 +49,7 @@ const MOCK_INPUT: NarrativeInput = {
       payload: { kind: "push", ref: "refs/heads/main", commits: ["fix typo", "update deps"] },
     },
   ],
+  commitMessages: [],
   externalContributions: [],
 };
 
@@ -212,6 +213,25 @@ describe("buildLLMContext", () => {
     };
     const context = buildLLMContext(input);
     expect(context).not.toContain("events:");
+  });
+
+  it("includes commit messages when present", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      commitMessages: [
+        { repo: "org/repo-a", messages: ["feat: add OAuth flow", "fix: typo"] },
+        { repo: "org/repo-b", messages: ["chore: update deps"] },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("commit_messages:");
+    expect(context).toContain("feat: add OAuth flow");
+    expect(context).toContain("chore: update deps");
+  });
+
+  it("omits commit_messages when empty", () => {
+    const context = buildLLMContext(MOCK_INPUT);
+    expect(context).not.toContain("commit_messages:");
   });
 
   it("truncates commits per push event", () => {

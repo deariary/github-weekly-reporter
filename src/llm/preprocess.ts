@@ -3,12 +3,13 @@
 
 import { stringify as toYaml } from "yaml";
 import type { NarrativeInput } from "./types.js";
-import type { PullRequest, Issue, GitHubEvent, PushEventPayload, PullRequestReviewEventPayload, ReleaseEventPayload } from "../types.js";
+import type { PullRequest, Issue, GitHubEvent, PushEventPayload, PullRequestReviewEventPayload, ReleaseEventPayload, RepoCommitMessages } from "../types.js";
 
 const MAX_PRS = 20;
 const MAX_ISSUES = 15;
 const MAX_EVENTS = 40;
 const MAX_COMMITS_PER_PUSH = 5;
+const MAX_COMMIT_MESSAGES = 50;
 
 const formatPR = (pr: PullRequest): Record<string, unknown> => ({
   title: pr.title,
@@ -90,6 +91,19 @@ export const buildLLMContext = (input: NarrativeInput): string => {
     context.repositories = input.repositories
       .slice(0, 8)
       .map((r) => `${r.name}: ${r.prsOpened} PRs, ${r.issuesOpened} issues`);
+  }
+
+  if (input.commitMessages && input.commitMessages.length > 0) {
+    let count = 0;
+    context.commit_messages = input.commitMessages
+      .filter((r: RepoCommitMessages) => r.messages.length > 0)
+      .map((r: RepoCommitMessages) => {
+        const remaining = MAX_COMMIT_MESSAGES - count;
+        const msgs = r.messages.slice(0, remaining);
+        count += msgs.length;
+        return { repo: r.repo, messages: msgs };
+      })
+      .filter((r) => r.messages.length > 0);
   }
 
   if (input.externalContributions.length > 0) {

@@ -76,6 +76,7 @@ const MOCK_INPUT: NarrativeInput = {
       payload: { kind: "release", action: "published", tag: "v1.0.0", name: "First Release" },
     },
   ],
+  commitMessages: [],
   externalContributions: [],
 };
 

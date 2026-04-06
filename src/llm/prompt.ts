@@ -40,7 +40,7 @@ Section requirements:
 
 Predefined summary types (use when relevant):
 - repo-summary: which repos were active and what the focus was
-- commit-summary: commit patterns, volume, notable streaks
+- commit-summary: commit patterns, volume, notable streaks. Use actual commit messages when available.
 - review-summary: review activity, what kind of feedback was given/received
 - contribution-summary: contributions to repos outside own org
 - collaboration-summary: who was worked with, review dynamics
