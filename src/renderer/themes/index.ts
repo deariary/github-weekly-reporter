@@ -9,6 +9,13 @@ import {
   buildIndexCSS as brutalistBuildIndexCSS,
   colors as brutalistColors,
 } from "./brutalist/index.js";
+import {
+  buildCSS as minimalBuildCSS,
+  buildIndexCSS as minimalBuildIndexCSS,
+  colors as minimalColors,
+  THEME_INIT_SCRIPT as minimalInitScript,
+  THEME_TOGGLE_SCRIPT as minimalToggleScript,
+} from "./minimal/index.js";
 
 export type ThemeColors = {
   bg: string;
@@ -23,6 +30,10 @@ export type ThemeModule = {
   buildIndexCSS: (language: Language) => string;
   colors: ThemeColors;
   templatesDir: string;
+  /** Inline script for <head> to prevent flash of wrong color scheme. */
+  themeInitScript?: string;
+  /** Inline script for end of <body> to handle theme toggle button. */
+  themeToggleScript?: string;
 };
 
 const THEMES_DIR = join(
@@ -32,6 +43,13 @@ const THEMES_DIR = join(
 
 const themeModules: Record<Theme, Omit<ThemeModule, "templatesDir">> = {
   brutalist: { buildCSS: brutalistBuildCSS, buildIndexCSS: brutalistBuildIndexCSS, colors: brutalistColors },
+  minimal: {
+    buildCSS: minimalBuildCSS,
+    buildIndexCSS: minimalBuildIndexCSS,
+    colors: minimalColors,
+    themeInitScript: minimalInitScript,
+    themeToggleScript: minimalToggleScript,
+  },
 };
 
 export const AVAILABLE_THEMES: Theme[] = Object.keys(themeModules) as Theme[];

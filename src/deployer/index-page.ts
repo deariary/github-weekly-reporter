@@ -89,6 +89,8 @@ export const renderIndexPage = (
     generatedWith: locale.generatedWith,
     monoFamily: fontConfig.monoFamily,
     accentColor: theme.colors.accent,
+    themeInitScript: theme.themeInitScript ?? "",
+    themeToggleScript: theme.themeToggleScript ?? "",
   });
 };
 

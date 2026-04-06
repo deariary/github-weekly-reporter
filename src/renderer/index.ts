@@ -83,6 +83,8 @@ export const renderReport = (
     siteTitle,
     siteTitleInline,
     themeColor: theme.colors.bg,
+    themeInitScript: theme.themeInitScript ?? "",
+    themeToggleScript: theme.themeToggleScript ?? "",
     prevWeek: options.prevWeek,
     nextWeek: options.nextWeek,
   });
