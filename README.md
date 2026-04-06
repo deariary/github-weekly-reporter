@@ -87,6 +87,23 @@ On paid LLM providers (OpenAI, Anthropic, Grok), the cost is roughly $0.10-0.35/
 
 Private repositories work too. GitHub Free gives 2,000 Actions minutes/month (this tool uses ~4% of that), but GitHub Pages on private repos requires a paid GitHub plan.
 
+## Themes
+
+Three built-in themes, each with light/dark mode and responsive design.
+
+| Theme | Description | Demo |
+|---|---|---|
+| **brutalist** | Bold, high-contrast dark theme with monospace typography (default) | [EN](https://deariary.github.io/github-weekly-reporter/brutalist/en/2026/W14/) / [JA](https://deariary.github.io/github-weekly-reporter/brutalist/ja/2026/W14/) |
+| **minimal** | Clean lines, generous whitespace, understated elegance | [EN](https://deariary.github.io/github-weekly-reporter/minimal/en/2026/W14/) / [JA](https://deariary.github.io/github-weekly-reporter/minimal/ja/2026/W14/) |
+| **editorial** | Horizontal-scroll magazine with serif typography and column layout | [EN](https://deariary.github.io/github-weekly-reporter/editorial/en/2026/W14/) / [JA](https://deariary.github.io/github-weekly-reporter/editorial/ja/2026/W14/) |
+
+Set the theme in your workflow or during `setup`:
+
+```yaml
+with:
+  theme: 'editorial'
+```
+
 ## Features
 
 - Weekly stats: commits, PRs opened/merged, reviews
@@ -94,7 +111,6 @@ Private repositories work too. GitHub Free gives 2,000 Actions minutes/month (th
 - Language breakdown (CSS-only chart)
 - 7-day contribution heatmap
 - AI-generated narrative summary
-- 3 themes: brutalist (default), minimal, editorial
 - Light/dark mode with responsive design
 - Self-contained HTML, no JavaScript
 - SEO optimized (OG images, JSON-LD, sitemap)
