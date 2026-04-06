@@ -9,6 +9,7 @@ import { buildWeeklyRange, buildYesterdayRange, localDateParts, toISODate, parse
 import { fetchEvents, dedupeEvents } from "../../collector/fetch-events.js";
 import { fetchContributions } from "../../collector/fetch-contributions.js";
 import { fetchPRsByRefs, type PRRef } from "../../collector/fetch-repo-prs.js";
+import { fetchCommitMessages } from "../../collector/fetch-commits.js";
 import { aggregateRepositories } from "../../collector/aggregate.js";
 import { getWeekId, getCurrentWeekId } from "../../deployer/week.js";
 import type { GitHubEvent } from "../../types.js";
@@ -230,6 +231,13 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
   const totalAdditions = pullRequests.reduce((sum, pr) => sum + pr.additions, 0);
   const totalDeletions = pullRequests.reduce((sum, pr) => sum + pr.deletions, 0);
 
+  // Fetch commit messages per repository
+  const repoNames = repositories.map((r) => r.name);
+  console.log(`Fetching commit messages for ${repoNames.length} repositories...`);
+  const commitMessages = await fetchCommitMessages(options.token, options.username, repoNames, plan.range);
+  const totalMsgs = commitMessages.reduce((sum, r) => sum + r.messages.length, 0);
+  console.log(`Collected ${totalMsgs} commit messages from ${commitMessages.length} repositories.`);
+
   const githubData = {
     username: contributions.username,
     avatarUrl: contributions.avatarUrl,
@@ -250,6 +258,7 @@ const runWeeklyFetch = async (options: BaseOptions): Promise<void> => {
     pullRequests,
     issues: [],
     events,
+    commitMessages,
     externalContributions: [],
   };
   const dataPath = join(plan.reportDir, "github-data.yaml");

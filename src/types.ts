@@ -125,6 +125,11 @@ export type UserProfile = {
   publicRepos: number;
 };
 
+export type RepoCommitMessages = {
+  repo: string;
+  messages: string[];
+};
+
 export type WeeklyReportData = {
   username: string;
   avatarUrl: string;
@@ -136,6 +141,7 @@ export type WeeklyReportData = {
   pullRequests: PullRequest[];
   issues: Issue[];
   events: GitHubEvent[];
+  commitMessages: RepoCommitMessages[];
   externalContributions: ExternalContribution[];
   aiContent: AIContent;
 };
