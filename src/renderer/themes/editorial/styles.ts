@@ -122,8 +122,8 @@ export const THEME_TOGGLE_SCRIPT = `<script>
 
 export const buildCSS = (language: Language = "en"): string => {
   const f = getFontConfig(language);
-  const heading = `'Playfair Display', ${f.bodyFamily}, Georgia, 'Times New Roman', serif`;
-  const body = `'Newsreader', ${f.bodyFamily}, Georgia, serif`;
+  const heading = `'Playfair Display', ${f.serifFamily}`;
+  const body = `'Newsreader', ${f.serifFamily}`;
   const mono = f.monoFamily;
 
   return `
@@ -131,7 +131,7 @@ export const buildCSS = (language: Language = "en"): string => {
     ${THEME_TOGGLE_CSS}
 
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,700;1,6..72,400&display=swap');
-    ${f.importUrl ? `@import url('${f.importUrl}');` : ""}
+    @import url('${f.importUrl}');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -415,8 +415,8 @@ export const buildCSS = (language: Language = "en"): string => {
 
 export const buildIndexCSS = (language: Language = "en"): string => {
   const f = getFontConfig(language);
-  const heading = `'Playfair Display', ${f.bodyFamily}, Georgia, serif`;
-  const body = `'Newsreader', ${f.bodyFamily}, Georgia, serif`;
+  const heading = `'Playfair Display', ${f.serifFamily}`;
+  const body = `'Newsreader', ${f.serifFamily}`;
   const mono = f.monoFamily;
 
   return `
