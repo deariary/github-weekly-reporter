@@ -50,16 +50,16 @@ describe("fetchCommitMessages", () => {
     expect(result[0].messages).toEqual(["feat: new feature"]);
   });
 
-  it("truncates long commit messages to 120 characters", async () => {
-    const longMessage = "a".repeat(200);
+  it("truncates long commit messages to 200 characters", async () => {
+    const longMessage = "a".repeat(300);
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response(JSON.stringify([makeRawCommit(longMessage)]), { status: 200 }),
     );
 
     const result = await fetchCommitMessages("token", "user", ["org/repo"], range);
 
-    expect(result[0].messages[0]).toBe("a".repeat(120) + "...");
-    expect(result[0].messages[0].length).toBe(123);
+    expect(result[0].messages[0]).toBe("a".repeat(200) + "...");
+    expect(result[0].messages[0].length).toBe(203);
   });
 
   it("skips repos with no commits", async () => {

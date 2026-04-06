@@ -18,7 +18,7 @@ type RawCommit = {
 
 const MAX_MESSAGES_PER_REPO = 10;
 const MAX_TOTAL_MESSAGES = 50;
-const MAX_MESSAGE_LENGTH = 120;
+const MAX_MESSAGE_LENGTH = 200;
 const MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY_MS = 5_000;
 
