@@ -78,7 +78,7 @@ const COLOR_VARS = `
 
 const THEME_TOGGLE_CSS = `
   .theme-toggle-row {
-    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
   }
   .theme-toggle {
     background: none; border: none;
@@ -105,7 +105,7 @@ export const THEME_TOGGLE_SCRIPT = `<script>
     return document.documentElement.getAttribute("data-theme")
       || (matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
   }
-  function update(){btn.textContent=current()==="dark"?"\\u2600\\uFE0E":"\\u263D\\uFE0E";}
+  function update(){btn.textContent=current()==="dark"?"\\u2600\\uFE0E Light":"\\u263D\\uFE0E Dark";}
   update();
   btn.addEventListener("click",function(){
     var next=current()==="dark"?"light":"dark";
