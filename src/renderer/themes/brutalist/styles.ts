@@ -107,14 +107,17 @@ const COLOR_VARS = `
 `;
 
 const THEME_TOGGLE_CSS = `
-  .theme-toggle {
-    background: none; border: 1px solid var(--b-chip-border); border-radius: 6px;
-    color: var(--b-text-tertiary); cursor: pointer;
-    font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 0.25rem 0.5rem; margin-left: 0.75rem;
-    transition: all 0.2s;
+  .theme-toggle-row {
+    margin-top: 0.75rem;
   }
-  .theme-toggle:hover { color: var(--b-accent); border-color: var(--b-accent); }
+  .theme-toggle {
+    background: none; border: none;
+    color: var(--b-text-tertiary); cursor: pointer;
+    font-size: 1rem; line-height: 1;
+    padding: 0; opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+  .theme-toggle:hover { opacity: 1; }
 `;
 
 export const THEME_INIT_SCRIPT = `<script>
@@ -132,9 +135,7 @@ export const THEME_TOGGLE_SCRIPT = `<script>
     return document.documentElement.getAttribute("data-theme")
       || (matchMedia("(prefers-color-scheme:light)").matches?"light":"dark");
   }
-  function update(){
-    btn.textContent=current()==="dark"?"Light":"Dark";
-  }
+  function update(){btn.textContent=current()==="dark"?"\\u2600\\uFE0E":"\\u263D\\uFE0E";}
   update();
   btn.addEventListener("click",function(){
     var next=current()==="dark"?"light":"dark";

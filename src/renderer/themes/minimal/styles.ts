@@ -77,16 +77,19 @@ const COLOR_VARS = `
 `;
 
 const THEME_TOGGLE_CSS = `
-  .theme-toggle {
-    background: none; border: 1px solid var(--border); border-radius: 4px;
-    color: var(--text-tertiary); cursor: pointer; font-size: 0.8125rem;
-    padding: 0.25rem 0.5rem; margin-left: 0.5rem;
+  .theme-toggle-row {
+    margin-top: 0.75rem;
   }
-  .theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
+  .theme-toggle {
+    background: none; border: none;
+    color: var(--text-tertiary); cursor: pointer;
+    font-size: 1rem; line-height: 1;
+    padding: 0; opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .theme-toggle:hover { opacity: 1; }
 `;
 
-// Inline script: reads localStorage, applies data-theme, handles toggle.
-// Placed in <head> to prevent flash of wrong theme.
 export const THEME_INIT_SCRIPT = `<script>
 (function(){
   var s=localStorage.getItem("theme");
@@ -94,7 +97,6 @@ export const THEME_INIT_SCRIPT = `<script>
 })();
 </script>`;
 
-// Inline script for the toggle button (placed at end of body).
 export const THEME_TOGGLE_SCRIPT = `<script>
 (function(){
   var btn=document.querySelector(".theme-toggle");
@@ -103,9 +105,7 @@ export const THEME_TOGGLE_SCRIPT = `<script>
     return document.documentElement.getAttribute("data-theme")
       || (matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
   }
-  function update(){
-    btn.textContent=current()==="dark"?"Light":"Dark";
-  }
+  function update(){btn.textContent=current()==="dark"?"\\u2600\\uFE0E":"\\u263D\\uFE0E";}
   update();
   btn.addEventListener("click",function(){
     var next=current()==="dark"?"light":"dark";
