@@ -48,6 +48,9 @@
   "engines": {
     "node": ">=20"
   },
+  "overrides": {
+    "jsdom": "~28.0.0"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
     "@google/generative-ai": "^0.24.1",
