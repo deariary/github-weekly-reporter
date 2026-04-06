@@ -1,0 +1,24 @@
+{{#if aiContent.highlights.length}}
+<div class="section-group">
+  <div class="section-group-header">
+    <h2 class="section-group-title">{{i18n.sectionHighlights}}</h2>
+    <div class="section-group-line"></div>
+    <span class="section-group-count">{{itemsCount aiContent.highlights.length}}</span>
+  </div>
+
+  <div class="highlight-grid">
+  {{#each aiContent.highlights}}
+  <div class="highlight-card">
+    <span class="highlight-badge highlight-{{this.type}}">{{this.type}}</span>
+    {{#if this.url}}
+    <div class="highlight-title"><a href="{{this.url}}" target="_blank" rel="noopener nofollow">{{this.title}}</a></div>
+    {{else}}
+    <div class="highlight-title">{{this.title}}</div>
+    {{/if}}
+    <div class="highlight-meta">{{this.repo}} · {{this.meta}}</div>
+    <div class="highlight-body">{{{mdInline this.body}}}</div>
+  </div>
+  {{/each}}
+  </div>
+</div>
+{{/if}}
