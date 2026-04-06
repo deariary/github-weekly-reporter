@@ -10,7 +10,8 @@ import { getWeekId } from "../../deployer/week.js";
 import { parseLocalDate } from "../../collector/date-range.js";
 import { generateOGImage, generateIndexOGImage } from "../../renderer/og-image.js";
 import { buildRSSFeed } from "../../renderer/rss.js";
-import type { WeeklyReportData, AIContent, Language } from "../../types.js";
+import type { WeeklyReportData, AIContent, Language, Theme } from "../../types.js";
+import { AVAILABLE_THEMES } from "../../renderer/themes/index.js";
 
 const env = (key: string): string | undefined => process.env[key];
 
@@ -21,6 +22,7 @@ type RenderOptions = {
   siteTitle?: string;
   language: Language;
   timezone: string;
+  theme: Theme;
   date?: Date;
 };
 
@@ -112,13 +114,14 @@ const run = async (options: RenderOptions): Promise<void> => {
 
   const base = options.baseUrl.replace(/\/+$/, "");
 
-  console.log(`Rendering report (lang: ${options.language})...`);
+  console.log(`Rendering report (lang: ${options.language}, theme: ${options.theme})...`);
   const html = renderReport(data, {
     language: options.language,
     timezone: options.timezone,
     baseUrl: base,
     weekPath: weekId.path,
     siteTitle: options.siteTitle,
+    theme: options.theme,
     prevWeek: prevWeek ? `../../${prevWeek}/` : undefined,
     nextWeek: nextWeek ? `../../${nextWeek}/` : undefined,
   });
@@ -141,6 +144,7 @@ const run = async (options: RenderOptions): Promise<void> => {
         baseUrl: base,
         weekPath: prevWeek,
         siteTitle: options.siteTitle,
+        theme: options.theme,
         prevWeek: prevPrev ? `../../${prevPrev}/` : undefined,
         nextWeek: `../../${weekId.path}/`,
       });
@@ -176,6 +180,7 @@ const run = async (options: RenderOptions): Promise<void> => {
     options.language,
     options.siteTitle,
     base,
+    options.theme,
   );
   const indexPath = join(options.outputDir, "index.html");
   await mkdir(options.outputDir, { recursive: true });
@@ -244,11 +249,17 @@ export const registerRender = (program: Command): void => {
     .option("--site-title <title>", "Site title for nav header (env: SITE_TITLE, default: {username}'s Weekly Reports)")
     .option("--language <lang>", "Report language: en, ja, zh-CN, zh-TW, ko, es, fr, de, pt, ru (env: LANGUAGE, default: en)")
     .option("--timezone <tz>", "IANA timezone (env: TIMEZONE, default: UTC)")
+    .option("--theme <name>", `Theme name: ${AVAILABLE_THEMES.join(", ")} (env: THEME, default: dark)`)
     .option("--date <date>", "Date within the target week (YYYY-MM-DD, default: today)")
     .action(async (opts) => {
       try {
         const baseUrl = opts.baseUrl ?? env("BASE_URL");
         if (!baseUrl) throw new Error("Base URL required. Pass --base-url or set BASE_URL (e.g. https://user.github.io/repo).");
+
+        const theme = (opts.theme ?? env("THEME") ?? "brutalist") as Theme;
+        if (!AVAILABLE_THEMES.includes(theme)) {
+          throw new Error(`Unknown theme "${theme}". Available: ${AVAILABLE_THEMES.join(", ")}`);
+        }
 
         const options: RenderOptions = {
           dataDir: opts.dataDir ?? env("DATA_DIR") ?? "./data",
@@ -257,6 +268,7 @@ export const registerRender = (program: Command): void => {
           siteTitle: opts.siteTitle ?? env("SITE_TITLE"),
           language: (opts.language ?? env("LANGUAGE") ?? "en") as Language,
           timezone: opts.timezone ?? env("TIMEZONE") ?? "UTC",
+          theme,
           date: opts.date ? parseLocalDate(opts.date, opts.timezone ?? env("TIMEZONE") ?? "UTC") : undefined,
         };
         await run(options);

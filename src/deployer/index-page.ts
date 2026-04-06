@@ -1,12 +1,9 @@
 // Generate the index.html that lists all archived reports
 
-import { readFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
-import type { Language, UserProfile } from "../types.js";
+import type { Language, Theme, UserProfile } from "../types.js";
 import { getLocale, getFontConfig } from "../i18n/index.js";
-import { buildCSS } from "../renderer/themes.js";
+import { loadTheme, readThemeTemplate } from "../renderer/themes/index.js";
 
 export type IndexPageData = {
   username?: string;
@@ -37,13 +34,6 @@ type YearGroup = {
   reports: ReportEntry[];
 };
 
-const TEMPLATES_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "..", "..", "src", "renderer", "templates",
-);
-
-const TEMPLATE = readFileSync(join(TEMPLATES_DIR, "index-page.hbs"), "utf-8");
-
 const weekToDateLabel = (path: string): string => {
   const [year, week] = path.split("/");
   return `${year} ${week}`;
@@ -68,18 +58,22 @@ export const renderIndexPage = (
   language: Language = "en",
   siteTitle?: string,
   baseUrl?: string,
+  themeName: Theme = "brutalist",
 ): string => {
   const locale = getLocale(language);
   const fontConfig = getFontConfig(language);
+  const theme = loadTheme(themeName);
   const resolvedSiteTitle = (siteTitle ?? "Dev\nPulse").replace(/\\n/g, "\n");
   const siteTitleInline = resolvedSiteTitle.replace(/\n/g, " ");
   const username = pageData?.username ?? "";
   const description = `Weekly reports by @${username}`;
   const ogImageUrl = baseUrl ? `${baseUrl}/og.png` : "og.png";
-  const template = Handlebars.compile(TEMPLATE);
+  const indexTemplate = readThemeTemplate(theme, "index-page.hbs");
+  const template = Handlebars.compile(indexTemplate);
   return template({
     yearGroups: groupByYear(reports),
-    css: buildCSS(language),
+    css: theme.buildCSS(language),
+    indexCss: theme.buildIndexCSS(language),
     username,
     avatarUrl: pageData?.avatarUrl,
     profile: pageData?.profile,
@@ -94,7 +88,7 @@ export const renderIndexPage = (
     poweredBy: locale.poweredBy,
     generatedWith: locale.generatedWith,
     monoFamily: fontConfig.monoFamily,
-    accentColor: "#39d353",
+    accentColor: theme.colors.accent,
   });
 };
 

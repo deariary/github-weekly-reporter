@@ -1,22 +1,10 @@
 // Main report renderer: compiles Handlebars templates into a self-contained HTML file
 
-import { readFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
-import type { WeeklyReportData, Language, DailyCommitCount } from "../types.js";
+import type { WeeklyReportData, Language, Theme, DailyCommitCount } from "../types.js";
 import { getLocale } from "../i18n/index.js";
-import { buildCSS } from "./themes.js";
+import { loadTheme, readThemeTemplate } from "./themes/index.js";
 import { registerHelpers } from "./helpers.js";
-
-// Templates live at src/renderer/templates/ (both dev and npm package)
-const TEMPLATES_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "..", "..", "src", "renderer", "templates",
-);
-
-const readTemplate = (path: string): string =>
-  readFileSync(join(TEMPLATES_DIR, path), "utf-8");
 
 const PARTIAL_NAMES = [
   "header",
@@ -48,14 +36,15 @@ export type RenderOptions = {
   siteTitle?: string;
   prevWeek?: string;
   nextWeek?: string;
+  theme?: Theme;
 };
 
-const createInstance = (language: Language, timezone: string): typeof Handlebars => {
+const createInstance = (language: Language, timezone: string, theme: ReturnType<typeof loadTheme>): typeof Handlebars => {
   const hbs = Handlebars.create();
   registerHelpers(hbs, { language, timezone });
 
   PARTIAL_NAMES.forEach((name) => {
-    hbs.registerPartial(name, readTemplate(`partials/${name}.hbs`));
+    hbs.registerPartial(name, readThemeTemplate(theme, `partials/${name}.hbs`));
   });
 
   return hbs;
@@ -69,9 +58,10 @@ export const renderReport = (
   const language = options.language ?? "en";
   const timezone = options.timezone ?? "UTC";
   const locale = getLocale(language);
+  const theme = loadTheme(options.theme ?? "brutalist");
 
-  const hbs = createInstance(language, timezone);
-  const template = hbs.compile(readTemplate("report.hbs"));
+  const hbs = createInstance(language, timezone, theme);
+  const template = hbs.compile(readThemeTemplate(theme, "report.hbs"));
 
   const baseUrl = options.baseUrl?.replace(/\/+$/, "") ?? "";
   const weekPath = options.weekPath ?? "";
@@ -84,7 +74,7 @@ export const renderReport = (
   return template({
     ...data,
     dailyCommits: computeHeatmapLevels(data.dailyCommits),
-    css: buildCSS(language),
+    css: theme.buildCSS(language),
     lang: language,
     i18n: locale,
     baseUrl,
@@ -92,6 +82,7 @@ export const renderReport = (
     ogImageUrl,
     siteTitle,
     siteTitleInline,
+    themeColor: theme.colors.bg,
     prevWeek: options.prevWeek,
     nextWeek: options.nextWeek,
   });

@@ -58,6 +58,10 @@ inputs:
     description: 'LLM model name. Required for weekly mode.'
     required: false
     default: ''
+  theme:
+    description: 'Report theme (brutalist). Different themes provide distinct HTML/CSS designs.'
+    required: false
+    default: 'brutalist'
   date:
     description: 'Target date within the week (YYYY-MM-DD). Defaults to today. Use to generate reports for past weeks.'
     required: false
@@ -169,6 +173,7 @@ runs:
       env:
         LANGUAGE: ${{ inputs.language }}
         TIMEZONE: ${{ inputs.timezone }}
+        THEME: ${{ inputs.theme }}
         DATA_DIR: ./data
         OUTPUT_DIR: ./output
         SITE_TITLE: ${{ env.SITE_TITLE }}
