@@ -138,9 +138,27 @@ with:
   version: '0.3.0'
 ```
 
+## Theme
+
+Three built-in themes are available, each with light/dark mode:
+
+| Theme | Description |
+|---|---|
+| `brutalist` | Bold, high-contrast dark theme with monospace typography (default) |
+| `minimal` | Clean lines, generous whitespace, understated elegance |
+| `editorial` | Horizontal-scroll magazine with serif typography and column layout |
+
+Edit `weekly-report.yml`:
+
+```yaml
+with:
+  theme: 'editorial'
+```
+
+The `setup` command also lets you pick a theme interactively.
+
 ## What Cannot Be Customized
 
-- **Theme**: the dark theme is built-in and not configurable.
 - **Deploy branch**: always deploys to `gh-pages`.
-- **Report structure**: the HTML layout and sections are fixed.
+- **Report structure**: the HTML layout and sections are fixed per theme.
 - **LLM parameters**: `max_tokens` (16384) and `temperature` (0.7) are not configurable.

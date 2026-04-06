@@ -89,6 +89,7 @@ describe("buildDailyWorkflow", () => {
     language: "en",
     timezone: "UTC",
     siteTitle: "DevPulse",
+    theme: "brutalist",
   };
 
   it("contains the workflow name", () => {
@@ -135,6 +136,7 @@ describe("buildWeeklyWorkflow", () => {
     language: "en",
     timezone: "UTC",
     siteTitle: "DevPulse",
+    theme: "brutalist",
   };
 
   it("contains the workflow name", () => {
@@ -174,6 +176,16 @@ describe("buildWeeklyWorkflow", () => {
     expect(yaml).toContain("llm-model: 'gpt-4o'");
     expect(yaml).toContain("openai-api-key:");
     expect(yaml).toContain("secrets.OPENAI_API_KEY");
+  });
+
+  it("includes theme input", () => {
+    const yaml = buildWeeklyWorkflow(baseOpts);
+    expect(yaml).toContain("theme: 'brutalist'");
+  });
+
+  it("includes non-default theme", () => {
+    const yaml = buildWeeklyWorkflow({ ...baseOpts, theme: "editorial" });
+    expect(yaml).toContain("theme: 'editorial'");
   });
 
   it("omits LLM inputs when not provided", () => {
@@ -226,9 +238,10 @@ const setupPromptDefaults = () => {
     .mockResolvedValueOnce("Dev Pulse")  // site title
     .mockResolvedValueOnce("gpt-4o");    // model
 
-  // select: language, timezone, LLM provider
+  // select: language, theme, timezone, LLM provider
   mockSelect
     .mockResolvedValueOnce("en")         // language
+    .mockResolvedValueOnce("brutalist")  // theme
     .mockResolvedValueOnce("UTC")        // timezone
     .mockResolvedValueOnce("openai");    // LLM provider
 
@@ -327,6 +340,7 @@ describe("registerSetup (full flow)", () => {
       .mockResolvedValueOnce("gpt-4o");   // model
     mockSelect
       .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
       .mockResolvedValueOnce("UTC")
       .mockResolvedValueOnce("openai");
     mockValidateModel.mockResolvedValue({ valid: true });
@@ -360,6 +374,7 @@ describe("registerSetup (full flow)", () => {
       .mockResolvedValueOnce("gpt-4o");
     mockSelect
       .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
       .mockResolvedValueOnce("UTC")
       .mockResolvedValueOnce("openai");
     mockValidateModel.mockResolvedValue({ valid: true });
@@ -405,6 +420,7 @@ describe("registerSetup (full flow)", () => {
       .mockResolvedValueOnce("good-model"); // second attempt: valid
     mockSelect
       .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
       .mockResolvedValueOnce("UTC")
       .mockResolvedValueOnce("openai");
     mockValidateModel
@@ -450,6 +466,7 @@ describe("registerSetup (full flow)", () => {
       .mockResolvedValueOnce("gpt-4o");
     mockSelect
       .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
       .mockResolvedValueOnce("__other__") // triggers manual timezone input
       .mockResolvedValueOnce("openai");
     mockValidateModel.mockResolvedValue({ valid: true });

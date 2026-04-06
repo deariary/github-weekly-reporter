@@ -49,6 +49,7 @@ describe("buildReadme", () => {
     pagesUrl: "https://testuser.github.io/weekly-report",
     language: "en" as const,
     timezone: "UTC",
+    theme: "brutalist" as const,
   };
 
   it("includes site title as heading", () => {

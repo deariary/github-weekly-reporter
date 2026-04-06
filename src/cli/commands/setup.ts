@@ -2,7 +2,8 @@
 
 import { Command } from "commander";
 import { input, select, password, confirm } from "@inquirer/prompts";
-import type { LLMProvider, Language } from "../../types.js";
+import type { LLMProvider, Language, Theme } from "../../types.js";
+import { AVAILABLE_THEMES } from "../../renderer/themes/index.js";
 import { validateToken, ensureRepo, setRepoTopics, addFileToRepo, enablePages, setRepoSecret, ghGet, ghPost, sleep } from "./setup/github-api.js";
 import { midnightCronUTC, buildDailyWorkflow, buildWeeklyWorkflow, buildReadme, LLM_SECRET_NAMES } from "./setup/workflows.js";
 import type { WorkflowOpts } from "./setup/workflows.js";
@@ -23,6 +24,7 @@ type SetupConfig = {
   siteTitle: string;
   language: Language;
   timezone: string;
+  theme: Theme;
   llmProvider?: LLMProvider;
   llmApiKey?: string;
   llmModel?: string;
@@ -77,7 +79,17 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
     default: "en",
   })) as Language;
 
-  // 6. Timezone
+  // 6. Theme
+  const theme = (await select({
+    message: "Report theme:",
+    choices: AVAILABLE_THEMES.map((t) => ({
+      name: t === "brutalist" ? `${t} (default)` : t,
+      value: t,
+    })),
+    default: "brutalist",
+  })) as Theme;
+
+  // 7. Timezone
   const timezone = (await select({
     message: "Timezone (for scheduling and date calculations):",
     choices: [
@@ -102,7 +114,7 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
         })
       : timezone;
 
-  // 7. LLM (required for report generation)
+  // 8. LLM (required for report generation)
   console.log("\n  An LLM provider is required for report generation.");
   console.log("  Groq and OpenRouter offer generous free tiers (no credit card required).\n");
 
@@ -171,6 +183,7 @@ const collectInputs = async (cliRepo?: string): Promise<SetupConfig> => {
     siteTitle,
     language,
     timezone: resolvedTimezone,
+    theme,
     llmProvider,
     llmApiKey,
     llmModel,
@@ -196,6 +209,7 @@ const run = async (cliRepo?: string): Promise<void> => {
   console.log(`  Username:      ${config.username}`);
   console.log(`  Site title:    ${config.siteTitle.replace(/\\n/g, " ")}`);
   console.log(`  Language:      ${config.language}`);
+  console.log(`  Theme:         ${config.theme}`);
   console.log(`  Timezone:      ${config.timezone}`);
   console.log(`  Schedule:      Daily at midnight (cron: ${cron})`);
   if (config.llmProvider && config.llmModel) {
@@ -258,6 +272,7 @@ const run = async (cliRepo?: string): Promise<void> => {
     language: config.language,
     timezone: config.timezone,
     siteTitle: config.siteTitle,
+    theme: config.theme,
     llmProvider: config.llmProvider,
     llmModel: config.llmModel,
     llmSecretName: config.llmProvider
@@ -290,6 +305,7 @@ const run = async (cliRepo?: string): Promise<void> => {
     pagesUrl,
     language: config.language,
     timezone: config.timezone,
+    theme: config.theme,
     llmProvider: config.llmProvider,
     llmModel: config.llmModel,
   });

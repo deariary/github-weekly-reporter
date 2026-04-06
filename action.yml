@@ -59,7 +59,7 @@ inputs:
     required: false
     default: ''
   theme:
-    description: 'Report theme (brutalist). Different themes provide distinct HTML/CSS designs.'
+    description: 'Report theme: brutalist, minimal, editorial'
     required: false
     default: 'brutalist'
   date:
