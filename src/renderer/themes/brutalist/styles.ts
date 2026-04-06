@@ -113,7 +113,7 @@ const THEME_TOGGLE_CSS = `
   .theme-toggle {
     background: none; border: none;
     color: var(--b-text-tertiary); cursor: pointer;
-    font-size: 1rem; line-height: 1;
+    font-size: 0.8125rem; line-height: 1;
     padding: 0; opacity: 0.4;
     transition: opacity 0.2s;
   }
