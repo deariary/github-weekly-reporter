@@ -335,15 +335,18 @@ describe("editorial theme", () => {
     expect(html).toContain("first-letter");
   });
 
-  it("renders highlights in grid", () => {
+  it("renders highlights in column stack", () => {
     const html = renderReport(MOCK_DATA, { theme: "editorial" });
-    expect(html).toContain("highlight-grid");
-    expect(html).toContain("highlight-card");
+    expect(html).toContain("stack-card");
+    expect(html).toContain("highlight-badge");
     expect(html).toContain("feat: add OAuth flow");
   });
 
-  it("includes header rule", () => {
+  it("includes horizontal scroll strip layout with fixed footer", () => {
     const html = renderReport(MOCK_DATA, { theme: "editorial" });
-    expect(html).toContain("header-rule");
+    expect(html).toContain("scroll-strip");
+    expect(html).toContain("panel-cover");
+    expect(html).toContain("column-stack");
+    expect(html).toContain("fixed-footer");
   });
 });

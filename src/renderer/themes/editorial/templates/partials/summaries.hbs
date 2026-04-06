@@ -5,8 +5,9 @@
     <span class="section-group-count">{{sectionsCount aiContent.summaries.length}}</span>
   </div>
 
+  <div class="section-summaries-grid">
   {{#each aiContent.summaries}}
-  <div class="section-summary">
+  <div class="section-summary{{#if @first}} section-summary-lead{{/if}}">
     <div class="section-type">{{this.type}}</div>
     <div class="section-heading">{{{mdInline this.heading}}}</div>
     <div class="section-body">{{{mdInline this.body}}}</div>
@@ -64,5 +65,6 @@
     {{/if}}
   </div>
   {{/each}}
+  </div>
 </div>
 {{/if}}

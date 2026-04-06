@@ -57,49 +57,148 @@
 </head>
 <body>
 
-<nav>
-  <a href="../../" class="nav-site-title">{{siteTitleInline}}</a>
-  <a href="../../">&larr; {{i18n.allWeeks}}</a>
-</nav>
+<div class="scroll-strip">
 
-<div class="header">
-  {{> header}}
+  {{!-- COVER --}}
+  <article class="panel panel-cover">
+    <div class="cover-inner">
+      <div class="header-meta">
+        <a href="https://github.com/{{username}}" target="_blank" rel="noopener nofollow"><img src="{{avatarUrl}}" alt="{{username}}" width="22" height="22" loading="lazy" /><span>{{username}}</span></a>
+        <span>&middot;</span>
+        <span>{{weekLabel dateRange.from dateRange.to}}</span>
+      </div>
+      <h1>{{aiContent.title}}</h1>
+      <p class="cover-sub">{{aiContent.subtitle}}</p>
+    </div>
+  </article>
+
+  {{!-- OVERVIEW --}}
+  <article class="panel panel-text">
+    <div class="text-inner">
+      {{{md aiContent.overview}}}
+    </div>
+  </article>
+
+  {{!-- ALL SUMMARIES + HIGHLIGHTS: vertical columns flowing right --}}
+  {{#if aiContent.summaries.length}}
+  <div class="column-stack">
+    {{#each aiContent.summaries}}
+    <article class="stack-card">
+      <div class="card-label">{{this.type}}</div>
+      <h3>{{{mdInline this.heading}}}</h3>
+      <p>{{{mdInline this.body}}}</p>
+      {{#eq this.type "repo-summary"}}
+      {{#if @root.repositories.length}}
+      <div class="repo-bars">
+        {{#each (sortReposDesc @root.repositories)}}
+        <div class="repo-bar-item">
+          <div class="repo-bar-header">
+            <span class="repo-bar-label">{{this.name}}</span>
+            <span class="repo-bar-value">{{this.prsOpened}} PRs</span>
+          </div>
+          <div class="repo-bar-track">
+            <div class="repo-bar-fill" style="width:{{repoBarWidth this.prsOpened @root.repositories}}%"></div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      {{/if}}
+      {{/eq}}
+      {{#eq this.type "activity-pattern"}}
+      {{#if @root.dailyCommits.length}}
+      <div class="mini-heatmap">
+        {{#each @root.dailyCommits}}
+        <div class="mh-day">
+          <div class="mh-block mh-level-{{this.level}}">{{this.count}}</div>
+          <div class="mh-label">{{weekday this.date}}</div>
+        </div>
+        {{/each}}
+      </div>
+      {{/if}}
+      {{/eq}}
+      {{#eq this.type "commit-summary"}}
+      {{#if @root.stats.totalAdditions}}
+      <div class="diff-bar">
+        <div class="diff-add" style="flex:{{@root.stats.totalAdditions}}"></div>
+        <div class="diff-del" style="flex:{{@root.stats.totalDeletions}}"></div>
+      </div>
+      <div class="diff-labels">
+        <span class="diff-label-add">+{{formatNumber @root.stats.totalAdditions}}</span>
+        <span class="diff-label-del">-{{formatNumber @root.stats.totalDeletions}}</span>
+      </div>
+      {{/if}}
+      {{/eq}}
+      {{#if this.chips}}
+      <div class="data-chips">
+        {{#each this.chips}}
+        <span class="chip chip-{{this.color}}">{{this.label}}: {{this.value}}</span>
+        {{/each}}
+      </div>
+      {{/if}}
+    </article>
+    {{/each}}
+
+    {{#each aiContent.highlights}}
+    <article class="stack-card">
+      <span class="highlight-badge highlight-{{this.type}}">{{this.type}}</span>
+      {{#if this.url}}
+      <h3><a href="{{this.url}}" target="_blank" rel="noopener nofollow">{{this.title}}</a></h3>
+      {{else}}
+      <h3>{{this.title}}</h3>
+      {{/if}}
+      <div class="highlight-meta">{{this.repo}} &middot; {{this.meta}}</div>
+      <p>{{{mdInline this.body}}}</p>
+    </article>
+    {{/each}}
+
+    {{#if canonicalUrl}}
+    <article class="stack-card stack-share">
+      <div class="card-label">{{i18n.share}}</div>
+      <div class="share-links">
+        <a href="https://x.com/intent/tweet?url={{{canonicalUrl}}}&text={{urlEncode aiContent.title}}" target="_blank" rel="noopener nofollow">X</a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{{canonicalUrl}}}" target="_blank" rel="noopener nofollow">LinkedIn</a>
+        <a href="https://bsky.app/intent/compose?text={{urlEncode aiContent.title}}%20{{{canonicalUrl}}}" target="_blank" rel="noopener nofollow">Bluesky</a>
+      </div>
+    </article>
+    {{/if}}
+
+    <article class="stack-card stack-credits">
+      <div class="card-label">Credits</div>
+      <p>{{i18n.poweredBy}} <a href="https://deariary.com?utm_source=github-weekly-reporter&utm_medium=footer" target="_blank" rel="noopener">deariary</a></p>
+      <p>{{i18n.generatedWith}} <a href="https://github.com/deariary/github-weekly-reporter" target="_blank" rel="noopener">github-weekly-reporter</a></p>
+    </article>
+  </div>
+  {{/if}}
+
 </div>
 
-<main>
-  {{> overview}}
-  {{> summaries}}
-  {{> highlights}}
-</main>
+<footer class="fixed-footer">
+  <nav class="footer-breadcrumb" aria-label="Breadcrumb">
+    <a href="../../">{{i18n.allWeeks}}</a>
+    <span class="footer-sep">/</span>
+    <span class="footer-current">{{weekLabel dateRange.from dateRange.to}}</span>
+  </nav>
+  <div class="footer-right">
+    {{#if prevWeek}}<a href="{{prevWeek}}">&larr;</a>{{/if}}
+    {{#if nextWeek}}<a href="{{nextWeek}}">&rarr;</a>{{/if}}
+    <span class="footer-sep">&middot;</span>
+    <button class="theme-toggle" type="button" aria-label="Toggle theme">&#9790;&#65038; Dark</button>
+  </div>
+</footer>
 
-{{#if canonicalUrl}}
-<div class="share-bar">
-  <span class="share-label">{{i18n.share}}</span>
-  <a href="https://x.com/intent/tweet?url={{{canonicalUrl}}}&text={{urlEncode aiContent.title}}" target="_blank" rel="noopener nofollow" class="share-btn">X</a>
-  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn">LinkedIn</a>
-  <a href="https://bsky.app/intent/compose?text={{urlEncode aiContent.title}}%20{{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn">Bluesky</a>
-</div>
-{{/if}}
-
-{{#if prevWeek}}{{#if nextWeek}}
-<div class="week-nav">
-  <a href="{{prevWeek}}">&larr; {{i18n.prevWeek}}</a>
-  <a href="{{nextWeek}}">{{i18n.nextWeek}} &rarr;</a>
-</div>
-{{else}}
-<div class="week-nav">
-  <a href="{{prevWeek}}">&larr; {{i18n.prevWeek}}</a>
-  <span></span>
-</div>
-{{/if}}{{else}}{{#if nextWeek}}
-<div class="week-nav">
-  <span></span>
-  <a href="{{nextWeek}}">{{i18n.nextWeek}} &rarr;</a>
-</div>
-{{/if}}{{/if}}
-
-{{> footer}}
-
+<script>
+(function(){
+  var strip = document.querySelector('.scroll-strip');
+  if (!strip) return;
+  strip.addEventListener('wheel', function(e) {
+    var isHorizontal = strip.scrollWidth > strip.clientWidth;
+    if (isHorizontal && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      e.preventDefault();
+      strip.scrollLeft += e.deltaY;
+    }
+  }, { passive: false });
+})();
+</script>
 {{{themeToggleScript}}}
 </body>
 </html>

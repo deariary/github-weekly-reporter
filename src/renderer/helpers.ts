@@ -121,4 +121,17 @@ export const registerHelpers = (
   hbs.registerHelper("urlEncode", (text: string): string =>
     encodeURIComponent(String(text ?? "")),
   );
+
+  // Array helpers for magazine-style layouts
+  hbs.registerHelper("first", <T>(arr: T[]): T | undefined =>
+    Array.isArray(arr) ? arr[0] : undefined,
+  );
+
+  hbs.registerHelper("rest", <T>(arr: T[]): T[] =>
+    Array.isArray(arr) ? arr.slice(1) : [],
+  );
+
+  hbs.registerHelper("isEven", (index: number): boolean =>
+    index % 2 === 0,
+  );
 };
