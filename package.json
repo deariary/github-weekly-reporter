@@ -48,9 +48,6 @@
   "engines": {
     "node": ">=20"
   },
-  "overrides": {
-    "jsdom": "~28.0.0"
-  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
     "@google/generative-ai": "^0.24.1",
@@ -58,10 +55,10 @@
     "@octokit/graphql": "^9.0.3",
     "commander": "^14.0.3",
     "handlebars": "^4.7.9",
-    "isomorphic-dompurify": "^3.7.1",
     "libsodium-wrappers": "^0.8.2",
     "marked": "^17.0.5",
     "openai": "^6.33.0",
+    "sanitize-html": "^2.17.2",
     "satori": "^0.26.0",
     "sharp": "^0.34.5",
     "yaml": "^2.8.3"
@@ -70,6 +67,7 @@
     "@eslint/js": "^10.0.1",
     "@types/libsodium-wrappers": "^0.8.2",
     "@types/node": "^25.5.2",
+    "@types/sanitize-html": "^2.16.1",
     "@vitest/coverage-v8": "^4.1.2",
     "eslint": "^10.2.0",
     "typescript": "^6.0.2",

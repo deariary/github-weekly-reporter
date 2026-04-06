@@ -2,13 +2,20 @@
 
 import Handlebars from "handlebars";
 import { Marked } from "marked";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 import type { RepositoryActivity, Language } from "../types.js";
 import { getLocale, formatNumber as fmtNumber } from "../i18n/index.js";
 import { parseLocalDate } from "../collector/date-range.js";
 
 const sanitize = (html: string): string =>
-  DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+  sanitizeHtml(html, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      a: ["href", "target", "rel"],
+      img: ["src", "alt"],
+    },
+  });
 
 const externalLinkRenderer = {
   link({ href, text }: { href: string; text: string }): string {
@@ -85,7 +92,7 @@ export const registerHelpers = (
 
   // Markdown rendering with HTML sanitization
   // All links get target="_blank" rel="noopener nofollow",
-  // and DOMPurify strips any dangerous tags (script, iframe, etc.)
+  // and sanitize-html strips any dangerous tags (script, iframe, etc.)
   hbs.registerHelper("md", (text: string): Handlebars.SafeString =>
     new Handlebars.SafeString(sanitize(marked.parse(text ?? "") as string)),
   );
