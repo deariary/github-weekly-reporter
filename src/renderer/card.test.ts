@@ -3,7 +3,8 @@ import { generateCard, generateDarkCard } from "./card.js";
 
 const data = {
   username: "testuser",
-  weekLabel: "2026 Week 14",
+  weekLabel: "Week 14",
+  dateRange: "Mar 30 - Apr 5, 2026",
   title: "Auth refactor completed",
   summaries: [
     {
@@ -34,10 +35,10 @@ describe("generateCard", () => {
     expect(svg).toContain("WEEKLY NEWS");
   });
 
-  it("includes username and week label", () => {
+  it("includes week label and date range", () => {
     const svg = generateCard(data);
-    expect(svg).toContain("@testuser");
-    expect(svg).toContain("2026 Week 14");
+    expect(svg).toContain("Week 14");
+    expect(svg).toContain("Mar 30 - Apr 5, 2026");
   });
 
   it("includes summary headings with fallback labels", () => {
@@ -103,6 +104,6 @@ describe("generateDarkCard", () => {
   it("includes the same ticker content", () => {
     const svg = generateDarkCard(data);
     expect(svg).toContain("Commit Summary");
-    expect(svg).toContain("@testuser");
+    expect(svg).toContain("Week 14");
   });
 });

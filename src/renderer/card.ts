@@ -7,6 +7,7 @@ import type { SummarySection, TickerItem } from "../types.js";
 export type CardData = {
   username: string;
   weekLabel: string;
+  dateRange: string; // e.g. "Mar 30 - Apr 5, 2026"
   title: string;
   summaries: SummarySection[];
   ticker?: TickerItem[];
@@ -47,7 +48,8 @@ const DARK: CardColors = {
 };
 
 const WIDTH = 900;
-const HEIGHT = 48;
+export const CARD_HEIGHT = 48;
+const HEIGHT = CARD_HEIGHT;
 const TICKER_H = 24;
 const REPEATS = 50;
 const SCROLL_PX_PER_SEC = 30;
@@ -136,11 +138,13 @@ const buildSVG = (data: CardData, colors: CardColors): string => {
   const labelY = (topH - labelH) / 2;
   const weekX = labelX + labelW + 6;
 
+  const dateX = weekX + data.weekLabel.length * 7 + 8;
+
   const topBar = [
     `<rect x="${labelX}" y="${labelY}" width="${labelW}" height="${labelH}" rx="2" fill="${colors.accentBg}"/>`,
     `<text x="${labelX + labelW / 2}" y="${midY}" font-family="${font}" text-anchor="middle" font-size="9" font-weight="800" fill="#fff" letter-spacing="0.08em">WEEKLY NEWS</text>`,
     `<text x="${weekX}" y="${midY}" font-family="${font}" font-size="11" font-weight="700" fill="${colors.text}">${escapeXml(data.weekLabel)}</text>`,
-    `<text x="${WIDTH}" y="${midY}" font-family="${font}" font-size="10" fill="${colors.textSecondary}" text-anchor="end">@${escapeXml(data.username)}</text>`,
+    `<text x="${dateX}" y="${midY}" font-family="${font}" font-size="10" fill="${colors.textSecondary}">${escapeXml(data.dateRange)}</text>`,
     `<line x1="0" y1="${topH}" x2="10000" y2="${topH}" stroke="${colors.border}" stroke-width="0.5"/>`,
   ].join("\n");
 

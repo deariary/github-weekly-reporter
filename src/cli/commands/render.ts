@@ -174,9 +174,22 @@ const run = async (options: RenderOptions): Promise<void> => {
   console.log(`OG image written to ${ogPath}`);
 
   // Generate animated SVG summary cards (light + dark)
+  // Compute Mon-Sun date range from ISO week number (independent of data file)
+  const isoWeekToMonday = (year: number, week: number): Date => {
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const dow = jan4.getUTCDay() || 7;
+    const w1Mon = new Date(jan4.getTime() - (dow - 1) * 86_400_000);
+    return new Date(w1Mon.getTime() + (week - 1) * 7 * 86_400_000);
+  };
+  const fmtShort = (d: Date): string =>
+    d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  const monday = isoWeekToMonday(weekId.year, weekId.week);
+  const sunday = new Date(monday.getTime() + 6 * 86_400_000);
+  const dateRange = `${fmtShort(monday)} - ${fmtShort(sunday)}, ${weekId.year}`;
   const cardData = {
     username: githubData.username,
-    weekLabel: `${weekId.year} Week ${weekId.path.split("/")[1].replace("W", "")}`,
+    weekLabel: `Week ${weekId.path.split("/")[1].replace("W", "")}`,
+    dateRange,
     title: aiContent.title,
     summaries: aiContent.summaries,
     ticker: aiContent.ticker,
