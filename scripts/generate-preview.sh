@@ -36,9 +36,8 @@ done
 # Copy theme screenshots for LP
 cp -r scripts/screenshots "$OUT_DIR/screenshots"
 
-# Copy example card SVGs for LP
-mkdir -p "$OUT_DIR/examples"
-cp examples/card.svg examples/card-dark.svg "$OUT_DIR/examples/"
+# Copy card SVGs for LP and README
+cp scripts/screenshots/card.svg scripts/screenshots/card-dark.svg "$OUT_DIR/screenshots/"
 
 # Generate top-level index
 node scripts/generate-preview-index.js "$OUT_DIR" "$BASE_URL" "$THEMES" "$LANGS"
