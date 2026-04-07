@@ -167,6 +167,17 @@ describe("registerRender", () => {
 
     // Should generate index OG image
     expect(mockGenerateIndexOGImage).toHaveBeenCalled();
+
+    // Should write card SVGs with correct date range from weekId (2026 W14 = Mar 30 - Apr 5)
+    const cardCall = mockWriteFile.mock.calls.find(
+      (call: unknown[]) => typeof call[0] === "string" && (call[0] as string).endsWith("card.svg"),
+    );
+    expect(cardCall).toBeDefined();
+    const cardSvg = cardCall![1] as string;
+    expect(cardSvg).toContain("Week 14");
+    expect(cardSvg).toContain("Mar 30");
+    expect(cardSvg).toContain("Apr 5");
+    expect(cardSvg).toContain("2026");
   });
 
   it("exits when github-data.yaml is missing", async () => {
