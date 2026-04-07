@@ -46,13 +46,14 @@ Section requirements:
     "HISTORIC MERGE", "KEYBOARD ON FIRE", "UNPRECEDENTED", "EXPERTS BAFFLED",
     "NO SURVIVORS", "RED ALERT", "JUST IN", "NOT A DRILL"
   - text: a headline (40-80 chars). Write like a breathless news anchor.
-    Use the developer's username as subject. Present tense, active voice.
+    Use @{developer username from the activity data} as the subject. Present tense, active voice.
+    IMPORTANT: use the ACTUAL username from the activity data, NOT "@user".
     Exaggerate the drama. Make it entertaining.
-    BAD (boring): "@user pushes 42 commits" (just restating facts)
-    BAD (boring): "@user completes OAuth2 migration" (corporate memo)
-    GOOD: "@user goes on mass deletion spree, mass removing 1,204 lines of legacy code"
-    GOOD: "@user spotted deploying to production at 2 AM. Witnesses report maniacal laughter."
-    GOOD: "@user single-handedly mass-reviews 8 PRs before mass-lunch. Coworkers stunned."
+    BAD (boring): "@user pushes 42 commits" (wrong: used literal "@user" instead of actual username)
+    BAD (boring): "@deariary completes OAuth2 migration" (too corporate)
+    GOOD: "@deariary goes on mass deletion spree, mass removing 1,204 lines of legacy code"
+    GOOD: "@deariary spotted deploying to production at 2 AM. Witnesses report maniacal laughter."
+    GOOD: "@deariary single-handedly mass-reviews 8 PRs before lunch. Coworkers stunned."
 
 Predefined summary types (use when relevant):
 - repo-summary: which repos were active and what the focus was
@@ -125,15 +126,15 @@ highlights:
     body: "1-2 sentences"
 ticker:
   - label: "ABSOLUTE CARNAGE"
-    text: "@user goes on mass deletion spree, mass removing 1,204 lines of legacy auth code"
+    text: "@${input.username} goes on mass deletion spree, removing 1,204 lines of legacy auth code"
   - label: "NOT A DRILL"
-    text: "@user deploys JWT sessions to prod on a Wednesday. Bold move."
+    text: "@${input.username} deploys JWT sessions to prod on a Wednesday. Bold move."
   - label: "EXPERTS BAFFLED"
-    text: "@user reviews 8 PRs before lunch. Coworkers reportedly stunned."
+    text: "@${input.username} reviews 8 PRs before lunch. Coworkers reportedly stunned."
   - label: "DEVELOPING"
-    text: "@user spotted mass pushing commits at an alarming rate. 42 this week alone."
+    text: "@${input.username} spotted pushing commits at an alarming rate. 42 this week alone."
   - label: "UNPRECEDENTED"
-    text: "@user migrates three repos to OAuth2 PKCE in what sources call a historic sprint"
+    text: "@${input.username} migrates three repos to OAuth2 PKCE in what sources call a historic sprint"
 
 Activity data:
 ${buildLLMContext(input)}
