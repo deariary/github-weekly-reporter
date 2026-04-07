@@ -126,7 +126,7 @@ const buildSVG = (data: CardData, colors: CardColors): string => {
       100% { transform: translateX(-${totalWidth.toFixed(0)}px); }
     }`;
 
-  const font = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif';
+  const font = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
   const topH = HEIGHT - TICKER_H;
   const midY = topH / 2 + 4;
 
