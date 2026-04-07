@@ -186,13 +186,23 @@ export const buildReadme = (opts: {
   const displayTitle = opts.siteTitle.replace(/\\n/g, " ");
   return `# ${displayTitle}
 
-Weekly GitHub activity reports for [@${opts.username}](https://github.com/${opts.username}), powered by [github-weekly-reporter](https://github.com/deariary/github-weekly-reporter).
+This repository is generated and updated by [github-weekly-reporter](https://github.com/deariary/github-weekly-reporter).
+
+Every week, GitHub Actions collects my activity (commits, PRs, reviews), an LLM writes a narrative summary, and the result is published as a blog-style report page and an animated profile card.
 
 ## Live Reports
 
 ${opts.pagesUrl}
 
 ## Profile Card
+
+<a href="https://github.com/${opts.repo}">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="${opts.pagesUrl}/card-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="${opts.pagesUrl}/card.svg" />
+    <img alt="Weekly Report" src="${opts.pagesUrl}/card.svg" />
+  </picture>
+</a>
 
 Add this to your [GitHub Profile README](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme):
 

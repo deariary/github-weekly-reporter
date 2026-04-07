@@ -57,9 +57,9 @@ describe("buildReadme", () => {
     expect(readme).toMatch(/^# Dev Pulse/);
   });
 
-  it("includes username with link", () => {
+  it("includes github-weekly-reporter link", () => {
     const readme = buildReadme(baseOpts);
-    expect(readme).toContain("[@testuser](https://github.com/testuser)");
+    expect(readme).toContain("[github-weekly-reporter](https://github.com/deariary/github-weekly-reporter)");
   });
 
   it("includes pages URL", () => {
