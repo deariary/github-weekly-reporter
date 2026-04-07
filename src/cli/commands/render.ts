@@ -9,6 +9,7 @@ import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deplo
 import { getWeekId } from "../../deployer/week.js";
 import { parseLocalDate } from "../../collector/date-range.js";
 import { generateOGImage, generateIndexOGImage } from "../../renderer/og-image.js";
+import { generateCard, generateDarkCard } from "../../renderer/card.js";
 import { buildRSSFeed } from "../../renderer/rss.js";
 import type { WeeklyReportData, AIContent, Language, Theme } from "../../types.js";
 import { AVAILABLE_THEMES } from "../../renderer/themes/index.js";
@@ -171,6 +172,25 @@ const run = async (options: RenderOptions): Promise<void> => {
   const ogPath = join(outputWeekDir, "og.png");
   await writeFile(ogPath, ogImage);
   console.log(`OG image written to ${ogPath}`);
+
+  // Generate animated SVG summary cards (light + dark)
+  const cardData = {
+    username: githubData.username,
+    weekLabel: `${weekId.year} Week ${weekId.path.split("/")[1].replace("W", "")}`,
+    title: aiContent.title,
+    summaries: aiContent.summaries,
+    ticker: aiContent.ticker,
+    reportUrl: `${base}/${weekId.path}/`,
+  };
+  const cardSvg = generateCard(cardData);
+  const cardDarkSvg = generateDarkCard(cardData);
+  const cardPath = join(options.outputDir, "card.svg");
+  const cardDarkPath = join(options.outputDir, "card-dark.svg");
+  await Promise.all([
+    writeFile(cardPath, cardSvg, "utf-8"),
+    writeFile(cardDarkPath, cardDarkSvg, "utf-8"),
+  ]);
+  console.log(`SVG cards written to ${cardPath} and ${cardDarkPath}`);
 
   // Write index page with titles from each week's LLM data
   const entries = await buildReportEntries(options.dataDir, allPaths);

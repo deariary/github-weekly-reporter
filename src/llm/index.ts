@@ -4,6 +4,7 @@ import { parse as parseYaml } from "yaml";
 import type {
   AIContent,
   HighlightType,
+  TickerItem,
   PullRequest,
   Issue,
   GitHubEvent,
@@ -112,6 +113,12 @@ const parseAIContent = (raw: string): AIContent => {
           body: String(h.body),
         }))
       : [],
+    ticker: Array.isArray(parsed.ticker)
+      ? parsed.ticker.map((t: Record<string, unknown>): TickerItem => ({
+          label: String(t.label ?? ""),
+          text: String(t.text ?? ""),
+        }))
+      : undefined,
   };
 };
 

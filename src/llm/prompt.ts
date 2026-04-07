@@ -37,6 +37,23 @@ Section requirements:
   Add 2-4 chips per summary with key stats. Every chip MUST have a non-empty label and value.
 - highlights: pick 2-5 notable items. Use exact PR titles from the data.
   Each highlight has 1-2 sentences explaining why it mattered.
+- ticker: a list of 5-8 items for an animated scrolling news-ticker card (GitHub Profile README).
+  Each item has a label and text. Write like a dramatic, tongue-in-cheek TV news broadcast.
+  Be funny, over-the-top, and entertaining while staying accurate to the actual data.
+  - label: a short, dramatic, fun ALL-CAPS badge (1-3 words). Be creative and absurd.
+    Think cable news chyrons meets developer humor.
+    Examples: "ABSOLUTE CARNAGE", "SOURCES SAY", "DEVELOPING", "TREMENDOUS COMMITS",
+    "HISTORIC MERGE", "KEYBOARD ON FIRE", "UNPRECEDENTED", "EXPERTS BAFFLED",
+    "NO SURVIVORS", "RED ALERT", "JUST IN", "NOT A DRILL"
+  - text: a headline (40-80 chars). Write like a breathless news anchor.
+    Use @{developer username from the activity data} as the subject. Present tense, active voice.
+    IMPORTANT: use the ACTUAL username from the activity data, NOT "@user".
+    Exaggerate the drama. Make it entertaining.
+    BAD (boring): "@user pushes 42 commits" (wrong: used literal "@user" instead of actual username)
+    BAD (boring): "@deariary completes OAuth2 migration" (too corporate)
+    GOOD: "@deariary goes on mass deletion spree, mass removing 1,204 lines of legacy code"
+    GOOD: "@deariary spotted deploying to production at 2 AM. Witnesses report maniacal laughter."
+    GOOD: "@deariary single-handedly mass-reviews 8 PRs before lunch. Coworkers stunned."
 
 Predefined summary types (use when relevant):
 - repo-summary: which repos were active and what the focus was
@@ -107,6 +124,17 @@ highlights:
     repo: "owner/repo"
     meta: "released Apr 3"
     body: "1-2 sentences"
+ticker:
+  - label: "ABSOLUTE CARNAGE"
+    text: "@${input.username} goes on mass deletion spree, removing 1,204 lines of legacy auth code"
+  - label: "NOT A DRILL"
+    text: "@${input.username} deploys JWT sessions to prod on a Wednesday. Bold move."
+  - label: "EXPERTS BAFFLED"
+    text: "@${input.username} reviews 8 PRs before lunch. Coworkers reportedly stunned."
+  - label: "DEVELOPING"
+    text: "@${input.username} spotted pushing commits at an alarming rate. 42 this week alone."
+  - label: "UNPRECEDENTED"
+    text: "@${input.username} migrates three repos to OAuth2 PKCE in what sources call a historic sprint"
 
 Activity data:
 ${buildLLMContext(input)}
