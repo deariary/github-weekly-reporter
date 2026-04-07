@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { renderReport } from "../../renderer/index.js";
 import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deployer/index-page.js";
-import { getWeekId } from "../../deployer/week.js";
+import { getWeekId, isoWeekToMonday } from "../../deployer/week.js";
 import { parseLocalDate } from "../../collector/date-range.js";
 import { generateOGImage, generateIndexOGImage } from "../../renderer/og-image.js";
 import { generateCard, generateDarkCard } from "../../renderer/card.js";
@@ -175,12 +175,6 @@ const run = async (options: RenderOptions): Promise<void> => {
 
   // Generate animated SVG summary cards (light + dark)
   // Compute Mon-Sun date range from ISO week number (independent of data file)
-  const isoWeekToMonday = (year: number, week: number): Date => {
-    const jan4 = new Date(Date.UTC(year, 0, 4));
-    const dow = jan4.getUTCDay() || 7;
-    const w1Mon = new Date(jan4.getTime() - (dow - 1) * 86_400_000);
-    return new Date(w1Mon.getTime() + (week - 1) * 7 * 86_400_000);
-  };
   const fmtShort = (d: Date): string =>
     d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
   const monday = isoWeekToMonday(weekId.year, weekId.week);
