@@ -96,18 +96,6 @@
   {{/each}}
 </div>
 
-{{#if baseUrl}}
-<div class="embed-section">
-  <div class="embed-label">Embed in your GitHub README</div>
-  <pre class="embed-snippet"><code>&lt;a href="{{#if repoUrl}}{{repoUrl}}{{else}}https://github.com/{username}/{repo}{{/if}}"&gt;
-  &lt;picture&gt;
-    &lt;source media="(prefers-color-scheme: dark)" srcset="{{baseUrl}}/card-dark.svg" /&gt;
-    &lt;source media="(prefers-color-scheme: light)" srcset="{{baseUrl}}/card.svg" /&gt;
-    &lt;img alt="Weekly Report" src="{{baseUrl}}/card.svg" /&gt;
-  &lt;/picture&gt;
-&lt;/a&gt;</code></pre>
-</div>
-{{/if}}
 
 <footer class="footer">
   <div class="theme-toggle-row">
