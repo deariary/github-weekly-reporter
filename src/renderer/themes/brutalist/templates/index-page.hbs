@@ -99,11 +99,13 @@
 {{#if baseUrl}}
 <div class="embed-section">
   <div class="embed-label">Embed in your GitHub README</div>
-  <pre class="embed-snippet"><code>&lt;picture&gt;
-  &lt;source media="(prefers-color-scheme: dark)" srcset="{{baseUrl}}/card-dark.svg" /&gt;
-  &lt;source media="(prefers-color-scheme: light)" srcset="{{baseUrl}}/card.svg" /&gt;
-  &lt;img alt="Weekly Report" src="{{baseUrl}}/card.svg" /&gt;
-&lt;/picture&gt;</code></pre>
+  <pre class="embed-snippet"><code>&lt;a href="https://github.com/{your-repo}"&gt;
+  &lt;picture&gt;
+    &lt;source media="(prefers-color-scheme: dark)" srcset="{{baseUrl}}/card-dark.svg" /&gt;
+    &lt;source media="(prefers-color-scheme: light)" srcset="{{baseUrl}}/card.svg" /&gt;
+    &lt;img alt="Weekly Report" src="{{baseUrl}}/card.svg" /&gt;
+  &lt;/picture&gt;
+&lt;/a&gt;</code></pre>
 </div>
 {{/if}}
 

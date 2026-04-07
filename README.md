@@ -104,11 +104,13 @@ Embed an animated news ticker in your GitHub Profile README. AI-generated headli
 Generated automatically as part of the `render` command. Add this to your profile README:
 
 ```html
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://{username}.github.io/{repo}/card-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="https://{username}.github.io/{repo}/card.svg" />
-  <img alt="Weekly Report" src="https://{username}.github.io/{repo}/card.svg" />
-</picture>
+<a href="https://github.com/{username}/{repo}">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://{username}.github.io/{repo}/card-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://{username}.github.io/{repo}/card.svg" />
+    <img alt="Weekly Report" src="https://{username}.github.io/{repo}/card.svg" />
+  </picture>
+</a>
 ```
 
 ## Features
