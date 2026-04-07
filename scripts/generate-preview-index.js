@@ -242,6 +242,17 @@ const html = `<!DOCTYPE html>
 </header>
 
 <section class="fade-in">
+  <h2>Profile Card</h2>
+  <p class="lead">Embed an animated news ticker in your GitHub Profile README. AI writes the headlines.</p>
+  <div style="border:1px solid #222;border-radius:6px;overflow:hidden;margin-bottom:1rem;">
+    <img src="examples/card-dark.svg" alt="Weekly News Ticker" style="width:100%;display:block;" />
+  </div>
+  <p class="qs-note" style="margin-top:0.5rem;">
+    Generated automatically with each weekly report. Headlines use dramatic, tongue-in-cheek labels like a TV news broadcast.
+  </p>
+</section>
+
+<section class="fade-in">
   <h2>Features</h2>
   <ul class="feature-list">
     <li class="feature-item"><strong>AI narratives</strong>: six LLM providers (OpenRouter, Anthropic, OpenAI, Gemini, Groq, Grok). One API call per week generates title, overview, summaries, and highlights.</li>

@@ -91,6 +91,26 @@ with:
   theme: 'editorial'
 ```
 
+## Profile Card
+
+Embed an animated news ticker in your GitHub Profile README. AI-generated headlines scroll with dramatic labels.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="examples/card-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="examples/card.svg" />
+  <img alt="Weekly News Ticker" src="examples/card.svg" />
+</picture>
+
+Generated automatically as part of the `render` command. Add this to your profile README:
+
+```html
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://{username}.github.io/{repo}/card-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://{username}.github.io/{repo}/card.svg" />
+  <img alt="Weekly Report" src="https://{username}.github.io/{repo}/card.svg" />
+</picture>
+```
+
 ## Features
 
 - Weekly stats: commits, PRs opened/merged, reviews
