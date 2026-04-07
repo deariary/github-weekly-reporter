@@ -194,12 +194,15 @@ const run = async (options: RenderOptions): Promise<void> => {
 
   // Write index page with titles from each week's LLM data
   const entries = await buildReportEntries(options.dataDir, allPaths);
+  const ghRepo = env("GITHUB_REPOSITORY");
+  const repoUrl = ghRepo ? `https://github.com/${ghRepo}` : undefined;
   const indexHtml = renderIndexPage(
     entries,
     { username: githubData.username, avatarUrl: githubData.avatarUrl, profile: githubData.profile },
     options.language,
     options.siteTitle,
     base,
+    repoUrl,
     options.theme,
   );
   const indexPath = join(options.outputDir, "index.html");

@@ -58,6 +58,7 @@ export const renderIndexPage = (
   language: Language = "en",
   siteTitle?: string,
   baseUrl?: string,
+  repoUrl?: string,
   themeName: Theme = "brutalist",
 ): string => {
   const locale = getLocale(language);
@@ -83,6 +84,7 @@ export const renderIndexPage = (
     description,
     ogImageUrl,
     baseUrl,
+    repoUrl,
     lang: language,
     weeklyReports: locale.weeklyReports,
     poweredBy: locale.poweredBy,
