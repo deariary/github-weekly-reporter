@@ -96,9 +96,9 @@ with:
 Embed an animated news ticker in your GitHub Profile README. AI-generated headlines scroll with dramatic labels.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="examples/card-dark.svg" />
-  <source media="(prefers-color-scheme: light)" srcset="examples/card.svg" />
-  <img alt="Weekly News Ticker" src="examples/card.svg" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://deariary.github.io/github-weekly-reporter/examples/card-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset="https://deariary.github.io/github-weekly-reporter/examples/card.svg" />
+  <img alt="Weekly News Ticker" src="https://deariary.github.io/github-weekly-reporter/examples/card.svg" />
 </picture>
 
 Generated automatically as part of the `render` command. Add this to your profile README:
