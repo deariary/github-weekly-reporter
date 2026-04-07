@@ -37,6 +37,15 @@ Section requirements:
   Add 2-4 chips per summary with key stats. Every chip MUST have a non-empty label and value.
 - highlights: pick 2-5 notable items. Use exact PR titles from the data.
   Each highlight has 1-2 sentences explaining why it mattered.
+- ticker: a list of 5-8 items for an animated scrolling news-ticker card (GitHub Profile README).
+  Each item has a label and text.
+  - label: a short, dramatic, fun ALL-CAPS badge (1-2 words). Be creative and match the content.
+    Examples: "SHIPPED!", "CODE PURGE", "REVIEW STORM", "BUG SQUASHED", "TREMENDOUS COMMITS",
+    "CLEAN SWEEP", "DEEP DIVE", "MEGA MERGE", "HOTFIX HERO", "PR MACHINE"
+  - text: a headline (40-80 chars). Always start with WHO did WHAT.
+    Use the developer's username as subject. Present tense, active voice.
+    BAD: "Peak commit activity on Tuesday" (no subject)
+    GOOD: "@deariary pushes 42 commits in auth refactor sprint"
 
 Predefined summary types (use when relevant):
 - repo-summary: which repos were active and what the focus was
@@ -107,6 +116,17 @@ highlights:
     repo: "owner/repo"
     meta: "released Apr 3"
     body: "1-2 sentences"
+ticker:
+  - label: "MASSIVE REFACTOR"
+    text: "@user completes OAuth2 PKCE migration across three repos"
+  - label: "CODE PURGE"
+    text: "@user removes 1,204 lines in aggressive auth cleanup"
+  - label: "SHIPPED!"
+    text: "@user deploys JWT session management to production"
+  - label: "REVIEW STORM"
+    text: "@user reviews 8 PRs and merges 5 across two projects"
+  - label: "TREMENDOUS COMMITS"
+    text: "@user pushes 42 commits in a single week sprint"
 
 Activity data:
 ${buildLLMContext(input)}

@@ -185,12 +185,18 @@ export type HighlightSection = {
   url?: string; // resolved from PR/Issue data, not from LLM
 };
 
+export type TickerItem = {
+  label: string; // short punchy badge label (e.g. "SHIPPED!", "CODE PURGE")
+  text: string;  // headline text (e.g. "@user ships JWT to production")
+};
+
 export type AIContent = {
   title: string;
   subtitle: string;
   overview: string; // multi-paragraph long-form text
   summaries: SummarySection[];
   highlights: HighlightSection[];
+  ticker?: TickerItem[]; // headline items for animated SVG news ticker card
 };
 
 // Configuration types
