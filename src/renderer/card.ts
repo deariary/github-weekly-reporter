@@ -60,16 +60,26 @@ const escapeXml = (s: string): string =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 
+const IDLE_ITEMS: TickerItem[] = [
+  { label: "STANDBY", text: "Developer is recharging. Weekly report will resume shortly." },
+  { label: "SOURCES SAY", text: "Unnamed keyboard spotted resting peacefully on desk." },
+  { label: "DEVELOPING", text: "Local developer reportedly seen outdoors. Authorities investigating." },
+  { label: "JUST IN", text: "Coffee reserves holding steady. No commits at this time." },
+  { label: "EXCLUSIVE", text: "Anonymous sources confirm: sleep was had this week." },
+];
+
 const buildTickerItems = (data: CardData): TickerItem[] => {
   if (data.ticker && data.ticker.length > 0) return data.ticker;
-  // Fallback: build from summaries or title
-  const texts = data.summaries.length > 0
-    ? data.summaries.map((s) => s.heading)
-    : [data.title];
-  return texts.map((t, i) => ({
-    label: FALLBACK_LABELS[i % FALLBACK_LABELS.length],
-    text: t,
-  }));
+  if (data.summaries.length > 0) {
+    return data.summaries.map((s, i) => ({
+      label: FALLBACK_LABELS[i % FALLBACK_LABELS.length],
+      text: s.heading,
+    }));
+  }
+  if (data.title) {
+    return [{ label: FALLBACK_LABELS[0], text: data.title }];
+  }
+  return IDLE_ITEMS;
 };
 
 // Build one segment of ticker as SVG <tspan> elements with estimated width.
