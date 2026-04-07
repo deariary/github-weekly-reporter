@@ -132,15 +132,15 @@ const buildSVG = (data: CardData, colors: CardColors): string => {
 
   const labelW = 82;
   const labelH = 15;
-  const labelX = 8;
+  const labelX = 0;
   const labelY = (topH - labelH) / 2;
-  const weekX = labelX + labelW + 8;
+  const weekX = labelX + labelW + 6;
 
   const topBar = [
     `<rect x="${labelX}" y="${labelY}" width="${labelW}" height="${labelH}" rx="2" fill="${colors.accentBg}"/>`,
     `<text x="${labelX + labelW / 2}" y="${midY}" font-family="${font}" text-anchor="middle" font-size="9" font-weight="800" fill="#fff" letter-spacing="0.08em">WEEKLY NEWS</text>`,
     `<text x="${weekX}" y="${midY}" font-family="${font}" font-size="11" font-weight="700" fill="${colors.text}">${escapeXml(data.weekLabel)}</text>`,
-    `<text x="${WIDTH - 10}" y="${midY}" font-family="${font}" font-size="10" fill="${colors.textSecondary}" text-anchor="end">@${escapeXml(data.username)}</text>`,
+    `<text x="${WIDTH}" y="${midY}" font-family="${font}" font-size="10" fill="${colors.textSecondary}" text-anchor="end">@${escapeXml(data.username)}</text>`,
     `<line x1="0" y1="${topH}" x2="10000" y2="${topH}" stroke="${colors.border}" stroke-width="0.5"/>`,
   ].join("\n");
 
