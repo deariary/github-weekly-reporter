@@ -98,7 +98,7 @@ Embed an animated news ticker in your GitHub Profile README. AI-generated headli
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://deariary.github.io/github-weekly-reporter/screenshots/card-dark.svg" />
   <source media="(prefers-color-scheme: light)" srcset="https://deariary.github.io/github-weekly-reporter/screenshots/card.svg" />
-  <img alt="Weekly News Ticker" src="https://deariary.github.io/github-weekly-reporter/screenshots/card.svg" />
+  <img alt="Weekly News Ticker" src="https://deariary.github.io/github-weekly-reporter/screenshots/card.svg" height="48" />
 </picture>
 
 Generated automatically as part of the `render` command. Add this to your profile README:
@@ -108,7 +108,7 @@ Generated automatically as part of the `render` command. Add this to your profil
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://{username}.github.io/{repo}/card-dark.svg" />
     <source media="(prefers-color-scheme: light)" srcset="https://{username}.github.io/{repo}/card.svg" />
-    <img alt="Weekly Report" src="https://{username}.github.io/{repo}/card.svg" />
+    <img alt="Weekly Report" src="https://{username}.github.io/{repo}/card.svg" height="48" />
   </picture>
 </a>
 ```
