@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { renderReport } from "../../renderer/index.js";
 import { renderIndexPage, buildReportEntry, type ReportEntry } from "../../deployer/index-page.js";
-import { getWeekId } from "../../deployer/week.js";
+import { getWeekId, isoWeekToMonday } from "../../deployer/week.js";
 import { parseLocalDate } from "../../collector/date-range.js";
 import { generateOGImage, generateIndexOGImage } from "../../renderer/og-image.js";
 import { generateCard, generateDarkCard } from "../../renderer/card.js";
@@ -174,9 +174,16 @@ const run = async (options: RenderOptions): Promise<void> => {
   console.log(`OG image written to ${ogPath}`);
 
   // Generate animated SVG summary cards (light + dark)
+  // Compute Mon-Sun date range from ISO week number (independent of data file)
+  const fmtShort = (d: Date): string =>
+    d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+  const monday = isoWeekToMonday(weekId.year, weekId.week);
+  const sunday = new Date(monday.getTime() + 6 * 86_400_000);
+  const dateRange = `${fmtShort(monday)} - ${fmtShort(sunday)}, ${weekId.year}`;
   const cardData = {
     username: githubData.username,
-    weekLabel: `${weekId.year} Week ${weekId.path.split("/")[1].replace("W", "")}`,
+    weekLabel: `Week ${weekId.path.split("/")[1].replace("W", "")}`,
+    dateRange,
     title: aiContent.title,
     summaries: aiContent.summaries,
     ticker: aiContent.ticker,

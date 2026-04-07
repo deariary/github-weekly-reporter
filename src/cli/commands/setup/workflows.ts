@@ -200,7 +200,7 @@ ${opts.pagesUrl}
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="${opts.pagesUrl}/card-dark.svg" />
     <source media="(prefers-color-scheme: light)" srcset="${opts.pagesUrl}/card.svg" />
-    <img alt="Weekly Report" src="${opts.pagesUrl}/card.svg" />
+    <img alt="Weekly Report" src="${opts.pagesUrl}/card.svg" height="48" />
   </picture>
 </a>
 
@@ -211,7 +211,7 @@ Add this to your [GitHub Profile README](https://docs.github.com/en/account-and-
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="${opts.pagesUrl}/card-dark.svg" />
     <source media="(prefers-color-scheme: light)" srcset="${opts.pagesUrl}/card.svg" />
-    <img alt="Weekly Report" src="${opts.pagesUrl}/card.svg" />
+    <img alt="Weekly Report" src="${opts.pagesUrl}/card.svg" height="48" />
   </picture>
 </a>
 \`\`\`

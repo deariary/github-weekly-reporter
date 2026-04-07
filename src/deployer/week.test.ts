@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getWeekId, getCurrentWeekId } from "./week.js";
+import { getWeekId, getCurrentWeekId, isoWeekToMonday } from "./week.js";
 
 describe("getWeekId", () => {
   // -------------------------------------------------------------------
@@ -218,5 +218,65 @@ describe("getCurrentWeekId", () => {
   it("pads single-digit week numbers", () => {
     const result = getCurrentWeekId(new Date("2026-01-01T12:00:00Z"));
     expect(result.path).toBe("2026/W01");
+  });
+});
+
+describe("isoWeekToMonday", () => {
+  const dayOfWeek = (d: Date): string =>
+    d.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
+  const fmt = (d: Date): string =>
+    d.toISOString().slice(0, 10);
+
+  it("returns Monday for 2026 W14 (Mar 30)", () => {
+    const mon = isoWeekToMonday(2026, 14);
+    expect(fmt(mon)).toBe("2026-03-30");
+    expect(dayOfWeek(mon)).toBe("Monday");
+  });
+
+  it("returns Monday for 2026 W1 (Dec 29, 2025)", () => {
+    // ISO 2026 W1 starts on Mon Dec 29 2025
+    const mon = isoWeekToMonday(2026, 1);
+    expect(fmt(mon)).toBe("2025-12-29");
+    expect(dayOfWeek(mon)).toBe("Monday");
+  });
+
+  it("returns Monday for 2025 W1 (Dec 30, 2024)", () => {
+    const mon = isoWeekToMonday(2025, 1);
+    expect(fmt(mon)).toBe("2024-12-30");
+    expect(dayOfWeek(mon)).toBe("Monday");
+  });
+
+  it("handles 2024 W1 (Jan 1, 2024 is Monday)", () => {
+    const mon = isoWeekToMonday(2024, 1);
+    expect(fmt(mon)).toBe("2024-01-01");
+    expect(dayOfWeek(mon)).toBe("Monday");
+  });
+
+  it("handles last week of year: 2026 W52", () => {
+    const mon = isoWeekToMonday(2026, 52);
+    expect(fmt(mon)).toBe("2026-12-21");
+    expect(dayOfWeek(mon)).toBe("Monday");
+  });
+
+  it("handles W53 in a long year (2020 has 53 weeks)", () => {
+    const mon = isoWeekToMonday(2020, 53);
+    expect(fmt(mon)).toBe("2020-12-28");
+    expect(dayOfWeek(mon)).toBe("Monday");
+  });
+
+  it("Sunday is always 6 days after Monday", () => {
+    const cases = [
+      { year: 2026, week: 1 },
+      { year: 2026, week: 14 },
+      { year: 2026, week: 52 },
+      { year: 2020, week: 53 },
+      { year: 2024, week: 1 },
+    ];
+    cases.forEach(({ year, week }) => {
+      const mon = isoWeekToMonday(year, week);
+      const sun = new Date(mon.getTime() + 6 * 86_400_000);
+      expect(dayOfWeek(mon)).toBe("Monday");
+      expect(dayOfWeek(sun)).toBe("Sunday");
+    });
   });
 });

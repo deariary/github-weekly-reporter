@@ -34,6 +34,14 @@ export const getWeekId = (
 
 // Current ISO week ID. Used by daily-fetch to store events for the
 // week that is still in progress.
+// Monday (00:00 UTC) of the given ISO week. Week 1 contains January 4.
+export const isoWeekToMonday = (year: number, week: number): Date => {
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const dow = jan4.getUTCDay() || 7;
+  const w1Mon = new Date(jan4.getTime() - (dow - 1) * 86_400_000);
+  return new Date(w1Mon.getTime() + (week - 1) * 7 * 86_400_000);
+};
+
 export const getCurrentWeekId = (
   date: Date = new Date(),
   timezone: string = "UTC",
