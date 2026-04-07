@@ -192,6 +192,20 @@ Weekly GitHub activity reports for [@${opts.username}](https://github.com/${opts
 
 ${opts.pagesUrl}
 
+## Profile Card
+
+Add this to your [GitHub Profile README](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme):
+
+\`\`\`html
+<a href="https://github.com/${opts.repo}">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="${opts.pagesUrl}/card-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="${opts.pagesUrl}/card.svg" />
+    <img alt="Weekly Report" src="${opts.pagesUrl}/card.svg" />
+  </picture>
+</a>
+\`\`\`
+
 ## How It Works
 
 1. **Daily** (automatic): A scheduled workflow collects your GitHub events at midnight (${opts.timezone}).
