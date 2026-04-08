@@ -16,13 +16,15 @@ Have these two things ready before running setup:
 
 1. **GitHub personal access token (PAT)**, either type works:
 
-   - **Fine-grained PAT** (recommended): `All repositories` access with `Contents: Read & Write`.
+   - **Fine-grained PAT** (recommended): `All repositories` access with permissions:
+     `Actions`, `Administration`, `Contents`, `Pages`, `Secrets`, `Workflows`
+     (all Read & Write).
      ([Create one](https://github.com/settings/personal-access-tokens/new))
-   - **Classic PAT**: scope `repo`.
-     ([Create one](https://github.com/settings/tokens/new?scopes=repo))
+   - **Classic PAT**: scopes `repo` and `workflow`.
+     ([Create one](https://github.com/settings/tokens/new?scopes=repo,workflow))
      Use this if you hit 403 errors with fine-grained tokens (e.g. org policy restrictions).
 
-   > **Using `npx github-weekly-reporter setup`?** The setup command creates a repository, sets secrets, adds workflow files, and enables Pages on your behalf, so it needs more permissions. See [PAT permissions for setup](#pat-permissions) below.
+   > After setup, you can tighten the PAT to the minimum the Action actually needs. See [PAT Permissions](#pat-permissions).
 
 2. **LLM API key** from any supported provider:
 
