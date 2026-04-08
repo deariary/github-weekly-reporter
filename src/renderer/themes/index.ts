@@ -25,6 +25,13 @@ import {
   THEME_INIT_SCRIPT as editorialInitScript,
   THEME_TOGGLE_SCRIPT as editorialToggleScript,
 } from "./editorial/index.js";
+import {
+  buildCSS as swissBuildCSS,
+  buildIndexCSS as swissBuildIndexCSS,
+  colors as swissColors,
+  THEME_INIT_SCRIPT as swissInitScript,
+  THEME_TOGGLE_SCRIPT as swissToggleScript,
+} from "./swiss/index.js";
 
 export type ThemeColors = {
   bg: string;
@@ -71,6 +78,13 @@ const themeModules: Record<Theme, Omit<ThemeModule, "templatesDir">> = {
     colors: editorialColors,
     themeInitScript: editorialInitScript,
     themeToggleScript: editorialToggleScript,
+  },
+  swiss: {
+    buildCSS: swissBuildCSS,
+    buildIndexCSS: swissBuildIndexCSS,
+    colors: swissColors,
+    themeInitScript: swissInitScript,
+    themeToggleScript: swissToggleScript,
   },
 };
 

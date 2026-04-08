@@ -20,6 +20,9 @@ const themeData = {
   editorial: {
     desc: "Horizontal-scroll magazine layout inspired by print editorial design. Serif typography (Playfair Display + Newsreader), column-based content flow, and data visualizations woven into the narrative.",
   },
+  swiss: {
+    desc: "International Typographic Style (Swiss Design) with asymmetric grid, Space Grotesk neo-grotesque typography, numbered sections, and geometric motifs inspired by Max Bill and Muller-Brockmann.",
+  },
 };
 
 const html = `<!DOCTYPE html>
@@ -272,7 +275,7 @@ const html = `<!DOCTYPE html>
 
 <section class="fade-in">
   <h2>Themes</h2>
-  <p class="lead">Three built-in themes, each with light/dark mode and responsive layout.</p>
+  <p class="lead">Four built-in themes, each with light/dark mode and responsive layout.</p>
   <ul class="theme-list">
 ${themes
   .map(

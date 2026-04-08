@@ -2,7 +2,7 @@
 # Generate preview site: theme x lang combinations from example/ data
 set -euo pipefail
 
-THEMES="brutalist minimal editorial"
+THEMES="brutalist minimal editorial swiss"
 LANGS="en ja"
 BASE_URL="${BASE_URL:-https://deariary.github.io/github-weekly-reporter}"
 OUT_DIR="${OUT_DIR:-preview-site}"

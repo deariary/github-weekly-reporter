@@ -135,13 +135,14 @@ Pin the action to a commit SHA and the CLI to a specific version for better secu
 
 ## Theme
 
-Three built-in themes are available, each with light/dark mode:
+Four built-in themes are available, each with light/dark mode:
 
 | Theme | Description |
 |---|---|
 | `brutalist` | Bold, high-contrast dark theme with monospace typography (default) |
 | `minimal` | Clean lines, generous whitespace, understated elegance |
 | `editorial` | Horizontal-scroll magazine with serif typography and column layout |
+| `swiss` | International Typographic Style with asymmetric grid, Space Grotesk, and geometric motifs |
 
 Edit `weekly-report.yml`:
 
