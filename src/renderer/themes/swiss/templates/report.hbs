@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+  <title>{{aiContent.title}} - {{dateRange.from}} - {{dateRange.to}}</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="{{aiContent.subtitle}}" />
+  <meta property="og:title" content="{{aiContent.title}}" />
+  <meta property="og:description" content="{{aiContent.subtitle}}" />
+  <meta property="og:image" content="{{{ogImageUrl}}}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="article" />
+  {{#if canonicalUrl}}<meta property="og:url" content="{{{canonicalUrl}}}" />
+  {{/if}}<meta property="og:site_name" content="{{username}} Weekly Reports" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{aiContent.title}}" />
+  <meta name="twitter:description" content="{{aiContent.subtitle}}" />
+  <meta name="twitter:image" content="{{{ogImageUrl}}}" />
+  <meta name="author" content="{{username}}" />
+  <meta name="theme-color" content="{{themeColor}}" />
+  <meta property="article:published_time" content="{{dateRange.to}}" />
+  <meta property="article:author" content="https://github.com/{{username}}" />
+  <link rel="icon" href="{{avatarUrl}}" />
+  {{#if canonicalUrl}}<link rel="canonical" href="{{{canonicalUrl}}}" />
+  {{/if}}{{#if baseUrl}}<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{{baseUrl}}}/feed.xml" />
+  {{/if}}<meta name="view-transition" content="same-origin" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "{{jsonLdEscape aiContent.title}}",
+    "description": "{{jsonLdEscape aiContent.subtitle}}",
+    "author": {
+      "@type": "Person",
+      "name": "{{jsonLdEscape username}}",
+      "url": "https://github.com/{{jsonLdEscape username}}"
+    },
+    "image": "{{jsonLdEscape ogImageUrl}}",
+    "datePublished": "{{jsonLdEscape dateRange.to}}"
+  }
+  </script>
+  {{#if canonicalUrl}}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{jsonLdEscape baseUrl}}/" },
+      { "@type": "ListItem", "position": 2, "name": "{{jsonLdEscape dateRange.from}} - {{jsonLdEscape dateRange.to}}", "item": "{{jsonLdEscape canonicalUrl}}" }
+    ]
+  }
+  </script>
+  {{/if}}
+  <style>{{{css}}}</style>
+  {{{themeInitScript}}}
+</head>
+<body>
+
+<div class="swiss-layout">
+
+  <nav>
+    <a href="../../" class="nav-site-title">{{siteTitleInline}}</a>
+    <a href="../../">&larr; {{i18n.allWeeks}}</a>
+  </nav>
+
+  <div class="header">
+    {{> header}}
+  </div>
+
+  {{> overview}}
+
+  <main>
+    {{> summaries}}
+    {{> highlights}}
+  </main>
+
+  {{#if canonicalUrl}}
+  <div class="share-bar">
+    <span class="share-label">{{i18n.share}}</span>
+    <a href="https://x.com/intent/tweet?url={{{canonicalUrl}}}&text={{urlEncode aiContent.title}}" target="_blank" rel="noopener nofollow" class="share-btn">X</a>
+    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn">LinkedIn</a>
+    <a href="https://bsky.app/intent/compose?text={{urlEncode aiContent.title}}%20{{{canonicalUrl}}}" target="_blank" rel="noopener nofollow" class="share-btn">Bluesky</a>
+  </div>
+  {{/if}}
+
+  {{#if prevWeek}}{{#if nextWeek}}
+  <div class="week-nav">
+    <a href="{{prevWeek}}">&larr; {{i18n.prevWeek}}</a>
+    <a href="{{nextWeek}}">{{i18n.nextWeek}} &rarr;</a>
+  </div>
+  {{else}}
+  <div class="week-nav">
+    <a href="{{prevWeek}}">&larr; {{i18n.prevWeek}}</a>
+    <span></span>
+  </div>
+  {{/if}}{{else}}{{#if nextWeek}}
+  <div class="week-nav">
+    <span></span>
+    <a href="{{nextWeek}}">{{i18n.nextWeek}} &rarr;</a>
+  </div>
+  {{/if}}{{/if}}
+
+  {{> footer}}
+
+</div>
+
+{{{themeToggleScript}}}
+</body>
+</html>

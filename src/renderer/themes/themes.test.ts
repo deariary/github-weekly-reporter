@@ -61,6 +61,10 @@ describe("AVAILABLE_THEMES", () => {
   it("includes editorial", () => {
     expect(AVAILABLE_THEMES).toContain("editorial");
   });
+
+  it("includes swiss", () => {
+    expect(AVAILABLE_THEMES).toContain("swiss");
+  });
 });
 
 describe("loadTheme", () => {
@@ -348,5 +352,77 @@ describe("editorial theme", () => {
     expect(html).toContain("panel-cover");
     expect(html).toContain("column-stack");
     expect(html).toContain("fixed-footer");
+  });
+});
+
+describe("swiss theme", () => {
+  it("loads swiss theme", () => {
+    const theme = loadTheme("swiss");
+    expect(theme.buildCSS).toBeTypeOf("function");
+    expect(theme.colors.bg).toBe("#ffffff");
+    expect(theme.colors.accent).toBe("#ff0000");
+    expect(theme.templatesDir).toContain("themes/swiss/templates");
+  });
+
+  it("buildCSS includes Space Grotesk", () => {
+    const theme = loadTheme("swiss");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("Space Grotesk");
+  });
+
+  it("buildCSS uses CSS custom properties", () => {
+    const theme = loadTheme("swiss");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("var(--s-bg)");
+    expect(css).toContain("var(--s-accent)");
+    expect(css).toContain("var(--s-border)");
+  });
+
+  it("buildCSS includes asymmetric grid layout", () => {
+    const theme = loadTheme("swiss");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("swiss-layout");
+    expect(css).toContain("grid-template-columns: 80px 1fr");
+  });
+
+  it("buildCSS includes dark mode", () => {
+    const theme = loadTheme("swiss");
+    const css = theme.buildCSS("en");
+    expect(css).toContain("prefers-color-scheme: dark");
+    expect(css).toContain("--s-bg: #0a0a0a");
+  });
+
+  it("buildCSS supports data-theme override", () => {
+    const theme = loadTheme("swiss");
+    const css = theme.buildCSS("en");
+    expect(css).toContain('html[data-theme="light"]');
+    expect(css).toContain('html[data-theme="dark"]');
+  });
+
+  it("has theme toggle scripts", () => {
+    const theme = loadTheme("swiss");
+    expect(theme.themeInitScript).toContain("localStorage");
+    expect(theme.themeToggleScript).toContain("theme-toggle");
+  });
+
+  it("renders report with swiss theme", () => {
+    const html = renderReport(MOCK_DATA, { theme: "swiss" });
+    expect(html).toMatch(/^<!DOCTYPE html>/);
+    expect(html).toContain("Auth refactor completed");
+    expect(html).toContain("Space Grotesk");
+    expect(html).toContain("swiss-layout");
+  });
+
+  it("renders section numbers and geometric motifs", () => {
+    const html = renderReport(MOCK_DATA, { theme: "swiss" });
+    expect(html).toContain("section-num");
+    expect(html).toContain("overview-geo");
+  });
+
+  it("renders highlights in grid layout", () => {
+    const html = renderReport(MOCK_DATA, { theme: "swiss" });
+    expect(html).toContain("highlight-grid");
+    expect(html).toContain("highlight-card");
+    expect(html).toContain("feat: add OAuth flow");
   });
 });

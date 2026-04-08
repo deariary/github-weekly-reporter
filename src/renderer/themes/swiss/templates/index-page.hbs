@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+  <title>{{siteTitleInline}}</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="{{description}}" />
+  <meta name="view-transition" content="same-origin" />
+  <meta property="og:title" content="{{siteTitleInline}}" />
+  <meta property="og:description" content="{{description}}" />
+  <meta property="og:type" content="website" />
+  {{#if ogImageUrl}}<meta property="og:image" content="{{ogImageUrl}}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />{{/if}}
+  {{#if baseUrl}}<meta property="og:url" content="{{baseUrl}}/" />{{/if}}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{siteTitleInline}}" />
+  <meta name="twitter:description" content="{{description}}" />
+  {{#if ogImageUrl}}<meta name="twitter:image" content="{{ogImageUrl}}" />{{/if}}
+  {{#if baseUrl}}<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{baseUrl}}/feed.xml" />{{/if}}
+  <style>{{{css}}}</style>
+  <style>{{{indexCss}}}</style>
+  {{{themeInitScript}}}
+</head>
+<body>
+
+<div class="index-layout">
+
+  <div class="index-header">
+    <h1>{{siteTitle}}</h1>
+
+    {{#if username}}
+    <a href="https://github.com/{{username}}" class="index-profile" target="_blank" rel="noopener nofollow">
+      {{#if avatarUrl}}<img src="{{avatarUrl}}" alt="{{username}}" width="40" height="40" />{{/if}}
+      <div>
+        <div class="index-profile-name">{{#if profile.name}}{{profile.name}}{{else}}{{username}}{{/if}}</div>
+        <div class="index-profile-handle">@{{username}}</div>
+      </div>
+    </a>
+    {{#if profile}}
+    <div class="index-stats">
+      {{#if profile.followers}}{{profile.followers}} followers{{/if}}
+      {{#if profile.publicRepos}} &middot; {{profile.publicRepos}} repos{{/if}}
+    </div>
+    {{/if}}
+    {{/if}}
+  </div>
+
+  {{#each yearGroups}}
+  <div class="year-group">
+    <div class="year-label">{{this.year}}</div>
+    <div class="week-list">
+      {{#each this.reports}}
+      <a href="{{this.path}}/" class="week-item">
+        <div class="week-item-header">
+          <span class="week-item-title">{{#if this.title}}{{this.title}}{{else}}Week {{this.week}}{{/if}}</span>
+          <span class="week-item-week">{{this.week}}</span>
+        </div>
+        {{#if this.subtitle}}<div class="week-item-subtitle">{{this.subtitle}}</div>{{/if}}
+      </a>
+      {{/each}}
+    </div>
+  </div>
+  {{/each}}
+
+  <footer class="footer">
+    <div class="theme-toggle-row">
+      <button class="theme-toggle" type="button" aria-label="Toggle theme">&#9790;&#65038; Dark</button>
+    </div>
+    {{poweredBy}} <a href="https://deariary.com?utm_source=github-weekly-reporter&utm_medium=footer" target="_blank" rel="noopener">deariary</a>
+    &middot;
+    {{generatedWith}} <a href="https://github.com/deariary/github-weekly-reporter" target="_blank" rel="noopener">github-weekly-reporter</a>
+  </footer>
+
+</div>
+
+{{{themeToggleScript}}}
+</body>
+</html>

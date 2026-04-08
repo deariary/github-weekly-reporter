@@ -231,7 +231,7 @@ Edit \`.github/workflows/weekly-report.yml\` to change:
 | \`username\` | \`${opts.username}\` | GitHub user to report on |
 | \`language\` | \`${opts.language}\` | Report language (en, ja, zh-CN, zh-TW, ko, es, fr, de, pt, ru) |
 | \`timezone\` | \`${opts.timezone}\` | IANA timezone for date calculations |
-| \`theme\` | \`${opts.theme}\` | Report theme (brutalist, minimal, editorial) |
+| \`theme\` | \`${opts.theme}\` | Report theme (brutalist, minimal, editorial, swiss) |
 | \`SITE_TITLE\` | \`${displayTitle}\` | Site title in the header and hero |
 ${opts.llmProvider ? `| \`llm-provider\` | \`${opts.llmProvider}\` | LLM provider for AI narrative |\n| \`llm-model\` | \`${opts.llmModel}\` | Model name |\n` : ""}
 ## Base URL
