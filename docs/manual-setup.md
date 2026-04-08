@@ -6,7 +6,7 @@ This guide walks through setting up GitHub Weekly Reporter without the `setup` C
 
 - A GitHub account
 - A personal access token (PAT). Since manual setup does not create repositories or set secrets on your behalf, you only need the permissions the Action uses at runtime:
-  - **Fine-grained PAT** (recommended): repository access **All repositories**, permission `Contents: Read & Write` ([create one](https://github.com/settings/personal-access-tokens/new))
+  - **Fine-grained PAT** (recommended): select your **report repository only**, permission `Contents: Read & Write` ([create one](https://github.com/settings/personal-access-tokens/new))
   - **Classic PAT**: scope `repo` ([create one](https://github.com/settings/tokens/new?scopes=repo))
 - An LLM API key for AI-generated narratives (free tiers available from Groq and OpenRouter)
 

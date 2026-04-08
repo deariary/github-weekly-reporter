@@ -142,10 +142,10 @@ The Action reads your public activity and pushes to the `gh-pages` branch. This 
 
 | | Fine-grained PAT | Classic PAT |
 |---|---|---|
-| Repository access | `All repositories` | - |
+| Repository access | Your report repository only | - |
 | Permissions / Scopes | `Contents: Read & Write` | `repo` |
 
-`All repositories` is required because the tool reads events, PRs, and contributions across all your public repositories, not just the report repository.
+Fine-grained PATs always include read-only access to all public repositories on GitHub, so selecting only the report repository is enough. `Contents: Write` is needed to push to the `gh-pages` branch.
 
 ### For `npx github-weekly-reporter setup`
 
