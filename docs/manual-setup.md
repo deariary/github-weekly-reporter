@@ -5,9 +5,9 @@ This guide walks through setting up GitHub Weekly Reporter without the `setup` C
 ## Prerequisites
 
 - A GitHub account
-- A personal access token (PAT)
-  - **Classic PAT**: scopes `repo` and `workflow` ([create one](https://github.com/settings/tokens/new?scopes=repo,workflow))
-  - **Fine-grained PAT**: repository access **All repositories**, permissions `Administration`, `Contents`, `Actions`, `Secrets`, `Pages`, `Workflows` (all Read & Write) ([create one](https://github.com/settings/personal-access-tokens/new))
+- A personal access token (PAT). Since manual setup does not create repositories or set secrets on your behalf, you only need the permissions the Action uses at runtime:
+  - **Fine-grained PAT** (recommended): repository access **All repositories**, permission `Contents: Read & Write` ([create one](https://github.com/settings/personal-access-tokens/new))
+  - **Classic PAT**: scope `repo` ([create one](https://github.com/settings/tokens/new?scopes=repo))
 - An LLM API key for AI-generated narratives (free tiers available from Groq and OpenRouter)
 
 ## Step 1: Create a Repository

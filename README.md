@@ -16,11 +16,13 @@ Have these two things ready before running setup:
 
 1. **GitHub personal access token (PAT)**, either type works:
 
-   - **Fine-grained PAT** (recommended): `All repositories` access with permissions: `Actions`, `Administration`, `Contents`, `Pages`, `Secrets`, `Workflows` (all Read & Write).
+   - **Fine-grained PAT** (recommended): `All repositories` access with `Contents: Read & Write`.
      ([Create one](https://github.com/settings/personal-access-tokens/new))
-   - **Classic PAT**: scopes `repo` and `workflow`.
-     ([Create one](https://github.com/settings/tokens/new?scopes=repo,workflow))
+   - **Classic PAT**: scope `repo`.
+     ([Create one](https://github.com/settings/tokens/new?scopes=repo))
      Use this if you hit 403 errors with fine-grained tokens (e.g. org policy restrictions).
+
+   > **Using `npx github-weekly-reporter setup`?** The setup command creates a repository, sets secrets, adds workflow files, and enables Pages on your behalf, so it needs more permissions. See [PAT permissions for setup](#pat-permissions) below.
 
 2. **LLM API key** from any supported provider:
 
@@ -125,6 +127,32 @@ Generated automatically as part of the `render` command. Add this to your profil
 - SEO optimized (OG images, JSON-LD, sitemap)
 - Deploys to GitHub Pages with weekly archive
 - 10 languages supported
+
+## PAT Permissions
+
+The `setup` command and the GitHub Action (runtime) need different levels of access. If you set things up manually, you can use a much more limited token.
+
+### For the GitHub Action (runtime)
+
+The Action reads your public activity and pushes to the `gh-pages` branch. This is all it needs:
+
+| | Fine-grained PAT | Classic PAT |
+|---|---|---|
+| Repository access | `All repositories` | - |
+| Permissions / Scopes | `Contents: Read & Write` | `repo` |
+
+`All repositories` is required because the tool reads events, PRs, and contributions across all your public repositories, not just the report repository.
+
+### For `npx github-weekly-reporter setup`
+
+The setup command creates a repository, stores secrets, adds workflow files, enables Pages, and triggers the first run. It needs broader permissions:
+
+| | Fine-grained PAT | Classic PAT |
+|---|---|---|
+| Repository access | `All repositories` | - |
+| Permissions / Scopes | `Actions`, `Administration`, `Contents`, `Pages`, `Secrets`, `Workflows` (all Read & Write) | `repo` + `workflow` |
+
+After setup completes, you can replace the PAT stored in the `GH_PAT` secret with a more restricted one (runtime permissions only). The setup-level permissions are not needed again unless you re-run the setup command.
 
 ## Supported Languages
 
