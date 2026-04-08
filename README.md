@@ -24,7 +24,7 @@ Have these two things ready before running setup:
      ([Create one](https://github.com/settings/tokens/new?scopes=repo,workflow))
      Use this if you hit 403 errors with fine-grained tokens (e.g. org policy restrictions).
 
-   > After setup, you can tighten the PAT to the minimum the Action actually needs. See [PAT Permissions](#pat-permissions).
+   > After setup, you can tighten the PAT to the minimum the Action actually needs. See [Security](docs/security.md#pat-permissions).
 
 2. **LLM API key** from any supported provider:
 
@@ -63,7 +63,7 @@ Your first report will be live within 5 minutes.
 
 See [Manual Setup](docs/manual-setup.md) if you prefer to configure everything yourself.
 
-> **Security tip:** The setup command uses `@main` in the generated workflow files. For production use, pin the action to a commit SHA and the CLI to a specific version. See [Pinning Versions](docs/customization.md#pinning-versions).
+> **Security tip:** The setup command uses `@main` in the generated workflow files. For production use, pin the action to a commit SHA and the CLI to a specific version. See [Security](docs/security.md#pinning-versions).
 
 ## Cost
 
@@ -132,32 +132,6 @@ Generated automatically as part of the `render` command. Add this to your profil
 - Deploys to GitHub Pages with weekly archive
 - 10 languages supported
 
-## PAT Permissions
-
-The `setup` command and the GitHub Action (runtime) need different levels of access. If you set things up manually, you can use a much more limited token.
-
-### For the GitHub Action (runtime)
-
-The Action reads your public activity and pushes to the `gh-pages` branch. This is all it needs:
-
-| | Fine-grained PAT | Classic PAT |
-|---|---|---|
-| Repository access | Your report repository only | - |
-| Permissions / Scopes | `Contents: Read & Write` | `repo` |
-
-Fine-grained PATs always include read-only access to all public repositories on GitHub, so selecting only the report repository is enough. `Contents: Write` is needed to push to the `gh-pages` branch.
-
-### For `npx github-weekly-reporter setup`
-
-The setup command creates a repository, stores secrets, adds workflow files, enables Pages, and triggers the first run. It needs broader permissions:
-
-| | Fine-grained PAT | Classic PAT |
-|---|---|---|
-| Repository access | `All repositories` | - |
-| Permissions / Scopes | `Actions`, `Administration`, `Contents`, `Pages`, `Secrets`, `Workflows` (all Read & Write) | `repo` + `workflow` |
-
-After setup completes, you can replace the PAT stored in the `GH_PAT` secret with a more restricted one (runtime permissions only). The setup-level permissions are not needed again unless you re-run the setup command.
-
 ## Supported Languages
 
 | Code | Language |
@@ -179,6 +153,7 @@ After setup completes, you can replace the PAT stored in the `GH_PAT` secret wit
 - [Manual Setup](docs/manual-setup.md): step-by-step guide without the setup command
 - [Customization](docs/customization.md): change language, timezone, LLM provider, custom domain, and more
 - [CLI Reference](docs/cli-reference.md): all commands and environment variables
+- [Security](docs/security.md): PAT permissions (setup vs runtime) and version pinning
 - [FAQ](docs/faq.md): common questions about cost, privacy, and limitations
 - [Troubleshooting](docs/troubleshooting.md): fixing workflow failures, missing data, and setup errors
 

@@ -5,9 +5,7 @@ This guide walks through setting up GitHub Weekly Reporter without the `setup` C
 ## Prerequisites
 
 - A GitHub account
-- A personal access token (PAT). Since manual setup does not create repositories or set secrets on your behalf, you only need the permissions the Action uses at runtime:
-  - **Fine-grained PAT** (recommended): select your **report repository only**, permission `Contents: Read & Write` ([create one](https://github.com/settings/personal-access-tokens/new))
-  - **Classic PAT**: scope `repo` ([create one](https://github.com/settings/tokens/new?scopes=repo))
+- A personal access token (PAT). Manual setup only needs runtime-level permissions (not the full set the `setup` command requires). See [Security: PAT Permissions](security.md#pat-permissions) for details.
 - An LLM API key for AI-generated narratives (free tiers available from Groq and OpenRouter)
 
 ## Step 1: Create a Repository
@@ -52,7 +50,7 @@ jobs:
       # current repository.
       # Add your PAT as a repository secret named GH_PAT (see Step 3).
       # Tip: pin to a commit SHA instead of @main for better security.
-      # See "Pinning Versions" in docs/customization.md.
+      # See docs/security.md for details.
       - uses: deariary/github-weekly-reporter@main
         with:
           github-token: ${{ secrets.GH_PAT }}
@@ -89,7 +87,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # Tip: pin to a commit SHA instead of @main for better security.
-      # See "Pinning Versions" in docs/customization.md.
+      # See docs/security.md for details.
       - uses: deariary/github-weekly-reporter@main
         with:
           github-token: ${{ secrets.GH_PAT }}
