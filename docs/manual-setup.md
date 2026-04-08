@@ -51,6 +51,8 @@ jobs:
       # repositories. The default GITHUB_TOKEN only has access to the
       # current repository.
       # Add your PAT as a repository secret named GH_PAT (see Step 3).
+      # Tip: pin to a commit SHA instead of @main for better security.
+      # See "Pinning Versions" in docs/customization.md.
       - uses: deariary/github-weekly-reporter@main
         with:
           github-token: ${{ secrets.GH_PAT }}
@@ -86,6 +88,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Tip: pin to a commit SHA instead of @main for better security.
+      # See "Pinning Versions" in docs/customization.md.
       - uses: deariary/github-weekly-reporter@main
         with:
           github-token: ${{ secrets.GH_PAT }}

@@ -61,6 +61,8 @@ Your first report will be live within 5 minutes.
 
 See [Manual Setup](docs/manual-setup.md) if you prefer to configure everything yourself.
 
+> **Security tip:** The setup command uses `@main` in the generated workflow files. For production use, pin the action to a commit SHA and the CLI to a specific version. See [Pinning Versions](docs/customization.md#pinning-versions).
+
 ## Cost
 
 **The entire stack runs at $0/month on a public repository.**

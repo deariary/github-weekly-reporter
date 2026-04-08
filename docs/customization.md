@@ -129,13 +129,31 @@ To change the automatic schedule, edit the `cron:` line. GitHub Actions cron use
 
 The daily fetch should run every day. The weekly report should run once a week (typically Monday), after the daily fetch completes.
 
-## Pinning the CLI Version
+## Pinning Versions
 
-By default, workflows use the latest version of the npm package. To pin a specific version for reproducibility, add the `version` input:
+### Action Version
+
+By default, the setup command and manual-setup examples reference the action with `@main`. For better security and reproducibility, pin the action to a specific commit SHA:
+
+```yaml
+# Before (tracks the main branch, picks up any future change automatically):
+- uses: deariary/github-weekly-reporter@main
+
+# After (pinned to a specific commit):
+- uses: deariary/github-weekly-reporter@<full-commit-sha>   # v0.8.5
+```
+
+To find the SHA for a release, visit the [releases page](https://github.com/deariary/github-weekly-reporter/releases) and copy the full commit hash of the tagged commit. Adding a trailing comment with the version tag makes it easy to see which version you are on.
+
+Dependabot and Renovate can automate SHA updates when new versions are released.
+
+### CLI Version
+
+By default, workflows use the latest version of the npm package (`npx github-weekly-reporter@latest`). To pin a specific version, add the `version` input:
 
 ```yaml
 with:
-  version: '0.3.0'
+  version: '0.8.5'
 ```
 
 ## Theme
