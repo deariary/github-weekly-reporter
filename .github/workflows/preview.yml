@@ -33,7 +33,7 @@ jobs:
         env:
           BASE_URL: https://deariary.github.io/github-weekly-reporter
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: preview-site
 
