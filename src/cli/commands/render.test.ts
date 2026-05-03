@@ -426,6 +426,103 @@ describe("registerRender", () => {
     expect(errorMsg).toContain("Unknown theme");
   });
 
+  it("falls back to ./data and ./output defaults when no opts or env vars", async () => {
+    const orig = {
+      data: process.env.DATA_DIR,
+      out: process.env.OUTPUT_DIR,
+    };
+    delete process.env.DATA_DIR;
+    delete process.env.OUTPUT_DIR;
+    try {
+      mockReadFile.mockImplementation((path: string) => {
+        if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+        if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+        return Promise.reject(new Error("not found"));
+      });
+      mockReaddir.mockResolvedValue([]);
+
+      const { registerRender } = await import("./render.js");
+      const program = new Command();
+      registerRender(program);
+
+      await program.parseAsync([
+        "node", "cli", "render",
+        "--base-url", "https://user.github.io/repo",
+        "--date", "2026-04-01",
+      ]);
+
+      // First readFile call should target ./data/2026/W14/github-data.yaml
+      const readPaths = mockReadFile.mock.calls.map((c: unknown[]) => c[0] as string);
+      expect(readPaths.some((p) => p.startsWith("data/") || p.includes("/data/"))).toBe(true);
+      // Output should land under ./output
+      const writePaths = mockWriteFile.mock.calls.map((c: unknown[]) => c[0] as string);
+      expect(writePaths.some((p) => typeof p === "string" && p.includes("output/"))).toBe(true);
+    } finally {
+      if (orig.data !== undefined) process.env.DATA_DIR = orig.data;
+      if (orig.out !== undefined) process.env.OUTPUT_DIR = orig.out;
+    }
+  });
+
+  it("logs non-Error rejection via instanceof Error false branch", async () => {
+    mockReadFile.mockImplementation((path: string) => {
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+    mockReaddir.mockResolvedValue([]);
+    mockRenderReport.mockImplementationOnce(() => { throw "string-failure"; });
+
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await expect(
+      program.parseAsync([
+        "node", "cli", "render",
+        "--data-dir", "./data",
+        "--output-dir", "./output",
+        "--base-url", "https://user.github.io/repo",
+        "--date", "2026-04-01",
+      ]),
+    ).rejects.toThrow("process.exit");
+
+    const logged = errorSpy.mock.calls.flat();
+    expect(logged).toContain("string-failure");
+  });
+
+  it("uses GITHUB_REPOSITORY env to compute repoUrl for index page", async () => {
+    vi.stubEnv("GITHUB_REPOSITORY", "octo/awesome");
+
+    mockReadFile.mockImplementation((path: string) => {
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+    mockReaddir.mockImplementation((dir: string) => {
+      if (dir.endsWith("data")) return Promise.resolve(["2026"]);
+      if (dir.includes("2026")) return Promise.resolve(["W14"]);
+      return Promise.resolve([]);
+    });
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await program.parseAsync([
+      "node", "cli", "render",
+      "--data-dir", "./data",
+      "--output-dir", "./output",
+      "--base-url", "https://user.github.io/repo",
+      "--date", "2026-04-01",
+    ]);
+
+    // renderIndexPage signature: (entries, profile, language, siteTitle, base, repoUrl, theme)
+    const indexCall = mockRenderIndexPage.mock.calls[0];
+    expect(indexCall[5]).toBe("https://github.com/octo/awesome");
+  });
+
   it("renders successfully when data dir does not exist (readdir rejects)", async () => {
     mockReadFile.mockImplementation((path: string) => {
       if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
