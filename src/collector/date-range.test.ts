@@ -528,4 +528,16 @@ describe("parseLocalDate", () => {
     // The local date in Beirut should still read 2026-03-29.
     expect(toISODate(result, "Asia/Beirut")).toBe("2026-03-29");
   });
+
+  // Pacific/Norfolk follows Australian DST: clocks fall back at 03:00 NFDT
+  // (UTC+12) on the first Sunday of April (April 5 in 2026), becoming
+  // 02:00 NFT (UTC+11). The first guess for midnight is computed against the
+  // post-DST offset, but the actual midnight instant lies before the
+  // transition, so the resolver must subtract the residual local hour to
+  // hit true midnight — exercising the "subtract remainMs" recovery branch
+  // in midnightInTz.
+  it("resolves midnight on Pacific/Norfolk DST-end day via remainMs subtraction", () => {
+    const result = parseLocalDate("2026-04-05", "Pacific/Norfolk");
+    expect(toISODate(result, "Pacific/Norfolk")).toBe("2026-04-05");
+  });
 });
