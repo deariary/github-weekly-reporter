@@ -226,6 +226,65 @@ describe("github-api", () => {
       const result = await setRepoSecret("token", "user/repo", "SECRET", "value");
       expect(result).toBe(true);
     });
+
+    it("returns false when public-key fetch fails on all 3 attempts", async () => {
+      // Pre-load libsodium so its real-timer init isn't affected by fake timers
+      const { default: _sodium } = await import("libsodium-wrappers");
+      await _sodium.ready;
+
+      vi.spyOn(globalThis, "fetch").mockResolvedValue(
+        new Response("", { status: 500 }),
+      );
+      vi.useFakeTimers();
+      const promise = setRepoSecret("token", "user/repo", "SECRET", "value");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      expect(result).toBe(false);
+      vi.useRealTimers();
+    });
+
+    it("retries public-key fetch and succeeds on second attempt", async () => {
+      const keyData = await makeValidKeyResponse();
+      vi.spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response("", { status: 500 })) // first key fetch fails
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify(keyData), { status: 200 }),
+        ) // second key fetch succeeds
+        .mockResolvedValueOnce(new Response("", { status: 200 })); // PUT secret succeeds
+
+      vi.useFakeTimers();
+      const promise = setRepoSecret("token", "user/repo", "SECRET", "value");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      expect(result).toBe(true);
+      vi.useRealTimers();
+    });
+
+    it("returns false when PUT fails on all 3 attempts", async () => {
+      const keyData = await makeValidKeyResponse();
+      vi.spyOn(globalThis, "fetch").mockImplementation(
+        async (_url, init?: RequestInit) => {
+          if ((init?.method ?? "GET") === "PUT") {
+            return new Response("error body", { status: 422 });
+          }
+          return new Response(JSON.stringify(keyData), { status: 200 });
+        },
+      );
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      vi.useFakeTimers();
+      const promise = setRepoSecret("token", "user/repo", "SECRET", "value");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      expect(result).toBe(false);
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Attempt 1/3 failed: 422"),
+      );
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Attempt 3/3 failed: 422"),
+      );
+      vi.useRealTimers();
+    });
   });
 
   describe("sleep", () => {
