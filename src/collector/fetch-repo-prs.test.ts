@@ -203,4 +203,22 @@ describe("fetchPRsByRefs", () => {
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Not Found"));
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("    Not Found"));
   });
+
+  it("omits the indented detail line when error body JSON has no message field", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ documentation_url: "https://docs.github.com" }), {
+        status: 422,
+        statusText: "Unprocessable Entity",
+      }),
+    );
+
+    const result = await fetchPRsByRefs("token", [{ repo: "owner/repo", number: 1 }]);
+
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("422"));
+    expect(
+      warnSpy.mock.calls.some((call) => /^\s{4}\S/.test(String(call[0]))),
+    ).toBe(false);
+  });
 });
