@@ -527,4 +527,97 @@ describe("registerFetch (weekly-fetch)", () => {
       "utf-8",
     );
   });
+
+  it("logs error and exits 1 when token is missing", async () => {
+    vi.clearAllMocks();
+    vi.stubEnv("GITHUB_TOKEN", "");
+    vi.stubEnv("GITHUB_USERNAME", "");
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation(((_code?: number) => undefined as never) as typeof process.exit);
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync(["node", "cli", "weekly-fetch", "--username", "alice"]);
+
+    expect(errSpy).toHaveBeenCalledWith("Error:", expect.stringContaining("GitHub token required"));
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+});
+
+// -------------------------------------------------------------------
+// registerFetch (commit-msg subcommand)
+// -------------------------------------------------------------------
+
+describe("registerFetch (commit-msg)", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  const captureStdout = (): { writes: string[]; restore: () => void } => {
+    const writes: string[] = [];
+    const spy = vi
+      .spyOn(process.stdout, "write")
+      .mockImplementation(((chunk: string | Uint8Array) => {
+        writes.push(typeof chunk === "string" ? chunk : Buffer.from(chunk).toString("utf-8"));
+        return true;
+      }) as typeof process.stdout.write);
+    return { writes, restore: () => spy.mockRestore() };
+  };
+
+  it("daily mode: prints commit message for given date", async () => {
+    const { writes, restore } = captureStdout();
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "commit-msg", "daily",
+      "--timezone", "Asia/Tokyo",
+      "--date", "2026-04-06",
+      "--data-dir", "./data",
+    ]);
+
+    restore();
+    expect(writes.join("")).toMatch(/^data: daily 2026\/W14 /);
+  });
+
+  it("weekly mode: prints commit message for given date", async () => {
+    const { writes, restore } = captureStdout();
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "commit-msg", "weekly",
+      "--timezone", "Asia/Tokyo",
+      "--date", "2026-04-07",
+      "--data-dir", "./data",
+    ]);
+
+    restore();
+    expect(writes.join("")).toMatch(/^data: weekly 2026\/W14 /);
+  });
+
+  it("uses env defaults for timezone/data-dir and current time when --date omitted", async () => {
+    vi.stubEnv("TIMEZONE", "UTC");
+    vi.stubEnv("DATA_DIR", "./data");
+    const { writes, restore } = captureStdout();
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync(["node", "cli", "commit-msg", "daily"]);
+
+    restore();
+    expect(writes.join("")).toMatch(/^data: daily \d{4}\/W\d{2} /);
+  });
 });
