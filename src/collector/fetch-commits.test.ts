@@ -112,6 +112,15 @@ describe("fetchCommitMessages", () => {
     expect(result).toEqual([]);
   });
 
+  it("skips falsy entries in repos list without calling fetch", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+
+    const result = await fetchCommitMessages("token", "user", [""], range);
+
+    expect(result).toEqual([]);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("retries on 429 rate limit", async () => {
     vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(
