@@ -337,6 +337,50 @@ describe("registerRender", () => {
     expect(prevWeekCall[1]).toHaveProperty("nextWeek", "../../2026/W14/");
   });
 
+  it("links nextWeek and prevPrev when current week sits in the middle", async () => {
+    const PREV_GITHUB_YAML = GITHUB_DATA_YAML.replace("2026-03-28", "2026-03-21").replace("2026-04-03", "2026-03-27");
+    const PREV_LLM_YAML = LLM_DATA_YAML.replace("Weekly Summary", "Previous Week Summary");
+
+    mockReadFile.mockImplementation((path: string) => {
+      if (path.includes("W13") && path.includes("github-data.yaml")) return Promise.resolve(PREV_GITHUB_YAML);
+      if (path.includes("W13") && path.includes("llm-data.yaml")) return Promise.resolve(PREV_LLM_YAML);
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+
+    // Four weeks exist: W12, W13, W14 (current), W15 — current is not last and prev has its own predecessor
+    mockReaddir.mockImplementation((dir: string) => {
+      if (dir.endsWith("data")) return Promise.resolve(["2026"]);
+      if (dir.includes("2026")) return Promise.resolve(["W12", "W13", "W14", "W15"]);
+      return Promise.resolve([]);
+    });
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await program.parseAsync([
+      "node", "cli", "render",
+      "--data-dir", "./data",
+      "--output-dir", "./output",
+      "--base-url", "https://user.github.io/repo",
+      "--date", "2026-04-01",
+    ]);
+
+    expect(mockRenderReport).toHaveBeenCalledTimes(2);
+
+    // Current call should reference nextWeek (W15) — covers `currentIdx < length-1` truthy branch
+    const currentCall = mockRenderReport.mock.calls[0];
+    expect(currentCall[1]).toHaveProperty("nextWeek", "../../2026/W15/");
+    expect(currentCall[1]).toHaveProperty("prevWeek", "../../2026/W13/");
+
+    // Prev re-render should reference prevPrev (W12) — covers `prevIdx > 0` and `prevPrev` truthy branches
+    const prevWeekCall = mockRenderReport.mock.calls[1];
+    expect(prevWeekCall[1]).toHaveProperty("prevWeek", "../../2026/W12/");
+    expect(prevWeekCall[1]).toHaveProperty("nextWeek", "../../2026/W14/");
+  });
+
   it("skips prev week re-render when prev week data is missing", async () => {
     mockReadFile.mockImplementation((path: string) => {
       // Only current week has data
