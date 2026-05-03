@@ -775,6 +775,61 @@ describe("registerFetch (daily-fetch error)", () => {
 });
 
 // -------------------------------------------------------------------
+// registerFetch (weekly-fetch error path)
+// -------------------------------------------------------------------
+
+describe("registerFetch (weekly-fetch error)", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("logs error and exits 1 when token is missing", async () => {
+    vi.clearAllMocks();
+    vi.stubEnv("GITHUB_TOKEN", "");
+    vi.stubEnv("GITHUB_USERNAME", "");
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation(((_code?: number) => undefined as never) as typeof process.exit);
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync(["node", "cli", "weekly-fetch", "--username", "alice"]);
+
+    expect(errSpy).toHaveBeenCalledWith("Error:", expect.stringContaining("GitHub token required"));
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it("logs raw value when error is not an Error instance", async () => {
+    vi.clearAllMocks();
+    vi.stubEnv("GITHUB_TOKEN", "ghp_xxx");
+    vi.stubEnv("GITHUB_USERNAME", "alice");
+    // Force mkdir (called early in runWeeklyFetch) to reject with a non-Error value
+    // so the `error instanceof Error ? ... : error` branch chooses the raw value.
+    mockMkdir.mockRejectedValueOnce("string-failure");
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation(((_code?: number) => undefined as never) as typeof process.exit);
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync(["node", "cli", "weekly-fetch"]);
+
+    expect(errSpy).toHaveBeenCalledWith("Error:", "string-failure");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    mockMkdir.mockResolvedValue(undefined);
+  });
+});
+
+// -------------------------------------------------------------------
 // registerFetch (commit-msg subcommand)
 // -------------------------------------------------------------------
 
