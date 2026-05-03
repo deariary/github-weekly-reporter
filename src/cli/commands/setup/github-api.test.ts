@@ -294,6 +294,34 @@ describe("github-api", () => {
       );
       vi.useRealTimers();
     });
+
+    it("falls back to empty body when PUT response text() rejects", async () => {
+      const keyData = await makeValidKeyResponse();
+      const failingPutResponse = {
+        ok: false,
+        status: 503,
+        text: () => Promise.reject(new Error("stream read failed")),
+      } as unknown as Response;
+      vi.spyOn(globalThis, "fetch").mockImplementation(
+        async (_url, init?: RequestInit) => {
+          if ((init?.method ?? "GET") === "PUT") {
+            return failingPutResponse;
+          }
+          return new Response(JSON.stringify(keyData), { status: 200 });
+        },
+      );
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      vi.useFakeTimers();
+      const promise = setRepoSecret("token", "user/repo", "SECRET", "value");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      expect(result).toBe(false);
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Attempt 1/3 failed: 503 "),
+      );
+      vi.useRealTimers();
+    });
   });
 
   describe("sleep", () => {
