@@ -80,6 +80,14 @@ describe("OpenRouter provider", () => {
     const result = await provider.generate("test");
     expect(result).toBe("openrouter response");
   });
+
+  it("returns empty string when no content", async () => {
+    mockCreate.mockResolvedValue({ choices: [{ message: { content: null } }] });
+    const { createOpenRouterProvider } = await import("./openrouter.js");
+    const provider = createOpenRouterProvider({ ...baseConfig, provider: "openrouter" });
+    const result = await provider.generate("test");
+    expect(result).toBe("");
+  });
 });
 
 describe("Groq provider", () => {
@@ -94,6 +102,14 @@ describe("Groq provider", () => {
     const result = await provider.generate("test");
     expect(result).toBe("groq response");
   });
+
+  it("returns empty string when no content", async () => {
+    mockCreate.mockResolvedValue({ choices: [{ message: { content: null } }] });
+    const { createGroqProvider } = await import("./groq.js");
+    const provider = createGroqProvider({ ...baseConfig, provider: "groq" });
+    const result = await provider.generate("test");
+    expect(result).toBe("");
+  });
 });
 
 describe("Grok provider", () => {
@@ -107,6 +123,14 @@ describe("Grok provider", () => {
     const provider = createGrokProvider({ ...baseConfig, provider: "grok" });
     const result = await provider.generate("test");
     expect(result).toBe("grok response");
+  });
+
+  it("returns empty string when no content", async () => {
+    mockCreate.mockResolvedValue({ choices: [{ message: { content: null } }] });
+    const { createGrokProvider } = await import("./grok.js");
+    const provider = createGrokProvider({ ...baseConfig, provider: "grok" });
+    const result = await provider.generate("test");
+    expect(result).toBe("");
   });
 });
 

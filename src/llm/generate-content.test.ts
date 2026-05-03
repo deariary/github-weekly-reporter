@@ -278,6 +278,28 @@ highlights:
     await expect(generateContent(MOCK_INPUT, config)).rejects.toThrow("LLM content generation failed");
   });
 
+  it("parses ticker items from YAML when present", async () => {
+    const yamlWithTicker = `title: Test
+subtitle: Sub
+overview: Overview.
+summaries: []
+highlights: []
+ticker:
+  - label: SHIP
+    text: Released v1.0.0
+  - label: REVIEW
+    text: Reviewed 8 PRs
+  - text: Item with no label
+`;
+    mockGenerate.mockResolvedValue(yamlWithTicker);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    expect(result.ticker).toHaveLength(3);
+    expect(result.ticker?.[0]).toEqual({ label: "SHIP", text: "Released v1.0.0" });
+    expect(result.ticker?.[1]).toEqual({ label: "REVIEW", text: "Reviewed 8 PRs" });
+    expect(result.ticker?.[2]).toEqual({ label: "", text: "Item with no label" });
+  });
+
   it("handles summaries without chips field", async () => {
     const yamlNoChips = `title: Test
 subtitle: Sub
