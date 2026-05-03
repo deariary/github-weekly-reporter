@@ -547,6 +547,106 @@ describe("registerFetch (weekly-fetch)", () => {
     expect(errSpy).toHaveBeenCalledWith("Error:", expect.stringContaining("GitHub token required"));
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
+
+  it("computes prsOpened/prsMerged and filters review events when assembling github-data", async () => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    const reviewEvent: GitHubEvent = {
+      id: "10",
+      type: "PullRequestReviewEvent",
+      repo: "owner/repo",
+      createdAt: "2026-04-01T00:00:00Z",
+      payload: { kind: "review", action: "submitted", prNumber: 1, prTitle: "r", state: "approved" },
+    };
+    const pushEvent: GitHubEvent = {
+      id: "11",
+      type: "PushEvent",
+      repo: "owner/repo",
+      createdAt: "2026-04-01T01:00:00Z",
+      payload: { kind: "push", ref: "refs/heads/main", commits: ["a"] },
+    };
+    mockReadFile.mockResolvedValue("[]"); // YAML for empty list — overridden below
+    // tryReadYaml returns parsed YAML; provide events array directly
+    const { parse: parseYaml } = await import("yaml");
+    const eventsYaml = "- id: '10'\n  type: PullRequestReviewEvent\n  repo: owner/repo\n  createdAt: '2026-04-01T00:00:00Z'\n  payload:\n    kind: review\n    action: submitted\n    prNumber: 1\n    prTitle: r\n    state: approved\n- id: '11'\n  type: PushEvent\n  repo: owner/repo\n  createdAt: '2026-04-01T01:00:00Z'\n  payload:\n    kind: push\n    ref: refs/heads/main\n    commits: [a]\n";
+    expect(parseYaml(eventsYaml)).toEqual([reviewEvent, pushEvent]); // sanity
+    mockReadFile.mockResolvedValue(eventsYaml);
+    mockWriteFile.mockResolvedValue(undefined);
+    mockMkdir.mockResolvedValue(undefined);
+    mockFetchContributions.mockResolvedValue({
+      username: "TestUser",
+      avatarUrl: "https://example.com/a.png",
+      profile: { name: null, bio: null, company: null, location: null, followers: 0, following: 0, publicRepos: 0 },
+      totalCommits: 5,
+      prsReviewed: 2,
+      dailyCommits: [],
+    });
+    const { fetchPRsByRefs } = await import("../../collector/fetch-repo-prs.js");
+    vi.mocked(fetchPRsByRefs).mockResolvedValue([
+      { title: "feat", body: null, url: "u1", repository: "owner/repo", state: "merged", labels: [], additions: 1, deletions: 0, changedFiles: 1, author: "TestUser", createdAt: "2026-04-01T00:00:00Z", mergedAt: "2026-04-02T00:00:00Z" },
+      { title: "fix", body: null, url: "u2", repository: "owner/repo", state: "open", labels: [], additions: 2, deletions: 1, changedFiles: 1, author: "testuser", createdAt: "2026-04-01T00:00:00Z", mergedAt: null },
+      { title: "docs", body: null, url: "u3", repository: "owner/repo", state: "merged", labels: [], additions: 0, deletions: 0, changedFiles: 1, author: "outsider", createdAt: "2026-04-01T00:00:00Z", mergedAt: "2026-04-02T00:00:00Z" },
+    ]);
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({ items: [], total_count: 0 }), { status: 200 })),
+    );
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "weekly-fetch",
+      "--token", "ghp_test",
+      "--username", "TestUser",
+      "--data-dir", "./data",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    const writeCall = mockWriteFile.mock.calls.find((c) =>
+      typeof c[0] === "string" && c[0].includes("github-data.yaml"),
+    );
+    expect(writeCall).toBeDefined();
+    const yaml = writeCall![1] as string;
+    expect(yaml).toMatch(/prsOpened:\s*2/);
+    expect(yaml).toMatch(/prsMerged:\s*1/);
+    // Only the review event should appear under events:
+    expect(yaml).toContain("kind: review");
+    expect(yaml).not.toMatch(/kind:\s*push/);
+  });
+});
+
+// -------------------------------------------------------------------
+// registerFetch (daily-fetch error path)
+// -------------------------------------------------------------------
+
+describe("registerFetch (daily-fetch error)", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("logs error and exits 1 when token is missing", async () => {
+    vi.clearAllMocks();
+    vi.stubEnv("GITHUB_TOKEN", "");
+    vi.stubEnv("GITHUB_USERNAME", "");
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation(((_code?: number) => undefined as never) as typeof process.exit);
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync(["node", "cli", "daily-fetch", "--username", "alice"]);
+
+    expect(errSpy).toHaveBeenCalledWith("Error:", expect.stringContaining("GitHub token required"));
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
 });
 
 // -------------------------------------------------------------------
