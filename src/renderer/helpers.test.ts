@@ -187,4 +187,76 @@ describe("registerHelpers", () => {
       expect(result).toContain("testuser");
     });
   });
+
+  describe("itemsCount", () => {
+    it("uses locale-specific formatting", () => {
+      const hbs = createHbs("en");
+      const result = compile(hbs, "{{itemsCount n}}", { n: 5 });
+      expect(result).toContain("5");
+    });
+  });
+
+  describe("urlEncode", () => {
+    it("percent-encodes special characters", () => {
+      const hbs = createHbs();
+      expect(compile(hbs, "{{urlEncode text}}", { text: "hello world" })).toBe("hello%20world");
+    });
+
+    it("handles null input", () => {
+      const hbs = createHbs();
+      expect(compile(hbs, "{{urlEncode text}}", { text: null })).toBe("");
+    });
+  });
+
+  describe("first", () => {
+    it("returns the first element of an array", () => {
+      const hbs = createHbs();
+      const result = compile(hbs, "{{first items}}", { items: ["a", "b", "c"] });
+      expect(result).toBe("a");
+    });
+
+    it("returns empty for non-array input", () => {
+      const hbs = createHbs();
+      const result = compile(hbs, "{{first items}}", { items: "not-an-array" });
+      expect(result).toBe("");
+    });
+  });
+
+  describe("rest", () => {
+    it("returns array without the first element", () => {
+      const hbs = createHbs();
+      const result = compile(hbs, "{{#each (rest items)}}[{{this}}]{{/each}}", {
+        items: ["a", "b", "c"],
+      });
+      expect(result).toBe("[b][c]");
+    });
+
+    it("returns empty array for non-array input", () => {
+      const hbs = createHbs();
+      const result = compile(hbs, "{{#each (rest items)}}x{{/each}}", {
+        items: "not-an-array",
+      });
+      expect(result).toBe("");
+    });
+  });
+
+  describe("isEven", () => {
+    it("returns true for even index", () => {
+      const hbs = createHbs();
+      expect(compile(hbs, "{{isEven n}}", { n: 4 })).toBe("true");
+    });
+
+    it("returns false for odd index", () => {
+      const hbs = createHbs();
+      expect(compile(hbs, "{{isEven n}}", { n: 3 })).toBe("false");
+    });
+  });
+
+  describe("mdInline", () => {
+    it("handles null input", () => {
+      const hbs = createHbs();
+      const result = compile(hbs, "{{{mdInline text}}}", { text: null });
+      expect(result).toBe("");
+    });
+  });
 });
