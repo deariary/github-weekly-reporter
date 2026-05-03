@@ -123,4 +123,73 @@ describe("fetchCommitMessages", () => {
 
     expect(result[0].messages).toEqual(["after retry"]);
   });
+
+  it("falls back to the default delay when retry-after header is missing", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response("", { status: 429 }))
+      .mockResolvedValueOnce(pagedResponse([makeRawCommit("after default delay")]));
+
+    const promise = fetchCommitMessages("token", "user", ["org/repo"], range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(result[0].messages).toEqual(["after default delay"]);
+    vi.useRealTimers();
+  });
+
+  it("falls back to the default delay when retry-after value is invalid", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response("", { status: 429, headers: { "retry-after": "soon" } }),
+      )
+      .mockResolvedValueOnce(pagedResponse([makeRawCommit("after invalid delay")]));
+
+    const promise = fetchCommitMessages("token", "user", ["org/repo"], range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(result[0].messages).toEqual(["after invalid delay"]);
+    vi.useRealTimers();
+  });
+
+  it("gives up after retry exhaustion on persistent 429", async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response("", {
+        status: 429,
+        statusText: "Too Many Requests",
+        headers: { "retry-after": "0" },
+      }),
+    );
+
+    const promise = fetchCommitMessages("token", "user", ["org/repo"], range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(4);
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Failed to fetch commits"));
+    vi.useRealTimers();
+  });
+
+  it("warns and skips on non-retryable server errors", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response("", { status: 500, statusText: "Internal Server Error" }),
+    );
+
+    const result = await fetchCommitMessages("token", "user", ["org/broken"], range);
+
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to fetch commits: 500 Internal Server Error"),
+    );
+  });
 });
