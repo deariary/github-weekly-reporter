@@ -600,6 +600,33 @@ describe("registerSetup (full flow)", () => {
     expect(modelValidate("gpt-4o")).toBe(true);
   });
 
+  it("falls back to default actions URL when runs API fails", async () => {
+    setupPromptDefaults();
+    mockGhGet.mockReset().mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve({}),
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+    await program.parseAsync(["node", "cli", "setup"]);
+
+    const progressLog = logSpy.mock.calls.find((args) =>
+      typeof args[0] === "string" && args[0].includes("Progress:"),
+    );
+    expect(progressLog).toBeDefined();
+    expect(progressLog![0] as string).toContain(
+      "https://github.com/testuser/my-reports/actions",
+    );
+    expect(progressLog![0] as string).not.toContain("/runs/");
+
+    logSpy.mockRestore();
+  });
+
   it("throws when LLM secret fails to set", async () => {
     setupPromptDefaults();
     // First call (GH_PAT) succeeds, second call (LLM secret) fails
