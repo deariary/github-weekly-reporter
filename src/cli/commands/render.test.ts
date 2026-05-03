@@ -403,4 +403,53 @@ describe("registerRender", () => {
       expect.objectContaining({ language: "ja", siteTitle: "My Reports" }),
     );
   });
+
+  it("exits when --theme is unknown", async () => {
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(
+      program.parseAsync([
+        "node", "cli", "render",
+        "--data-dir", "./data",
+        "--output-dir", "./output",
+        "--base-url", "https://example.com",
+        "--theme", "not-a-real-theme",
+      ]),
+    ).rejects.toThrow("process.exit");
+
+    expect(errorSpy).toHaveBeenCalled();
+    const errorMsg = errorSpy.mock.calls.flat().join(" ");
+    expect(errorMsg).toContain("Unknown theme");
+  });
+
+  it("renders successfully when data dir does not exist (readdir rejects)", async () => {
+    mockReadFile.mockImplementation((path: string) => {
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+    // Simulate ENOENT on the dataDir lookup inside listCompletedReportDirs
+    mockReaddir.mockRejectedValue(Object.assign(new Error("ENOENT"), { code: "ENOENT" }));
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await program.parseAsync([
+      "node", "cli", "render",
+      "--data-dir", "./missing-data",
+      "--output-dir", "./output",
+      "--base-url", "https://user.github.io/repo",
+      "--date", "2026-04-01",
+    ]);
+
+    // Render still succeeds for the current week, no prev/next links
+    expect(mockRenderReport).toHaveBeenCalledTimes(1);
+    const opts = mockRenderReport.mock.calls[0][1];
+    expect(opts).toMatchObject({ prevWeek: undefined, nextWeek: undefined });
+  });
 });
