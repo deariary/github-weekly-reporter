@@ -192,6 +192,15 @@ describe("github-api", () => {
       await expect(addFileToRepo("token", "user/repo", "file.txt", "content", "msg"))
         .rejects.toThrow("Failed to add file.txt");
     });
+
+    it("includes PAT permission hint when status is 403", async () => {
+      vi.spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response("", { status: 404 }))
+        .mockResolvedValueOnce(new Response("", { status: 403 }));
+
+      await expect(addFileToRepo("token", "user/repo", "file.txt", "content", "msg"))
+        .rejects.toThrow(/Failed to add file\.txt: 403[\s\S]*Fine-grained PAT[\s\S]*Classic PAT/);
+    });
   });
 
   describe("enablePages", () => {
