@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { generateOGImage, generateIndexOGImage } from "./og-image.js";
+import type { Language } from "../types.js";
 
 describe("generateOGImage", () => {
   const data = {
@@ -34,6 +35,12 @@ describe("generateOGImage", () => {
   it("works with Korean language", async () => {
     const result = await generateOGImage({ ...data, language: "ko" });
     expect(Buffer.isBuffer(result)).toBe(true);
+  });
+
+  it("falls back to English font when language is unknown", async () => {
+    const result = await generateOGImage({ ...data, language: "xx" as Language });
+    expect(Buffer.isBuffer(result)).toBe(true);
+    expect(result[0]).toBe(0x89);
   });
 });
 
