@@ -512,4 +512,74 @@ describe("registerSetup (full flow)", () => {
     // Setup continues after Pages failure
     expect(mockGhPost).toHaveBeenCalled();
   });
+
+  it("aborts when user declines to retry invalid model", async () => {
+    mockPassword
+      .mockResolvedValueOnce("ghp_token")
+      .mockResolvedValueOnce("sk-key");
+    mockValidateToken.mockResolvedValue({ login: "testuser", tokenType: "classic" });
+    mockInput
+      .mockResolvedValueOnce("testuser")
+      .mockResolvedValueOnce("my-reports")
+      .mockResolvedValueOnce("Dev Pulse")
+      .mockResolvedValueOnce("bad-model");
+    mockSelect
+      .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
+      .mockResolvedValueOnce("UTC")
+      .mockResolvedValueOnce("openai");
+    mockValidateModel.mockResolvedValueOnce({ valid: false, error: "Model not found" });
+    // User declines retry → throws "Setup cancelled: invalid model name."
+    mockConfirm.mockResolvedValueOnce(false);
+
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("process.exit");
+    }) as never);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+
+    await expect(program.parseAsync(["node", "cli", "setup"])).rejects.toThrow("process.exit");
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Setup cancelled: invalid model name."),
+    );
+    // Should not have proceeded to repo creation
+    expect(mockEnsureRepo).not.toHaveBeenCalled();
+
+    exitSpy.mockRestore();
+    errorSpy.mockRestore();
+  });
+
+  it("throws when LLM secret fails to set", async () => {
+    setupPromptDefaults();
+    // First call (GH_PAT) succeeds, second call (LLM secret) fails
+    mockSetRepoSecret
+      .mockReset()
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false);
+
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("process.exit");
+    }) as never);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+
+    await expect(program.parseAsync(["node", "cli", "setup"])).rejects.toThrow("process.exit");
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to set OPENAI_API_KEY secret."),
+    );
+    // GH_PAT was set, then LLM secret attempted, but workflows never added
+    expect(mockSetRepoSecret).toHaveBeenCalledTimes(2);
+    expect(mockAddFileToRepo).not.toHaveBeenCalled();
+
+    exitSpy.mockRestore();
+    errorSpy.mockRestore();
+  });
 });
