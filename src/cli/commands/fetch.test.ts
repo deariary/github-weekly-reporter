@@ -772,6 +772,31 @@ describe("registerFetch (daily-fetch error)", () => {
     expect(errSpy).toHaveBeenCalledWith("Error:", expect.stringContaining("GitHub token required"));
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
+
+  it("logs raw value when error is not an Error instance and uses current time when --date omitted", async () => {
+    vi.clearAllMocks();
+    vi.stubEnv("GITHUB_TOKEN", "ghp_xxx");
+    vi.stubEnv("GITHUB_USERNAME", "alice");
+    // Force mkdir (called early in runDailyFetch) to reject with a non-Error value
+    // so the daily-fetch `error instanceof Error ? ... : error` branch returns the raw value.
+    // Omitting --date also exercises the `options.date ?? new Date()` default branch.
+    mockMkdir.mockRejectedValueOnce("daily-string-failure");
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation(((_code?: number) => undefined as never) as typeof process.exit);
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync(["node", "cli", "daily-fetch"]);
+
+    expect(errSpy).toHaveBeenCalledWith("Error:", "daily-string-failure");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    mockMkdir.mockResolvedValue(undefined);
+  });
 });
 
 // -------------------------------------------------------------------
@@ -899,5 +924,27 @@ describe("registerFetch (commit-msg)", () => {
 
     restore();
     expect(writes.join("")).toMatch(/^data: daily \d{4}\/W\d{2} /);
+  });
+
+  it("falls back to UTC and ./data when neither flags nor env are set", async () => {
+    // Remove env vars so `process.env[key]` returns undefined, exercising
+    // the final `?? "UTC"` / `?? "./data"` literal defaults in commit-msg.
+    const prevTimezone = process.env.TIMEZONE;
+    const prevDataDir = process.env.DATA_DIR;
+    delete process.env.TIMEZONE;
+    delete process.env.DATA_DIR;
+
+    const { writes, restore } = captureStdout();
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync(["node", "cli", "commit-msg", "weekly", "--date", "2026-04-07"]);
+
+    restore();
+    if (prevTimezone !== undefined) process.env.TIMEZONE = prevTimezone;
+    if (prevDataDir !== undefined) process.env.DATA_DIR = prevDataDir;
+    expect(writes.join("")).toMatch(/^data: weekly 2026\/W\d{2} /);
   });
 });
