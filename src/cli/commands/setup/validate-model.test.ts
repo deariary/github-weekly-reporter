@@ -101,6 +101,13 @@ describe("validateModel", () => {
     expect(result.error).toContain("Connection error");
   });
 
+  it("stringifies non-Error rejection in connection error", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValue("network down");
+    const result = await validateModel("openai", "key", "gpt-4");
+    expect(result.valid).toBe(false);
+    expect(result.error).toBe("Connection error: network down");
+  });
+
   it("returns invalid for non-model API error", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response("server error", { status: 500 }),
