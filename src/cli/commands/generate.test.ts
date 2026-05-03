@@ -154,6 +154,12 @@ describe("resolveOptions", () => {
     });
     expect(result.date).toBeUndefined();
   });
+
+  it("throws generic API key message when provider is not in keymap", () => {
+    expect(() =>
+      resolveOptions({ llmProvider: "unknown-provider", llmModel: "some-model" }),
+    ).toThrow("the provider's API key env var");
+  });
 });
 
 describe("registerGenerate", () => {
@@ -239,5 +245,31 @@ externalContributions: []
     ).rejects.toThrow("process.exit");
 
     exitSpy.mockRestore();
+  });
+
+  it("logs raw value when error is not an Error instance", async () => {
+    mockReadFile.mockRejectedValue("string-failure");
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => { throw new Error("process.exit"); }) as never);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerGenerate } = await import("./generate.js");
+    const program = new Command();
+    registerGenerate(program);
+
+    await expect(
+      program.parseAsync([
+        "node", "cli", "generate",
+        "--llm-provider", "openai",
+        "--llm-api-key", "sk-test",
+        "--llm-model", "gpt-4o",
+        "--date", "2026-04-01",
+      ]),
+    ).rejects.toThrow("process.exit");
+
+    expect(errorSpy).toHaveBeenCalledWith("Error:", "string-failure");
+
+    exitSpy.mockRestore();
+    errorSpy.mockRestore();
   });
 });
