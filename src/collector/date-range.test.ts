@@ -517,4 +517,15 @@ describe("parseLocalDate", () => {
     expect(() => parseLocalDate("2026-13-01", "UTC")).not.toThrow(); // valid format, invalid date handled by midnightInTz
     expect(() => parseLocalDate("2026/04/16", "UTC")).toThrow("Invalid date format");
   });
+
+  // Asia/Beirut springs forward at 00:00 on the last Sunday of March (in 2026,
+  // March 29). The local clock jumps from 23:59 EET directly to 01:00 EEST,
+  // so "midnight March 29" never exists in Beirut local time. The midnight
+  // resolver must fall back to the closest valid local instant — exercising
+  // the DST correction branch in midnightInTz.
+  it("resolves DST-skipped midnight in Asia/Beirut (last Sunday of March)", () => {
+    const result = parseLocalDate("2026-03-29", "Asia/Beirut");
+    // The local date in Beirut should still read 2026-03-29.
+    expect(toISODate(result, "Asia/Beirut")).toBe("2026-03-29");
+  });
 });
