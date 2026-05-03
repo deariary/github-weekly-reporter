@@ -656,4 +656,27 @@ describe("registerSetup (full flow)", () => {
     exitSpy.mockRestore();
     errorSpy.mockRestore();
   });
+
+  it("logs String(error) when the run rejects with a non-Error value", async () => {
+    setupPromptDefaults();
+    mockEnsureRepo.mockReset().mockRejectedValue("ensure-repo failed (string)");
+
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("process.exit");
+    }) as never);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+
+    await expect(program.parseAsync(["node", "cli", "setup"])).rejects.toThrow("process.exit");
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Error: ensure-repo failed (string)"),
+    );
+
+    exitSpy.mockRestore();
+    errorSpy.mockRestore();
+  });
 });
