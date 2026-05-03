@@ -208,4 +208,31 @@ describe("fetchReleases", () => {
 
     expect(result[0].body).toBeNull();
   });
+
+  it("filters out releases with null published_at (drafts)", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify([
+        { tag_name: "v1.0.0", name: "v1.0.0", body: "ok", html_url: "https://example.com/1", published_at: null },
+        makeRawRelease("v1.1.0", "2026-04-02T12:00:00Z"),
+      ]), { status: 200 }),
+    );
+
+    const result = await fetchReleases("token", ["org/repo"], range);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].tag).toBe("v1.1.0");
+  });
+
+  it("falls back to tag_name when name is null", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify([
+        { tag_name: "v2.0.0", name: null, body: "release", html_url: "https://example.com/2", published_at: "2026-04-02T12:00:00Z" },
+      ]), { status: 200 }),
+    );
+
+    const result = await fetchReleases("token", ["org/repo"], range);
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("v2.0.0");
+  });
 });
