@@ -220,4 +220,75 @@ describe("buildLLMContext", () => {
     const context = buildLLMContext(MOCK_INPUT);
     expect(context).not.toContain("releases:");
   });
+
+  it("omits PR labels and body when PR has neither", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      pullRequests: [
+        {
+          title: "chore: bare PR",
+          body: "",
+          url: "",
+          repository: "org/repo-a",
+          state: "open",
+          labels: [],
+          additions: 1,
+          deletions: 0,
+          changedFiles: 1,
+          author: "testuser",
+          createdAt: "2026-04-01T00:00:00Z",
+          mergedAt: null,
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("chore: bare PR");
+    expect(context).not.toContain("labels:");
+    expect(context).not.toContain("body:");
+  });
+
+  it("omits issue labels and body when issue has neither", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      pullRequests: [],
+      issues: [
+        {
+          title: "Bare issue",
+          body: "",
+          url: "",
+          repository: "org/repo-a",
+          state: "open",
+          labels: [],
+          author: "testuser",
+          createdAt: "2026-04-01T00:00:00Z",
+          closedAt: null,
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("Bare issue");
+    expect(context).not.toContain("labels:");
+    expect(context).not.toContain("body:");
+  });
+
+  it("omits release body when release has none", () => {
+    const input: NarrativeInput = {
+      ...MOCK_INPUT,
+      pullRequests: [],
+      issues: [],
+      releases: [
+        {
+          repo: "org/repo-a",
+          tag: "v1.0.0",
+          name: "Initial",
+          body: "",
+          url: "https://github.com/org/repo-a/releases/tag/v1.0.0",
+          publishedAt: "2026-04-01T10:00:00Z",
+        },
+      ],
+    };
+    const context = buildLLMContext(input);
+    expect(context).toContain("v1.0.0");
+    expect(context).not.toContain("body:");
+  });
 });

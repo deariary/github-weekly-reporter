@@ -553,6 +553,53 @@ describe("registerSetup (full flow)", () => {
     errorSpy.mockRestore();
   });
 
+  it("prompt validate callbacks accept and reject inputs as expected", async () => {
+    type PromptOpts = { validate?: (v: string) => true | string };
+    setupPromptDefaults();
+    // Use custom timezone so the timezone-input validate is also invoked.
+    mockSelect.mockReset();
+    mockSelect
+      .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
+      .mockResolvedValueOnce("__other__")
+      .mockResolvedValueOnce("openai");
+    mockInput.mockReset();
+    mockInput
+      .mockResolvedValueOnce("testuser")    // username
+      .mockResolvedValueOnce("my-reports")  // repo
+      .mockResolvedValueOnce("Dev Pulse")   // site title
+      .mockResolvedValueOnce("Asia/Taipei") // custom timezone
+      .mockResolvedValueOnce("gpt-4o");     // model
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+    await program.parseAsync(["node", "cli", "setup"]);
+
+    // password() calls: [0] = token, [1] = LLM API key
+    const tokenValidate = (mockPassword.mock.calls[0][0] as PromptOpts).validate!;
+    expect(tokenValidate("")).toBe("Token is required");
+    expect(tokenValidate("ghp_x")).toBe(true);
+
+    const llmKeyValidate = (mockPassword.mock.calls[1][0] as PromptOpts).validate!;
+    expect(llmKeyValidate("")).toBe("API key is required");
+    expect(llmKeyValidate("sk-x")).toBe(true);
+
+    // input() calls: [0]=username, [1]=repo, [2]=siteTitle, [3]=tz, [4]=model
+    const repoValidate = (mockInput.mock.calls[1][0] as PromptOpts).validate!;
+    expect(repoValidate("bad name!")).toBe("Invalid repository name");
+    expect(repoValidate("ok.repo-name_1")).toBe(true);
+
+    const tzValidate = (mockInput.mock.calls[3][0] as PromptOpts).validate!;
+    expect(tzValidate("Not/AReal_Zone")).toMatch(/Invalid timezone/);
+    expect(tzValidate("UTC")).toBe(true);
+
+    const modelValidate = (mockInput.mock.calls[4][0] as PromptOpts).validate!;
+    expect(modelValidate("")).toBe("Model name is required");
+    expect(modelValidate("gpt-4o")).toBe(true);
+  });
+
   it("throws when LLM secret fails to set", async () => {
     setupPromptDefaults();
     // First call (GH_PAT) succeeds, second call (LLM secret) fails
