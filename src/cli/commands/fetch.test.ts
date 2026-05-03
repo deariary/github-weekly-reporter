@@ -38,7 +38,15 @@ vi.mock("../../collector/fetch-contributions.js", () => ({
 }));
 
 vi.mock("../../collector/aggregate.js", () => ({
-  aggregateRepositories: () => [],
+  aggregateRepositories: vi.fn().mockReturnValue([]),
+}));
+
+vi.mock("../../collector/fetch-commits.js", () => ({
+  fetchCommitMessages: vi.fn().mockResolvedValue([]),
+}));
+
+vi.mock("../../collector/fetch-releases.js", () => ({
+  fetchReleases: vi.fn().mockResolvedValue([]),
 }));
 
 // Note: deployer/week.js is NOT mocked here. buildDailyPlan/buildWeeklyPlan
@@ -740,6 +748,66 @@ describe("registerFetch (weekly-fetch)", () => {
     // Only the review event should appear under events:
     expect(yaml).toContain("kind: review");
     expect(yaml).not.toMatch(/kind:\s*push/);
+  });
+
+  it("maps repo names and reduces commit-message totals when repositories aggregate is non-empty", async () => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    mockReadFile.mockRejectedValue(new Error("not found"));
+    mockWriteFile.mockResolvedValue(undefined);
+    mockMkdir.mockResolvedValue(undefined);
+    mockFetchContributions.mockResolvedValue({
+      username: "alice",
+      avatarUrl: "https://example.com/a.png",
+      profile: { name: null, bio: null, company: null, location: null, followers: 0, following: 0, publicRepos: 0 },
+      totalCommits: 4,
+      prsReviewed: 1,
+      dailyCommits: [],
+    });
+    const { fetchPRsByRefs } = await import("../../collector/fetch-repo-prs.js");
+    vi.mocked(fetchPRsByRefs).mockResolvedValue([]);
+    const { aggregateRepositories } = await import("../../collector/aggregate.js");
+    vi.mocked(aggregateRepositories).mockReturnValueOnce([
+      { name: "owner/alpha", commits: 0, prsOpened: 0, prsMerged: 0, issuesOpened: 0, issuesClosed: 0, url: "https://github.com/owner/alpha" },
+      { name: "owner/beta", commits: 0, prsOpened: 0, prsMerged: 0, issuesOpened: 0, issuesClosed: 0, url: "https://github.com/owner/beta" },
+    ]);
+    const { fetchCommitMessages } = await import("../../collector/fetch-commits.js");
+    vi.mocked(fetchCommitMessages).mockResolvedValueOnce([
+      { repo: "owner/alpha", messages: ["feat: a", "fix: b"] },
+      { repo: "owner/beta", messages: ["docs: c"] },
+    ]);
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({ items: [], total_count: 0 }), { status: 200 })),
+    );
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "weekly-fetch",
+      "--token", "ghp_test",
+      "--username", "alice",
+      "--data-dir", "./data",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    const writeCall = mockWriteFile.mock.calls.find((c) =>
+      typeof c[0] === "string" && c[0].includes("github-data.yaml"),
+    );
+    expect(writeCall).toBeDefined();
+    const yaml = writeCall![1] as string;
+    expect(yaml).toContain("owner/alpha");
+    expect(yaml).toContain("owner/beta");
+    expect(yaml).toContain("feat: a");
+    expect(fetchCommitMessages).toHaveBeenCalledWith(
+      "ghp_test",
+      "alice",
+      ["owner/alpha", "owner/beta"],
+      expect.any(Object),
+    );
   });
 });
 
