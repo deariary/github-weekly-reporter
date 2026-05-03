@@ -548,6 +548,131 @@ describe("registerFetch (weekly-fetch)", () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
 
+  it("searchWeeklyPRs: collects PR refs from search items and passes them to fetchPRsByRefs", async () => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    mockReadFile.mockRejectedValue(new Error("not found"));
+    mockWriteFile.mockResolvedValue(undefined);
+    mockMkdir.mockResolvedValue(undefined);
+    mockFetchContributions.mockResolvedValue({
+      username: "alice",
+      avatarUrl: "https://example.com/a.png",
+      profile: { name: null, bio: null, company: null, location: null, followers: 0, following: 0, publicRepos: 0 },
+      totalCommits: 0,
+      prsReviewed: 0,
+      dailyCommits: [],
+    });
+    const { fetchPRsByRefs } = await import("../../collector/fetch-repo-prs.js");
+    vi.mocked(fetchPRsByRefs).mockResolvedValue([]);
+
+    const items = [
+      { number: 7, pull_request: { url: "u" }, repository_url: "https://api.github.com/repos/owner/repo" },
+      // Issue without pull_request — should be filtered out
+      { number: 8, repository_url: "https://api.github.com/repos/owner/repo" },
+    ];
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({ items, total_count: items.length }), { status: 200 })),
+    );
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "weekly-fetch",
+      "--token", "ghp_test",
+      "--username", "alice",
+      "--data-dir", "./data",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    // PR #7 should reach fetchPRsByRefs (deduped: only one entry even though
+    // both author: and reviewed-by: qualifier searches return it).
+    const refs = vi.mocked(fetchPRsByRefs).mock.calls.at(-1)?.[1];
+    expect(refs).toEqual([{ repo: "owner/repo", number: 7 }]);
+  });
+
+  it("searchWeeklyPRs: throws on 401 from Search API and exits 1", async () => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    mockReadFile.mockRejectedValue(new Error("not found"));
+    mockWriteFile.mockResolvedValue(undefined);
+    mockMkdir.mockResolvedValue(undefined);
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation(((_code?: number) => undefined as never) as typeof process.exit);
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve(new Response("nope", { status: 401 })),
+    );
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "weekly-fetch",
+      "--token", "ghp_bad",
+      "--username", "alice",
+      "--data-dir", "./data",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    expect(errSpy).toHaveBeenCalledWith(
+      "Error:",
+      expect.stringContaining("GitHub Search API returned 401"),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it("searchWeeklyPRs: warns and continues on non-auth error (500)", async () => {
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    mockReadFile.mockRejectedValue(new Error("not found"));
+    mockWriteFile.mockResolvedValue(undefined);
+    mockMkdir.mockResolvedValue(undefined);
+    mockFetchContributions.mockResolvedValue({
+      username: "alice",
+      avatarUrl: "https://example.com/a.png",
+      profile: { name: null, bio: null, company: null, location: null, followers: 0, following: 0, publicRepos: 0 },
+      totalCommits: 0,
+      prsReviewed: 0,
+      dailyCommits: [],
+    });
+    const { fetchPRsByRefs } = await import("../../collector/fetch-repo-prs.js");
+    vi.mocked(fetchPRsByRefs).mockResolvedValue([]);
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve(new Response("boom", { status: 500 })),
+    );
+
+    const { Command } = await import("commander");
+    const { registerFetch } = await import("./fetch.js");
+    const program = new Command();
+    registerFetch(program);
+
+    await program.parseAsync([
+      "node", "cli", "weekly-fetch",
+      "--token", "ghp_test",
+      "--username", "alice",
+      "--data-dir", "./data",
+      "--timezone", "UTC",
+      "--date", "2026-04-01",
+    ]);
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Search API error (500)"));
+    // weekly-fetch still completes and writes github-data.yaml
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      expect.stringContaining("github-data.yaml"),
+      expect.any(String),
+      "utf-8",
+    );
+  });
+
   it("computes prsOpened/prsMerged and filters review events when assembling github-data", async () => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
