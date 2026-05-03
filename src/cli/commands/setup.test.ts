@@ -679,4 +679,63 @@ describe("registerSetup (full flow)", () => {
     exitSpy.mockRestore();
     errorSpy.mockRestore();
   });
+
+  it("prints 'LLM: Not configured' and skips LLM secret when provider is undefined", async () => {
+    mockPassword
+      .mockResolvedValueOnce("ghp_token")
+      .mockResolvedValueOnce("sk-key");
+    mockValidateToken.mockResolvedValue({ login: "testuser", tokenType: "classic" });
+    mockInput
+      .mockResolvedValueOnce("testuser")
+      .mockResolvedValueOnce("my-reports")
+      .mockResolvedValueOnce("Dev Pulse")
+      .mockResolvedValueOnce("gpt-4o");
+    mockSelect
+      .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
+      .mockResolvedValueOnce("UTC")
+      .mockResolvedValueOnce(undefined); // LLM provider undefined → no llmProvider in config
+    // validateModel default switch case returns valid:true regardless of provider
+    mockValidateModel.mockResolvedValue({ valid: true });
+    mockConfirm.mockResolvedValue(true);
+    mockEnsureRepo.mockResolvedValue(true);
+    mockSetRepoTopics.mockResolvedValue(undefined);
+    mockSetRepoSecret.mockResolvedValue(true);
+    mockAddFileToRepo.mockResolvedValue(undefined);
+    mockEnablePages.mockResolvedValue("https://testuser.github.io/my-reports");
+    mockSleep.mockResolvedValue(undefined);
+    mockGhPost.mockResolvedValue({ ok: true });
+    mockGhGet.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ workflow_runs: [] }),
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+    await program.parseAsync(["node", "cli", "setup"]);
+
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("LLM:           Not configured"),
+    );
+    // GH_PAT secret set; LLM secret block skipped
+    expect(mockSetRepoSecret).toHaveBeenCalledTimes(1);
+    expect(mockSetRepoSecret).toHaveBeenCalledWith(
+      "ghp_token",
+      "testuser/my-reports",
+      "GH_PAT",
+      "ghp_token",
+    );
+    // Weekly workflow built without llm-provider input
+    const weeklyCall = mockAddFileToRepo.mock.calls.find(
+      (call: unknown[]) => (call[2] as string).includes("weekly-report.yml"),
+    );
+    expect(weeklyCall).toBeDefined();
+    expect(weeklyCall![3]).not.toContain("llm-provider:");
+
+    logSpy.mockRestore();
+  });
 });
