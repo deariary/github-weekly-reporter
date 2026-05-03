@@ -179,6 +179,22 @@ describe("fetchCommitMessages", () => {
     vi.useRealTimers();
   });
 
+  it("ignores link header without rel=\"next\"", async () => {
+    // Link header present but only contains rel="prev" — parseNextUrl's regex
+    // does not match, so pagination should stop after the first page.
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify([makeRawCommit("only page")]), {
+        status: 200,
+        headers: { link: '<https://api.github.com/repos/org/repo/commits?page=1>; rel="prev"' },
+      }),
+    );
+
+    const result = await fetchCommitMessages("token", "user", ["org/repo"], range);
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(result[0].messages).toEqual(["only page"]);
+  });
+
   it("warns and skips on non-retryable server errors", async () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
