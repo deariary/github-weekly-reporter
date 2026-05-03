@@ -417,6 +417,94 @@ describe("registerRender", () => {
     expect(mockRenderReport).toHaveBeenCalledTimes(1);
   });
 
+  it("skips prev re-render and emits index entry without stats when prev github-data is missing", async () => {
+    const PREV_LLM_YAML = LLM_DATA_YAML.replace("Weekly Summary", "Previous Week Summary");
+
+    mockReadFile.mockImplementation((path: string) => {
+      // W13 has llm-data only; its github-data.yaml is missing.
+      if (path.includes("W13") && path.includes("github-data.yaml"))
+        return Promise.reject(new Error("not found"));
+      if (path.includes("W13") && path.includes("llm-data.yaml"))
+        return Promise.resolve(PREV_LLM_YAML);
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+
+    // mockAccess resolves for everything — W13 IS listed in allPaths via listCompletedReportDirs.
+    mockReaddir.mockImplementation((dir: string) => {
+      if (dir.endsWith("data")) return Promise.resolve(["2026"]);
+      if (dir.includes("2026")) return Promise.resolve(["W13", "W14"]);
+      return Promise.resolve([]);
+    });
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await program.parseAsync([
+      "node", "cli", "render",
+      "--data-dir", "./data",
+      "--output-dir", "./output",
+      "--base-url", "https://user.github.io/repo",
+      "--date", "2026-04-01",
+    ]);
+
+    // Current week renders, but prev re-render is skipped because prevGhData is null
+    // (covers `if (prevGhData && prevAiContent)` false branch).
+    expect(mockRenderReport).toHaveBeenCalledTimes(1);
+
+    // buildReportEntry was invoked for W13 with stats=undefined
+    // (covers `const stats = ghData ? {...} : undefined` false branch).
+    const w13EntryCall = mockBuildReportEntry.mock.calls.find(
+      (call: unknown[]) => (call[0] as string) === "2026/W13",
+    );
+    expect(w13EntryCall).toBeDefined();
+    expect(w13EntryCall![3]).toBeUndefined();
+  });
+
+  it("filters index entries when llm-data fails to load", async () => {
+    mockReadFile.mockImplementation((path: string) => {
+      // W13's llm-data.yaml fails to parse — entry should be filtered out.
+      if (path.includes("W13") && path.includes("llm-data.yaml"))
+        return Promise.reject(new Error("parse error"));
+      if (path.includes("github-data.yaml")) return Promise.resolve(GITHUB_DATA_YAML);
+      if (path.includes("llm-data.yaml")) return Promise.resolve(LLM_DATA_YAML);
+      return Promise.reject(new Error("not found"));
+    });
+
+    mockReaddir.mockImplementation((dir: string) => {
+      if (dir.endsWith("data")) return Promise.resolve(["2026"]);
+      if (dir.includes("2026")) return Promise.resolve(["W13", "W14"]);
+      return Promise.resolve([]);
+    });
+
+    const { registerRender } = await import("./render.js");
+    const program = new Command();
+    registerRender(program);
+
+    await program.parseAsync([
+      "node", "cli", "render",
+      "--data-dir", "./data",
+      "--output-dir", "./output",
+      "--base-url", "https://user.github.io/repo",
+      "--date", "2026-04-01",
+    ]);
+
+    // W13 is included in allPaths (its llm-data.yaml passes the access check),
+    // but its tryReadYaml fails inside buildReportEntries → entry filtered out
+    // (covers `if (!llmData) return null` true branch).
+    const w13EntryCall = mockBuildReportEntry.mock.calls.find(
+      (call: unknown[]) => (call[0] as string) === "2026/W13",
+    );
+    expect(w13EntryCall).toBeUndefined();
+
+    // Index page still receives the surviving entries.
+    expect(mockRenderIndexPage).toHaveBeenCalled();
+    const entries = mockRenderIndexPage.mock.calls[0][0] as Array<{ path: string }>;
+    expect(entries.every((e) => e.path !== "2026/W13")).toBe(true);
+  });
+
   it("uses environment variables for options", async () => {
     vi.stubEnv("BASE_URL", "https://env-base.example.com");
     vi.stubEnv("DATA_DIR", "./env-data");
