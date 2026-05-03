@@ -79,4 +79,42 @@ describe("renderIndexPage", () => {
     const html = renderIndexPage(entries(["2026/W14"]), undefined, "en", "Weekly Reports");
     expect(html).toContain("Weekly Reports");
   });
+
+  it("builds absolute og.png URL when baseUrl is provided", () => {
+    const html = renderIndexPage(
+      entries(["2026/W14"]),
+      undefined,
+      "en",
+      undefined,
+      "https://user.github.io/repo",
+    );
+    expect(html).toContain("https://user.github.io/repo/og.png");
+  });
+});
+
+describe("buildReportEntry", () => {
+  it("falls back to path when no slash is present", () => {
+    const entry = buildReportEntry("legacy");
+    expect(entry.path).toBe("legacy");
+    // path.split("/") returns ["legacy"], so [1] is undefined -> falls back to path
+    expect(entry.week).toBe("legacy");
+    expect(entry.year).toBe("legacy");
+    expect(entry.dateLabel).toContain("legacy");
+  });
+
+  it("propagates optional fields when provided", () => {
+    const entry = buildReportEntry(
+      "2026/W14",
+      "Title",
+      "Subtitle",
+      { commits: 1, prs: 2, reviews: 3 },
+      "2026-04-05",
+      "Overview text",
+    );
+    expect(entry.title).toBe("Title");
+    expect(entry.subtitle).toBe("Subtitle");
+    expect(entry.stats).toEqual({ commits: 1, prs: 2, reviews: 3 });
+    expect(entry.dateTo).toBe("2026-04-05");
+    expect(entry.overview).toBe("Overview text");
+  });
 });
