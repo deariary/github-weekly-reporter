@@ -353,6 +353,14 @@ describe("editorial theme", () => {
     expect(html).toContain("column-stack");
     expect(html).toContain("fixed-footer");
   });
+
+  it("buildIndexCSS returns valid CSS string", () => {
+    const theme = loadTheme("editorial");
+    const css = theme.buildIndexCSS("en");
+    expect(css).toContain(".index-header");
+    expect(css).toContain("Playfair Display");
+    expect(css).toContain("var(--e-bg)");
+  });
 });
 
 describe("swiss theme", () => {
@@ -424,5 +432,12 @@ describe("swiss theme", () => {
     expect(html).toContain("highlight-grid");
     expect(html).toContain("highlight-card");
     expect(html).toContain("feat: add OAuth flow");
+  });
+
+  it("buildIndexCSS returns valid CSS string", () => {
+    const theme = loadTheme("swiss");
+    const css = theme.buildIndexCSS("en");
+    expect(css).toContain(".index-layout");
+    expect(css).toContain("Space Grotesk");
   });
 });

@@ -74,4 +74,14 @@ describe("aggregateRepositories", () => {
   it("returns empty array when no activity", () => {
     expect(aggregateRepositories([], [])).toEqual([]);
   });
+
+  it("does not increment issuesClosed for open issues", () => {
+    const issues: Issue[] = [
+      makeIssue({ repository: "org/repo-a", state: "open" }),
+    ];
+    const result = aggregateRepositories([], issues);
+    expect(result).toHaveLength(1);
+    expect(result[0].issuesOpened).toBe(1);
+    expect(result[0].issuesClosed).toBe(0);
+  });
 });

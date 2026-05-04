@@ -137,4 +137,47 @@ describe("registerDeploy", () => {
       expect.objectContaining({ directory: "./env-output" }),
     );
   });
+
+  it("falls back to ./output when neither --directory nor OUTPUT_DIR is set", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "ghp_test");
+    vi.stubEnv("GITHUB_REPOSITORY", "owner/repo");
+    const savedOutputDir = process.env.OUTPUT_DIR;
+    delete process.env.OUTPUT_DIR;
+
+    try {
+      const { Command } = await import("commander");
+      const { registerDeploy } = await import("./deploy.js");
+      const program = new Command();
+      registerDeploy(program);
+
+      await program.parseAsync(["node", "cli", "deploy"]);
+
+      expect(mockDeploy).toHaveBeenCalledWith(
+        expect.objectContaining({ directory: "./output" }),
+      );
+    } finally {
+      if (savedOutputDir !== undefined) process.env.OUTPUT_DIR = savedOutputDir;
+    }
+  });
+
+  it("logs raw value when deploy rejects with a non-Error", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "ghp_test");
+    mockDeploy.mockRejectedValueOnce("string-failure");
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerDeploy } = await import("./deploy.js");
+    const program = new Command();
+    registerDeploy(program);
+
+    await expect(
+      program.parseAsync([
+        "node", "cli", "deploy",
+        "--directory", "./output",
+        "--repo", "owner/repo",
+      ]),
+    ).rejects.toThrow("process.exit");
+
+    expect(errorSpy).toHaveBeenCalledWith("Error:", "string-failure");
+  });
 });

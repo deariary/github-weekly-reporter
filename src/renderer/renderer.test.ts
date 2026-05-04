@@ -172,12 +172,16 @@ describe("renderReport", () => {
         { date: "2026-03-28", count: 0 },
         { date: "2026-03-29", count: 1 },
         { date: "2026-03-30", count: 5 },
-        { date: "2026-03-31", count: 8 },
-        { date: "2026-04-01", count: 10 },
+        { date: "2026-03-31", count: 7 },
+        { date: "2026-04-01", count: 8 },
+        { date: "2026-04-02", count: 10 },
       ],
     };
     const html = renderReport(data);
     expect(html).toContain("level-0");
+    expect(html).toContain("level-1");
+    expect(html).toContain("level-2");
+    expect(html).toContain("level-3");
     expect(html).toContain("level-4");
   });
 

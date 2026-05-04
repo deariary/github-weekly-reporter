@@ -517,4 +517,39 @@ describe("parseLocalDate", () => {
     expect(() => parseLocalDate("2026-13-01", "UTC")).not.toThrow(); // valid format, invalid date handled by midnightInTz
     expect(() => parseLocalDate("2026/04/16", "UTC")).toThrow("Invalid date format");
   });
+
+  // Asia/Beirut springs forward at 00:00 on the last Sunday of March (in 2026,
+  // March 29). The local clock jumps from 23:59 EET directly to 01:00 EEST,
+  // so "midnight March 29" never exists in Beirut local time. The midnight
+  // resolver must fall back to the closest valid local instant — exercising
+  // the DST correction branch in midnightInTz.
+  it("resolves DST-skipped midnight in Asia/Beirut (last Sunday of March)", () => {
+    const result = parseLocalDate("2026-03-29", "Asia/Beirut");
+    // The local date in Beirut should still read 2026-03-29.
+    expect(toISODate(result, "Asia/Beirut")).toBe("2026-03-29");
+  });
+
+  // Pacific/Norfolk follows Australian DST: clocks fall back at 03:00 NFDT
+  // (UTC+12) on the first Sunday of April (April 5 in 2026), becoming
+  // 02:00 NFT (UTC+11). The first guess for midnight is computed against the
+  // post-DST offset, but the actual midnight instant lies before the
+  // transition, so the resolver must subtract the residual local hour to
+  // hit true midnight — exercising the "subtract remainMs" recovery branch
+  // in midnightInTz.
+  it("resolves midnight on Pacific/Norfolk DST-end day via remainMs subtraction", () => {
+    const result = parseLocalDate("2026-04-05", "Pacific/Norfolk");
+    expect(toISODate(result, "Pacific/Norfolk")).toBe("2026-04-05");
+  });
+
+  // America/Havana springs forward at 00:00 local on the second Sunday of
+  // March (2026-03-08). Local 00:00 never exists that day, so neither the
+  // remainMs subtraction (lands on Mar 7) nor the 24h-remainMs addition
+  // (lands on Mar 9) can recover midnight — the resolver falls through to
+  // the brute-force search, exercising the false branch of the adjusted2
+  // check in midnightInTz.
+  it("falls through to brute-force search on America/Havana DST-skipped midnight", () => {
+    const result = parseLocalDate("2026-03-08", "America/Havana");
+    expect(result).toBeInstanceOf(Date);
+    expect(Number.isNaN(result.getTime())).toBe(false);
+  });
 });

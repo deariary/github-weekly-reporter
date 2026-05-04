@@ -122,6 +122,17 @@ describe("buildRSSFeed", () => {
     expect(feed).toContain("Mon, 06 Apr 2026 05:00:00 GMT");
   });
 
+  it("computes pubDate when positive offset crosses a month boundary", () => {
+    // dateRange.to = 2026-05-31 (Sunday). UTC midnight of (dateTo + 1 day)
+    // is 2026-06-01 00:00 UTC, which in JST (UTC+9) is 2026-06-01 09:00.
+    // localMonth (6) > m (5), so the localMonth-overflow branch is exercised.
+    // Monday 01:00 JST = Sunday 16:00 UTC.
+    const entries = [makeEntry("2026/W22", "Title", "Sub", "2026-05-31")];
+    const feed = buildRSSFeed(entries, defaultChannel({ timezone: "Asia/Tokyo" }));
+
+    expect(feed).toContain("Sun, 31 May 2026 16:00:00 GMT");
+  });
+
   it("omits pubDate when dateTo is not available", () => {
     const entry: ReportEntry = {
       path: "2026/W14",

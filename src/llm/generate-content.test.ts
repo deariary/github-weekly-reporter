@@ -278,6 +278,28 @@ highlights:
     await expect(generateContent(MOCK_INPUT, config)).rejects.toThrow("LLM content generation failed");
   });
 
+  it("parses ticker items from YAML when present", async () => {
+    const yamlWithTicker = `title: Test
+subtitle: Sub
+overview: Overview.
+summaries: []
+highlights: []
+ticker:
+  - label: SHIP
+    text: Released v1.0.0
+  - label: REVIEW
+    text: Reviewed 8 PRs
+  - text: Item with no label
+`;
+    mockGenerate.mockResolvedValue(yamlWithTicker);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    expect(result.ticker).toHaveLength(3);
+    expect(result.ticker?.[0]).toEqual({ label: "SHIP", text: "Released v1.0.0" });
+    expect(result.ticker?.[1]).toEqual({ label: "REVIEW", text: "Reviewed 8 PRs" });
+    expect(result.ticker?.[2]).toEqual({ label: "", text: "Item with no label" });
+  });
+
   it("handles summaries without chips field", async () => {
     const yamlNoChips = `title: Test
 subtitle: Sub
@@ -292,5 +314,59 @@ highlights: []
     const { generateContent } = await import("./index.js");
     const result = await generateContent(MOCK_INPUT, config);
     expect(result.summaries[0].chips).toBeUndefined();
+  });
+
+  it("defaults title, subtitle, and overview to empty strings when missing", async () => {
+    const yamlMissing = `summaries: []
+highlights: []
+`;
+    mockGenerate.mockResolvedValue(yamlMissing);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    expect(result.title).toBe("");
+    expect(result.subtitle).toBe("");
+    expect(result.overview).toBe("");
+  });
+
+  it("defaults chip color to 'default' when omitted", async () => {
+    const yamlNoColor = `title: Test
+subtitle: Sub
+overview: Overview.
+summaries:
+  - type: commit-summary
+    heading: 10 commits
+    body: Some commits.
+    chips:
+      - label: lines
+        value: "+10"
+highlights: []
+`;
+    mockGenerate.mockResolvedValue(yamlNoColor);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    expect(result.summaries[0].chips![0].color).toBe("default");
+  });
+
+  it("defaults ticker text to empty string when missing", async () => {
+    const yamlTickerNoText = `title: Test
+subtitle: Sub
+overview: Overview.
+summaries: []
+highlights: []
+ticker:
+  - label: SHIP
+`;
+    mockGenerate.mockResolvedValue(yamlTickerNoText);
+    const { generateContent } = await import("./index.js");
+    const result = await generateContent(MOCK_INPUT, config);
+    expect(result.ticker?.[0]).toEqual({ label: "SHIP", text: "" });
+  });
+
+  it("appends parse-error hint when provider error mentions parse", async () => {
+    mockGenerate.mockRejectedValue(new Error("failed to parse response"));
+    const { generateContent } = await import("./index.js");
+    await expect(generateContent(MOCK_INPUT, config)).rejects.toThrow(
+      /Retry the command, or try a larger\/different model\./,
+    );
   });
 });

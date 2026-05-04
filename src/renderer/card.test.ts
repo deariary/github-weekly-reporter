@@ -79,6 +79,12 @@ describe("generateCard", () => {
     expect(svg).toContain("Auth refactor completed");
   });
 
+  it("falls back to idle items when no ticker, no summaries, and no title", () => {
+    const svg = generateCard({ ...data, summaries: [], title: "" });
+    expect(svg).toContain("STANDBY");
+    expect(svg).toContain("Developer is recharging");
+  });
+
   it("escapes XML special characters", () => {
     const svg = generateCard({
       ...data,

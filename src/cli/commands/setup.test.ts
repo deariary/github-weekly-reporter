@@ -512,4 +512,230 @@ describe("registerSetup (full flow)", () => {
     // Setup continues after Pages failure
     expect(mockGhPost).toHaveBeenCalled();
   });
+
+  it("aborts when user declines to retry invalid model", async () => {
+    mockPassword
+      .mockResolvedValueOnce("ghp_token")
+      .mockResolvedValueOnce("sk-key");
+    mockValidateToken.mockResolvedValue({ login: "testuser", tokenType: "classic" });
+    mockInput
+      .mockResolvedValueOnce("testuser")
+      .mockResolvedValueOnce("my-reports")
+      .mockResolvedValueOnce("Dev Pulse")
+      .mockResolvedValueOnce("bad-model");
+    mockSelect
+      .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
+      .mockResolvedValueOnce("UTC")
+      .mockResolvedValueOnce("openai");
+    mockValidateModel.mockResolvedValueOnce({ valid: false, error: "Model not found" });
+    // User declines retry → throws "Setup cancelled: invalid model name."
+    mockConfirm.mockResolvedValueOnce(false);
+
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("process.exit");
+    }) as never);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+
+    await expect(program.parseAsync(["node", "cli", "setup"])).rejects.toThrow("process.exit");
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Setup cancelled: invalid model name."),
+    );
+    // Should not have proceeded to repo creation
+    expect(mockEnsureRepo).not.toHaveBeenCalled();
+
+    exitSpy.mockRestore();
+    errorSpy.mockRestore();
+  });
+
+  it("prompt validate callbacks accept and reject inputs as expected", async () => {
+    type PromptOpts = { validate?: (v: string) => true | string };
+    setupPromptDefaults();
+    // Use custom timezone so the timezone-input validate is also invoked.
+    mockSelect.mockReset();
+    mockSelect
+      .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
+      .mockResolvedValueOnce("__other__")
+      .mockResolvedValueOnce("openai");
+    mockInput.mockReset();
+    mockInput
+      .mockResolvedValueOnce("testuser")    // username
+      .mockResolvedValueOnce("my-reports")  // repo
+      .mockResolvedValueOnce("Dev Pulse")   // site title
+      .mockResolvedValueOnce("Asia/Taipei") // custom timezone
+      .mockResolvedValueOnce("gpt-4o");     // model
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+    await program.parseAsync(["node", "cli", "setup"]);
+
+    // password() calls: [0] = token, [1] = LLM API key
+    const tokenValidate = (mockPassword.mock.calls[0][0] as PromptOpts).validate!;
+    expect(tokenValidate("")).toBe("Token is required");
+    expect(tokenValidate("ghp_x")).toBe(true);
+
+    const llmKeyValidate = (mockPassword.mock.calls[1][0] as PromptOpts).validate!;
+    expect(llmKeyValidate("")).toBe("API key is required");
+    expect(llmKeyValidate("sk-x")).toBe(true);
+
+    // input() calls: [0]=username, [1]=repo, [2]=siteTitle, [3]=tz, [4]=model
+    const repoValidate = (mockInput.mock.calls[1][0] as PromptOpts).validate!;
+    expect(repoValidate("bad name!")).toBe("Invalid repository name");
+    expect(repoValidate("ok.repo-name_1")).toBe(true);
+
+    const tzValidate = (mockInput.mock.calls[3][0] as PromptOpts).validate!;
+    expect(tzValidate("Not/AReal_Zone")).toMatch(/Invalid timezone/);
+    expect(tzValidate("UTC")).toBe(true);
+
+    const modelValidate = (mockInput.mock.calls[4][0] as PromptOpts).validate!;
+    expect(modelValidate("")).toBe("Model name is required");
+    expect(modelValidate("gpt-4o")).toBe(true);
+  });
+
+  it("falls back to default actions URL when runs API fails", async () => {
+    setupPromptDefaults();
+    mockGhGet.mockReset().mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve({}),
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+    await program.parseAsync(["node", "cli", "setup"]);
+
+    const progressLog = logSpy.mock.calls.find((args) =>
+      typeof args[0] === "string" && args[0].includes("Progress:"),
+    );
+    expect(progressLog).toBeDefined();
+    expect(progressLog![0] as string).toContain(
+      "https://github.com/testuser/my-reports/actions",
+    );
+    expect(progressLog![0] as string).not.toContain("/runs/");
+
+    logSpy.mockRestore();
+  });
+
+  it("throws when LLM secret fails to set", async () => {
+    setupPromptDefaults();
+    // First call (GH_PAT) succeeds, second call (LLM secret) fails
+    mockSetRepoSecret
+      .mockReset()
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false);
+
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("process.exit");
+    }) as never);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+
+    await expect(program.parseAsync(["node", "cli", "setup"])).rejects.toThrow("process.exit");
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to set OPENAI_API_KEY secret."),
+    );
+    // GH_PAT was set, then LLM secret attempted, but workflows never added
+    expect(mockSetRepoSecret).toHaveBeenCalledTimes(2);
+    expect(mockAddFileToRepo).not.toHaveBeenCalled();
+
+    exitSpy.mockRestore();
+    errorSpy.mockRestore();
+  });
+
+  it("logs String(error) when the run rejects with a non-Error value", async () => {
+    setupPromptDefaults();
+    mockEnsureRepo.mockReset().mockRejectedValue("ensure-repo failed (string)");
+
+    const exitSpy = vi.spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("process.exit");
+    }) as never);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+
+    await expect(program.parseAsync(["node", "cli", "setup"])).rejects.toThrow("process.exit");
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Error: ensure-repo failed (string)"),
+    );
+
+    exitSpy.mockRestore();
+    errorSpy.mockRestore();
+  });
+
+  it("prints 'LLM: Not configured' and skips LLM secret when provider is undefined", async () => {
+    mockPassword
+      .mockResolvedValueOnce("ghp_token")
+      .mockResolvedValueOnce("sk-key");
+    mockValidateToken.mockResolvedValue({ login: "testuser", tokenType: "classic" });
+    mockInput
+      .mockResolvedValueOnce("testuser")
+      .mockResolvedValueOnce("my-reports")
+      .mockResolvedValueOnce("Dev Pulse")
+      .mockResolvedValueOnce("gpt-4o");
+    mockSelect
+      .mockResolvedValueOnce("en")
+      .mockResolvedValueOnce("brutalist")
+      .mockResolvedValueOnce("UTC")
+      .mockResolvedValueOnce(undefined); // LLM provider undefined → no llmProvider in config
+    // validateModel default switch case returns valid:true regardless of provider
+    mockValidateModel.mockResolvedValue({ valid: true });
+    mockConfirm.mockResolvedValue(true);
+    mockEnsureRepo.mockResolvedValue(true);
+    mockSetRepoTopics.mockResolvedValue(undefined);
+    mockSetRepoSecret.mockResolvedValue(true);
+    mockAddFileToRepo.mockResolvedValue(undefined);
+    mockEnablePages.mockResolvedValue("https://testuser.github.io/my-reports");
+    mockSleep.mockResolvedValue(undefined);
+    mockGhPost.mockResolvedValue({ ok: true });
+    mockGhGet.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ workflow_runs: [] }),
+    });
+
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const { Command } = await import("commander");
+    const { registerSetup } = await import("./setup.js");
+    const program = new Command();
+    registerSetup(program);
+    await program.parseAsync(["node", "cli", "setup"]);
+
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining("LLM:           Not configured"),
+    );
+    // GH_PAT secret set; LLM secret block skipped
+    expect(mockSetRepoSecret).toHaveBeenCalledTimes(1);
+    expect(mockSetRepoSecret).toHaveBeenCalledWith(
+      "ghp_token",
+      "testuser/my-reports",
+      "GH_PAT",
+      "ghp_token",
+    );
+    // Weekly workflow built without llm-provider input
+    const weeklyCall = mockAddFileToRepo.mock.calls.find(
+      (call: unknown[]) => (call[2] as string).includes("weekly-report.yml"),
+    );
+    expect(weeklyCall).toBeDefined();
+    expect(weeklyCall![3]).not.toContain("llm-provider:");
+
+    logSpy.mockRestore();
+  });
 });

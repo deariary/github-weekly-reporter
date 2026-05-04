@@ -192,6 +192,15 @@ describe("github-api", () => {
       await expect(addFileToRepo("token", "user/repo", "file.txt", "content", "msg"))
         .rejects.toThrow("Failed to add file.txt");
     });
+
+    it("includes PAT permission hint when status is 403", async () => {
+      vi.spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response("", { status: 404 }))
+        .mockResolvedValueOnce(new Response("", { status: 403 }));
+
+      await expect(addFileToRepo("token", "user/repo", "file.txt", "content", "msg"))
+        .rejects.toThrow(/Failed to add file\.txt: 403[\s\S]*Fine-grained PAT[\s\S]*Classic PAT/);
+    });
   });
 
   describe("enablePages", () => {
@@ -225,6 +234,93 @@ describe("github-api", () => {
       // No sleep is called when first attempt succeeds
       const result = await setRepoSecret("token", "user/repo", "SECRET", "value");
       expect(result).toBe(true);
+    });
+
+    it("returns false when public-key fetch fails on all 3 attempts", async () => {
+      // Pre-load libsodium so its real-timer init isn't affected by fake timers
+      const { default: _sodium } = await import("libsodium-wrappers");
+      await _sodium.ready;
+
+      vi.spyOn(globalThis, "fetch").mockResolvedValue(
+        new Response("", { status: 500 }),
+      );
+      vi.useFakeTimers();
+      const promise = setRepoSecret("token", "user/repo", "SECRET", "value");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      expect(result).toBe(false);
+      vi.useRealTimers();
+    });
+
+    it("retries public-key fetch and succeeds on second attempt", async () => {
+      const keyData = await makeValidKeyResponse();
+      vi.spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response("", { status: 500 })) // first key fetch fails
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify(keyData), { status: 200 }),
+        ) // second key fetch succeeds
+        .mockResolvedValueOnce(new Response("", { status: 200 })); // PUT secret succeeds
+
+      vi.useFakeTimers();
+      const promise = setRepoSecret("token", "user/repo", "SECRET", "value");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      expect(result).toBe(true);
+      vi.useRealTimers();
+    });
+
+    it("returns false when PUT fails on all 3 attempts", async () => {
+      const keyData = await makeValidKeyResponse();
+      vi.spyOn(globalThis, "fetch").mockImplementation(
+        async (_url, init?: RequestInit) => {
+          if ((init?.method ?? "GET") === "PUT") {
+            return new Response("error body", { status: 422 });
+          }
+          return new Response(JSON.stringify(keyData), { status: 200 });
+        },
+      );
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      vi.useFakeTimers();
+      const promise = setRepoSecret("token", "user/repo", "SECRET", "value");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      expect(result).toBe(false);
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Attempt 1/3 failed: 422"),
+      );
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Attempt 3/3 failed: 422"),
+      );
+      vi.useRealTimers();
+    });
+
+    it("falls back to empty body when PUT response text() rejects", async () => {
+      const keyData = await makeValidKeyResponse();
+      const failingPutResponse = {
+        ok: false,
+        status: 503,
+        text: () => Promise.reject(new Error("stream read failed")),
+      } as unknown as Response;
+      vi.spyOn(globalThis, "fetch").mockImplementation(
+        async (_url, init?: RequestInit) => {
+          if ((init?.method ?? "GET") === "PUT") {
+            return failingPutResponse;
+          }
+          return new Response(JSON.stringify(keyData), { status: 200 });
+        },
+      );
+      const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      vi.useFakeTimers();
+      const promise = setRepoSecret("token", "user/repo", "SECRET", "value");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      expect(result).toBe(false);
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Attempt 1/3 failed: 503 "),
+      );
+      vi.useRealTimers();
     });
   });
 

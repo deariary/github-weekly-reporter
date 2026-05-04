@@ -148,4 +148,28 @@ describe("getFontConfig", () => {
     expect(config.bodyFamily).toBeTruthy();
     expect(config.monoFamily).toContain("Space Mono");
   });
+
+  it("falls back to English font config for unknown language", () => {
+    const config = getFontConfig("xx" as Language);
+    const enConfig = getFontConfig("en");
+    expect(config).toEqual(enConfig);
+  });
+});
+
+describe("fallbacks for unknown language", () => {
+  it("getLocale falls back to English for unknown language", () => {
+    const fallback = getLocale("xx" as Language);
+    const en = getLocale("en");
+    expect(fallback).toBe(en);
+  });
+
+  it("formatNumber falls back to en-US tag for unknown language", () => {
+    expect(formatNumber(1234, "xx" as Language)).toBe("1,234");
+  });
+
+  it("formatDate falls back to en-US tag for unknown language", () => {
+    const result = formatDate("2026-04-03", "xx" as Language);
+    expect(result).toContain("2026");
+    expect(result).toContain("Apr");
+  });
 });

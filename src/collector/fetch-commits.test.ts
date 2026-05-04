@@ -112,6 +112,15 @@ describe("fetchCommitMessages", () => {
     expect(result).toEqual([]);
   });
 
+  it("skips falsy entries in repos list without calling fetch", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+
+    const result = await fetchCommitMessages("token", "user", [""], range);
+
+    expect(result).toEqual([]);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("retries on 429 rate limit", async () => {
     vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(
@@ -122,5 +131,90 @@ describe("fetchCommitMessages", () => {
     const result = await fetchCommitMessages("token", "user", ["org/repo"], range);
 
     expect(result[0].messages).toEqual(["after retry"]);
+  });
+
+  it("falls back to the default delay when retry-after header is missing", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(new Response("", { status: 429 }))
+      .mockResolvedValueOnce(pagedResponse([makeRawCommit("after default delay")]));
+
+    const promise = fetchCommitMessages("token", "user", ["org/repo"], range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(result[0].messages).toEqual(["after default delay"]);
+    vi.useRealTimers();
+  });
+
+  it("falls back to the default delay when retry-after value is invalid", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response("", { status: 429, headers: { "retry-after": "soon" } }),
+      )
+      .mockResolvedValueOnce(pagedResponse([makeRawCommit("after invalid delay")]));
+
+    const promise = fetchCommitMessages("token", "user", ["org/repo"], range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(result[0].messages).toEqual(["after invalid delay"]);
+    vi.useRealTimers();
+  });
+
+  it("gives up after retry exhaustion on persistent 429", async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response("", {
+        status: 429,
+        statusText: "Too Many Requests",
+        headers: { "retry-after": "0" },
+      }),
+    );
+
+    const promise = fetchCommitMessages("token", "user", ["org/repo"], range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(4);
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Failed to fetch commits"));
+    vi.useRealTimers();
+  });
+
+  it("ignores link header without rel=\"next\"", async () => {
+    // Link header present but only contains rel="prev" — parseNextUrl's regex
+    // does not match, so pagination should stop after the first page.
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response(JSON.stringify([makeRawCommit("only page")]), {
+        status: 200,
+        headers: { link: '<https://api.github.com/repos/org/repo/commits?page=1>; rel="prev"' },
+      }),
+    );
+
+    const result = await fetchCommitMessages("token", "user", ["org/repo"], range);
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(result[0].messages).toEqual(["only page"]);
+  });
+
+  it("warns and skips on non-retryable server errors", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(
+      new Response("", { status: 500, statusText: "Internal Server Error" }),
+    );
+
+    const result = await fetchCommitMessages("token", "user", ["org/broken"], range);
+
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Failed to fetch commits: 500 Internal Server Error"),
+    );
   });
 });

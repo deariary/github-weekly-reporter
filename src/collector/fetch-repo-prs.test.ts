@@ -119,4 +119,106 @@ describe("fetchPRsByRefs", () => {
     const result = await fetchPRsByRefs("token", refs);
     expect(result[0].author).toBe("unknown");
   });
+
+  it("retries on 429 honoring retry-after header then succeeds", async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response("", {
+          status: 429,
+          statusText: "Too Many Requests",
+          headers: { "retry-after": "1" },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(makeRawPR(1)), { status: 200 }),
+      );
+
+    const promise = fetchPRsByRefs("token", [{ repo: "owner/repo", number: 1 }]);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe("PR #1");
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("429"));
+    vi.useRealTimers();
+  });
+
+  it("falls back to default delay when retry-after is missing and exhausts retries", async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response("", { status: 429, statusText: "Too Many Requests" }),
+    );
+
+    const promise = fetchPRsByRefs("token", [{ repo: "owner/repo", number: 1 }]);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    // MAX_RETRIES = 3 → attempts 0..3 (4 total). On attempt 3, retry guard fails → returns null.
+    expect(fetchSpy).toHaveBeenCalledTimes(4);
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Warning: 1 of 1 PRs"));
+    vi.useRealTimers();
+  });
+
+  it("ignores invalid retry-after values and uses default delay", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response("", {
+          status: 429,
+          statusText: "Too Many Requests",
+          headers: { "retry-after": "not-a-number" },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(makeRawPR(1)), { status: 200 }),
+      );
+
+    const promise = fetchPRsByRefs("token", [{ repo: "owner/repo", number: 1 }]);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(result).toHaveLength(1);
+    vi.useRealTimers();
+  });
+
+  it("logs error message from response body when fetch fails", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ message: "Not Found" }), {
+        status: 404,
+        statusText: "Not Found",
+      }),
+    );
+
+    const result = await fetchPRsByRefs("token", [{ repo: "owner/repo", number: 1 }]);
+
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Not Found"));
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("    Not Found"));
+  });
+
+  it("omits the indented detail line when error body JSON has no message field", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ documentation_url: "https://docs.github.com" }), {
+        status: 422,
+        statusText: "Unprocessable Entity",
+      }),
+    );
+
+    const result = await fetchPRsByRefs("token", [{ repo: "owner/repo", number: 1 }]);
+
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("422"));
+    expect(
+      warnSpy.mock.calls.some((call) => /^\s{4}\S/.test(String(call[0]))),
+    ).toBe(false);
+  });
 });

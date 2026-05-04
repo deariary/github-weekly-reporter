@@ -291,4 +291,105 @@ describe("fetchEvents", () => {
     expect(result).toHaveLength(300);
     expect(fetchSpy).toHaveBeenCalledTimes(3);
   });
+
+  it("retries on 429 honoring retry-after header then succeeds", async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response("", {
+          status: 429,
+          statusText: "Too Many Requests",
+          headers: { "retry-after": "1" },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([makeRawEvent("1", "2026-04-03T12:00:00Z")]), {
+          status: 200,
+        }),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }));
+
+    const promise = fetchEvents("token", "testuser", range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("1");
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Rate limited"));
+    vi.useRealTimers();
+  });
+
+  it("uses default delay when retry-after header is missing", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response("", { status: 429, statusText: "Too Many Requests" }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([makeRawEvent("1", "2026-04-03T12:00:00Z")]), {
+          status: 200,
+        }),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }));
+
+    const promise = fetchEvents("token", "testuser", range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(result).toHaveLength(1);
+    vi.useRealTimers();
+  });
+
+  it("ignores invalid retry-after values and uses default delay", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response("", {
+          status: 429,
+          statusText: "Too Many Requests",
+          headers: { "retry-after": "not-a-number" },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify([makeRawEvent("1", "2026-04-03T12:00:00Z")]), {
+          status: 200,
+        }),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }));
+
+    const promise = fetchEvents("token", "testuser", range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(result).toHaveLength(1);
+    vi.useRealTimers();
+  });
+
+  it("returns empty when 429 retries are exhausted", async () => {
+    vi.useFakeTimers();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response("", {
+        status: 429,
+        statusText: "Too Many Requests",
+        headers: { "retry-after": "1" },
+      }),
+    );
+
+    const promise = fetchEvents("token", "testuser", range);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    // attempts 0..MAX_RETRIES (4 total) on the first page; final attempt warns and returns []
+    expect(fetchSpy).toHaveBeenCalledTimes(4);
+    expect(result).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("Failed to fetch events page 1"));
+    vi.useRealTimers();
+  });
 });
