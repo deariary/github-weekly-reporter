@@ -66,7 +66,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/libsodium-wrappers": "^0.8.2",
-    "@types/node": "^25.5.2",
+    "@types/node": "^26.1.0",
     "@types/sanitize-html": "^2.16.1",
     "@vitest/coverage-v8": "^4.1.2",
     "eslint": "^10.2.0",
