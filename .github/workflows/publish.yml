@@ -69,8 +69,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEW_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "Yuji Ueki"
+          git config user.email "unhappychoice@gmail.com"
           git add package.json package-lock.json
           git commit -m "${NEW_VERSION}"
           git tag "${NEW_VERSION}"
