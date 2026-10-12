@@ -1,6 +1,19 @@
 import { describe, it, expect } from "vitest";
 import { generateOGImage, generateIndexOGImage } from "./og-image.js";
 import type { Language } from "../types.js";
+import sharp from "sharp";
+
+// Max green channel within the bottom stats row, where green (#39d353) text sits
+const bottomRowMaxGreen = async (png: Buffer): Promise<number> => {
+  const region = await sharp(png)
+    .extract({ left: 90, top: 500, width: 160, height: 60 })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const { channels } = region.info;
+  return Array.from(region.data)
+    .filter((_, i) => i % channels === 1)
+    .reduce((max, g) => Math.max(max, g), 0);
+};
 
 describe("generateOGImage", () => {
   const data = {
@@ -42,6 +55,11 @@ describe("generateOGImage", () => {
     expect(Buffer.isBuffer(result)).toBe(true);
     expect(result[0]).toBe(0x89);
   });
+
+  it("renders the stats row inside the canvas", async () => {
+    const result = await generateOGImage(data);
+    expect(await bottomRowMaxGreen(result)).toBeGreaterThan(150);
+  });
 });
 
 describe("generateIndexOGImage", () => {
@@ -66,5 +84,10 @@ describe("generateIndexOGImage", () => {
   it("handles single report count", async () => {
     const result = await generateIndexOGImage({ ...data, reportCount: 1 });
     expect(Buffer.isBuffer(result)).toBe(true);
+  });
+
+  it("renders the report count inside the canvas", async () => {
+    const result = await generateIndexOGImage(data);
+    expect(await bottomRowMaxGreen(result)).toBeGreaterThan(150);
   });
 });
